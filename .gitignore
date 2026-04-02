@@ -1,0 +1,12 @@
+# Credenciales y tokens de Google (NUNCA commitear)
+credentials.json
+token.json
+token*.json
+
+# Variables de entorno
+.env
+.env.*
+
+# Archivos temporales del sistema
+*.DS_Store
+Thumbs.db
