@@ -10,12 +10,12 @@
   1. Identifica la cantidad total de semanas generadas en el JSON.
   2. Si el plan es de 1 o 2 semanas, usarás la PLANTILLA MAESTRA 2 SEMANAS (ID: `[PEGA_AQUÍ_EL_ID_DE_TU_SLIDE_DE_2_SEMANAS]`).
   3. Si el plan es de 3 o 4 semanas, usarás la PLANTILLA MAESTRA 4 SEMANAS (ID: `[PEGA_AQUÍ_EL_ID_DE_TU_SLIDE_DE_4_SEMANAS]`).
-  4. Utiliza tu herramienta MCP de Google Drive para **COPIAR (Duplicar)** el archivo maestro correspondiente.
+  4. Utiliza tu herramienta GWS CLI de Google Drive para **COPIAR (Duplicar)** el archivo maestro correspondiente.
   5. Nombra el nuevo archivo resultante exactamente así: `Plan_Nutricional_[Nombre_del_Paciente_extraído_del_JSON]`.
   6. Guarda en tu memoria el nuevo **File ID** de esta presentación recién creada. Todo el trabajo siguiente se hará sobre esta nueva copia, NUNCA sobre la maestra.
 
 - **PASO 2: Inyección de Etiquetas Generales (Vía Google Slides MCP)**
-  Utiliza tu herramienta MCP de Google Slides (buscar y reemplazar texto) sobre la NUEVA presentación. Reemplaza estas etiquetas globales con los valores de la raíz de tu JSON:
+  Utiliza tu herramienta GWS CLI de Google Slides (buscar y reemplazar texto) sobre la NUEVA presentación. Reemplaza estas etiquetas globales con los valores de la raíz de tu JSON:
   * Busca `{{Nombre_Paciente}}` -> Reemplaza con el valor de `"paciente"`.
   * Busca `{{Fecha_Plan}}` -> Reemplaza con el valor de `"fecha"`.
   * Busca `{{Diagnostico}}` -> Reemplaza con el valor de `"diagnostico_nutricional"`.
@@ -67,7 +67,7 @@
   Si en el JSON una llave tiene como valor un string vacío `""` (ej. un día que no hay menestra), TIENES LA OBLIGACIÓN de buscar la etiqueta correspondiente (ej. `{{S1_A_Lun_Men}}`) y reemplazarla por el texto vacío `""`. Esto es CRÍTICO para que desaparezca del diseño y no quede texto residual en la presentación final de la paciente. No debe quedar NINGUNA llave `{{ }}` visible en el documento final.
 
 - **PASO 4: Registro Financiero (Vía Google Sheets MCP)**
-  1. Utiliza tu herramienta MCP de Google Sheets para hacer un "Append Row" (Añadir fila) en el documento de Métricas (ID: `[PEGA_AQUÍ_EL_ID_DE_TU_GOOGLE_SHEET_DE_METRICAS]`).
+  1. Utiliza tu herramienta GWS CLI de Google Sheets para hacer un "Append Row" (Añadir fila) en el documento de Métricas (ID: `[PEGA_AQUÍ_EL_ID_DE_TU_GOOGLE_SHEET_DE_METRICAS]`).
   2. Los datos a insertar en las columnas A, B, C, D y E respectivamente son:
      `[Fecha del JSON]`, `[Nombre del Paciente]`, `[Cantidad de Semanas del Plan]`, `[Costo de la consulta detectado en el chat]`, `"Plan Inyectado y Finalizado"`.
 
