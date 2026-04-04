@@ -1,12 +1,22 @@
-# Credenciales y tokens de Google (NUNCA commitear)
-credentials.json
+# ==========================================
+# REGLAS DE SEGURIDAD MÉDICA (INQUEBRANTABLES)
+# ==========================================
+# Ignorar estrictamente todo el contenido de los pacientes (PDFs, historiales, JSONs generados)
+pacientes/*
+
+# EXCEPCIÓN: Forzar a Git a conservar la estructura de la carpeta para cuando se clone
+!pacientes/.gitkeep
+
+# ==========================================
+# SEGURIDAD DE SESIÓN LOCAL (OAUTH TOKENS)
+# ==========================================
+# Ignorar los tokens de sesión generados por GWS CLI en la máquina local
 token.json
-token*.json
+*token*.json
+.gws*
 
-# Variables de entorno
-.env
-.env.*
-
-# Archivos temporales del sistema
-*.DS_Store
+# ==========================================
+# ARCHIVOS DE SISTEMA LOCALES
+# ==========================================
+.DS_Store
 Thumbs.db
