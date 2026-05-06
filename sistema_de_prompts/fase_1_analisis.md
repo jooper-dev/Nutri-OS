@@ -11,7 +11,7 @@
   2. **Fecha Actual.**
   3. **Duración del Plan:** Identifica cuántas semanas requiere el plan (ej. 1 semana, 2 semanas, 4 semanas).
   4. **Edad Exacta, Peso y Talla.**
-  5. **Categoría de Edad Obligatoria:** Clasifica matemáticamente la edad del paciente en UNA y SOLO UNA de las siguientes categorías exactas (esto definirá la base de datos a usar):
+  5. **Categoría de Edad Obligatoria:** Clasifica matemáticamente la edad del paciente en UNA y SOLO UNA de las siguientes categorías exactas (esto definirá la base de datos a usar para recetas y reglas de exclusión):
      - `6_meses`
      - `7_8_meses`
      - `9_11_meses`
