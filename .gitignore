@@ -1,22 +1,33 @@
-# ==========================================
-# REGLAS DE SEGURIDAD MÉDICA (INQUEBRANTABLES)
-# ==========================================
-# Ignorar estrictamente todo el contenido de los pacientes (PDFs, historiales, JSONs generados)
+# ==========================================================================
+# DATOS CLÍNICOS — nunca se suben. Son historiales de menores.
+# ==========================================================================
 pacientes/*
-
-# EXCEPCIÓN: Forzar a Git a conservar la estructura de la carpeta para cuando se clone
 !pacientes/.gitkeep
+!pacientes/_EJEMPLO_Mateo/
+salidas/*
+!salidas/.gitkeep
 
-# ==========================================
-# SEGURIDAD DE SESIÓN LOCAL (OAUTH TOKENS)
-# ==========================================
-# Ignorar los tokens de sesión generados por GWS CLI en la máquina local
+# ==========================================================================
+# SECRETOS
+# Estas dos líneas faltaban en el repositorio anterior y por eso se filtraron
+# las credenciales de Google al hacerlo público. No las quites.
+# ==========================================================================
+.env
+.env.*
+credentials.json
+client_secret*.json
 token.json
 *token*.json
 .gws*
+*.pem
+*.key
 
-# ==========================================
-# ARCHIVOS DE SISTEMA LOCALES
-# ==========================================
+# ==========================================================================
+# ENTORNO
+# ==========================================================================
+__pycache__/
+*.py[cod]
+.venv/
+venv/
 .DS_Store
 Thumbs.db

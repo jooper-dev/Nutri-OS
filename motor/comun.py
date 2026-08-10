@@ -1,0 +1,212 @@
+"""
+Utilidades compartidas del motor Nutri-OS.
+
+Todo lo que lee archivos del repositorio pasa por aquí, para que exista
+un solo sitio donde cambiar formatos.
+"""
+
+from __future__ import annotations
+
+import json
+import re
+import unicodedata
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
+
+import yaml
+
+RAIZ = Path(__file__).resolve().parent.parent
+
+DIR_PROTOCOLOS = RAIZ / "protocolos"
+DIR_BIBLIOTECA = RAIZ / "biblioteca"
+DIR_DATOS = RAIZ / "datos"
+DIR_PACIENTES = RAIZ / "pacientes"
+DIR_SALIDAS = RAIZ / "salidas"
+DIR_REGLAS = RAIZ / "reglas_exclusion"
+
+DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+
+
+class ErrorNutriOS(Exception):
+    """Fallo controlado del motor. Se imprime limpio, sin traza."""
+
+
+# ---------------------------------------------------------------------------
+# Front-matter
+# ---------------------------------------------------------------------------
+
+_FM = re.compile(r"\A\s*---\s*\n(.*?)\n---\s*\n?(.*)\Z", re.DOTALL)
+
+
+def leer_front_matter(ruta: Path) -> tuple[dict, str]:
+    """Devuelve (metadatos, cuerpo) de un .md con front-matter YAML."""
+    texto = ruta.read_text(encoding="utf-8")
+    m = _FM.match(texto)
+    if not m:
+        raise ErrorNutriOS(
+            f"{ruta.name}: no tiene front-matter YAML delimitado por '---'."
+        )
+    try:
+        meta = yaml.safe_load(m.group(1)) or {}
+    except yaml.YAMLError as e:
+        raise ErrorNutriOS(f"{ruta.name}: front-matter mal formado — {e}") from e
+    if not isinstance(meta, dict):
+        raise ErrorNutriOS(f"{ruta.name}: el front-matter no es un diccionario.")
+    return meta, m.group(2)
+
+
+def normalizar(s: str) -> str:
+    """Minúsculas, sin tildes, sin espacios. Para comparar ids y familias."""
+    s = unicodedata.normalize("NFD", str(s))
+    s = "".join(c for c in s if unicodedata.category(c) != "Mn")
+    return s.strip().lower().replace(" ", "_")
+
+
+# ---------------------------------------------------------------------------
+# Modelos
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class Opcion:
+    """Una cosa que puede ocupar una ranura del plan: receta o alimento base."""
+
+    id: str
+    nombre: str
+    componente: str
+    edad_min_meses: int
+    alergenos: list[str] = field(default_factory=list)
+    familia: str = ""
+    momento: list[str] = field(default_factory=list)
+    aporta: list[str] = field(default_factory=list)
+    es_receta: bool = False
+    validada_en_cocina: bool = False
+    ruta: str = ""
+
+    def apta_para(self, ficha: dict) -> tuple[bool, str]:
+        """¿Puede esta opción entrar en el plan de este paciente?"""
+        if self.edad_min_meses > ficha["edad_meses"]:
+            return False, f"edad mínima {self.edad_min_meses} m"
+        alergias = {normalizar(a) for a in ficha.get("alergias") or []}
+        choque = alergias & {normalizar(a) for a in self.alergenos}
+        if choque:
+            return False, f"alérgeno: {', '.join(sorted(choque))}"
+        rechazos = {normalizar(r) for r in ficha.get("rechazos") or []}
+        if normalizar(self.id) in rechazos or normalizar(self.familia) in rechazos:
+            return False, "rechazo declarado"
+        for r in rechazos:
+            if r and r in normalizar(self.nombre):
+                return False, "rechazo declarado"
+        return True, ""
+
+
+# ---------------------------------------------------------------------------
+# Cargadores
+# ---------------------------------------------------------------------------
+
+
+def cargar_protocolo(id_protocolo: str) -> dict:
+    ruta = DIR_PROTOCOLOS / f"{id_protocolo}.yaml"
+    if not ruta.exists():
+        disponibles = sorted(p.stem for p in DIR_PROTOCOLOS.glob("*.yaml"))
+        raise ErrorNutriOS(
+            f"No existe el protocolo '{id_protocolo}'. Disponibles: {', '.join(disponibles)}"
+        )
+    try:
+        return yaml.safe_load(ruta.read_text(encoding="utf-8"))
+    except yaml.YAMLError as e:
+        raise ErrorNutriOS(
+            f"El protocolo '{id_protocolo}.yaml' tiene YAML mal formado.\n"
+            f"    Detalle: {e}"
+        ) from e
+
+
+def cargar_alimentos_base() -> list[Opcion]:
+    ruta = DIR_DATOS / "alimentos_base.yaml"
+    datos = yaml.safe_load(ruta.read_text(encoding="utf-8")) or {}
+    opciones: list[Opcion] = []
+    for componente, lista in datos.items():
+        for a in lista or []:
+            opciones.append(
+                Opcion(
+                    id=a["id"],
+                    nombre=a["nombre"],
+                    componente=componente,
+                    edad_min_meses=int(a.get("edad_min_meses", 0)),
+                    alergenos=a.get("alergenos") or [],
+                    familia=a.get("familia") or a["id"],
+                    aporta=a.get("aporta") or [],
+                    es_receta=False,
+                    ruta=str(ruta.relative_to(RAIZ)),
+                )
+            )
+    return opciones
+
+
+def cargar_biblioteca() -> tuple[list[Opcion], list[str]]:
+    """Lee /biblioteca/*.md. Devuelve (opciones, avisos)."""
+    opciones: list[Opcion] = []
+    avisos: list[str] = []
+    obligatorios = ("id", "titulo", "edad_min_meses", "componente")
+
+    for ruta in sorted(DIR_BIBLIOTECA.glob("*.md")):
+        if ruta.name.startswith("_"):
+            continue
+        try:
+            meta, _ = leer_front_matter(ruta)
+        except ErrorNutriOS as e:
+            avisos.append(str(e))
+            continue
+
+        faltan = [c for c in obligatorios if meta.get(c) in (None, "")]
+        if faltan:
+            avisos.append(f"{ruta.name}: faltan campos {', '.join(faltan)} — se omite.")
+            continue
+
+        opciones.append(
+            Opcion(
+                id=str(meta["id"]),
+                nombre=str(meta["titulo"]),
+                componente=str(meta["componente"]),
+                edad_min_meses=int(meta["edad_min_meses"]),
+                alergenos=meta.get("alergenos_presentes") or [],
+                familia=str(meta.get("familia") or ""),
+                momento=meta.get("momento") or [],
+                aporta=meta.get("aporta") or [],
+                es_receta=True,
+                validada_en_cocina=bool(meta.get("validada_en_cocina", False)),
+                ruta=str(ruta.relative_to(RAIZ)),
+            )
+        )
+    return opciones, avisos
+
+
+def cargar_ficha(carpeta_paciente: Path) -> dict:
+    ruta = carpeta_paciente / "ficha.md"
+    if not ruta.exists():
+        raise ErrorNutriOS(
+            f"No existe {ruta}. Ejecuta primero la Fase 1 (prompts/PC_CLINICO.md)."
+        )
+    meta, cuerpo = leer_front_matter(ruta)
+
+    obligatorios = ["paciente", "edad_meses", "semanas_plan", "protocolo_sugerido", "porciones"]
+    faltan = [c for c in obligatorios if meta.get(c) in (None, "")]
+    if faltan:
+        raise ErrorNutriOS(f"ficha.md: faltan campos obligatorios: {', '.join(faltan)}")
+
+    if meta.get("bloqueantes"):
+        raise ErrorNutriOS(
+            "La ficha declara bloqueantes; el pipeline se detiene:\n  - "
+            + "\n  - ".join(meta["bloqueantes"])
+        )
+
+    meta["_cuerpo"] = cuerpo
+    return meta
+
+
+def guardar_json(ruta: Path, datos: Any) -> None:
+    ruta.parent.mkdir(parents=True, exist_ok=True)
+    ruta.write_text(
+        json.dumps(datos, ensure_ascii=False, indent=2), encoding="utf-8"
+    )

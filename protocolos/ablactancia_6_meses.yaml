@@ -1,0 +1,155 @@
+# =========================================================================
+# ESQUELETO — Paty debe validar todos los campos marcados '# REVISAR' antes
+# del primer uso clínico. La anatomía del archivo es correcta; los números
+# son marcadores de posición tomados de guías generales, no una recomendación.
+# =========================================================================
+
+id: ablactancia_6_meses
+nombre: Inicio de alimentación complementaria — 6 meses
+edad_min_meses: 6
+edad_max_meses: 6
+reglas_exclusion: reglas_6_meses.md
+descripcion: >
+  Primer mes de alimentación complementaria. La leche materna o fórmula sigue
+  siendo la fuente principal de energía; la comida cumple función de aprendizaje,
+  aporte de hierro y exposición progresiva a sabores y texturas.
+
+# ---------------------------------------------------------------
+# ANATOMÍA DEL DÍA
+# Nota: estructura radicalmente distinta al protocolo escolar.
+# Menos tiempos, textura como componente explícito, y la leche
+# aparece como marco del día, no como una comida más.
+# ---------------------------------------------------------------
+marco_diario:
+  leche: a demanda            # se imprime como nota fija, no se planifica
+  nota_plan: >
+    La leche materna o fórmula continúa a libre demanda. Las comidas
+    no la reemplazan: la acompañan.
+
+comidas:
+  - id: almuerzo
+    nombre: Almuerzo
+    hora: "12:00 – 1:00"
+    componentes: [base_energetica, proteina_hierro, verdura, grasa]
+
+  - id: media_tarde            # REVISAR: ¿se introduce ya en el mes 6 o al mes 7?
+    nombre: Media tarde
+    hora: "3:30 – 4:00"
+    componentes: [fruta]
+    activo_desde_semana: 3     # REVISAR
+
+# ---------------------------------------------------------------
+# FRECUENCIAS SEMANALES
+# ---------------------------------------------------------------
+frecuencias_semanales:
+  - componente: proteina_hierro
+    en: [almuerzo]
+    veces: 7
+    modo: exacto
+    razon: el hierro es el nutriente crítico de esta etapa
+
+  - componente: grasa
+    en: [almuerzo]
+    veces: 7
+    modo: exacto
+    razon: densidad calórica en volumen pequeño
+
+  - componente: proteina_hierro
+    familia: higado                # REVISAR frecuencia con Paty
+    en: [almuerzo]
+    veces: 1
+    modo: exacto
+
+  - componente: proteina_hierro
+    familia: menestra
+    en: [almuerzo]
+    veces: 2                       # REVISAR
+    modo: exacto
+
+# ---------------------------------------------------------------
+# INTRODUCCIÓN PROGRESIVA
+# Regla propia de este protocolo: no existe en el escolar.
+# ---------------------------------------------------------------
+introduccion_progresiva:
+  activa: true
+  dias_por_alimento_nuevo: 3       # REVISAR (2–3 días es el rango habitual)
+  max_alimentos_nuevos_semana: 3   # REVISAR
+  alergenos_mayores:
+    introducir: true
+    uno_por_vez: true
+    dias_observacion: 3            # REVISAR
+    nota_qa: >
+      El plan debe señalar explícitamente qué día se introduce cada alérgeno
+      mayor y dejar constancia de la ventana de observación.
+
+# ---------------------------------------------------------------
+# TEXTURA
+# ---------------------------------------------------------------
+progresion_textura:
+  semana_1: papilla lisa
+  semana_2: papilla lisa
+  semana_3: aplastado con tenedor       # REVISAR
+  semana_4: aplastado con grumos suaves # REVISAR
+
+# ---------------------------------------------------------------
+# ROTACIONES
+# ---------------------------------------------------------------
+rotaciones:
+  - componente: base_energetica
+    en: [almuerzo]
+    reparto: {papa_pure: 2, camote_pure: 2, zapallo_pure: 1, arroz_pure: resto}
+
+  - componente: verdura
+    en: [almuerzo]
+    reparto: {zanahoria: 3, zapallo: resto}   # REVISAR: espinaca y brócoli fuera a los 6 m
+
+# ---------------------------------------------------------------
+# REGLAS ACOPLADAS
+# ---------------------------------------------------------------
+reglas_acopladas:
+  - si: proteina_hierro.menestra
+    entonces: fruta_vitc
+    ambito: mismo_dia
+    razon: absorción de hierro no hemínico
+
+# (La grasa no necesita regla acoplada: ya es obligatoria 7 veces por semana
+#  en 'frecuencias_semanales'.)
+
+# ---------------------------------------------------------------
+# EXCLUSIONES DURAS
+# Redundan con reglas_6_meses.md a propósito: el validador comprueba
+# ambas fuentes y falla si discrepan.
+# ---------------------------------------------------------------
+exclusiones_duras:
+  - miel
+  - sal_anadida
+  - azucar_anadida
+  - edulcorantes
+  - leche_vaca_como_bebida
+  - jugos
+  - frutos_secos_enteros
+  - alimentos_redondos_duros
+
+# ---------------------------------------------------------------
+# VARIEDAD
+# ---------------------------------------------------------------
+variedad:
+  no_repetir_dia_completo: false   # a esta edad la repetición es deseable
+  max_veces_misma_receta_semana: 4 # REVISAR
+  min_recetas_distintas_semana: 3
+
+# ---------------------------------------------------------------
+# AJUSTES POR DIAGNÓSTICO
+# ---------------------------------------------------------------
+preferencias_clinicas:
+  anemia:
+    priorizar_aporta: [hierro, vitamina_c]
+    nota_qa: valorar si corresponde suplementación además del plan
+
+  estrenimiento:
+    priorizar_aporta: [fibra, grasas_saludables]
+    nota_qa: revisar aporte hídrico y proporción de plátano/manzana
+
+  aplv:
+    exclusiones_extra: [lacteos, derivados_lacteos]
+    nota_qa: verificar trazas en productos procesados

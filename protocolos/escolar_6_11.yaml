@@ -1,0 +1,171 @@
+id: escolar_6_11
+nombre: Escolar 6–11 años
+edad_min_meses: 72
+edad_max_meses: 143
+reglas_exclusion: reglas_6_11_anos.md
+descripcion: >
+  Plan de 5 tiempos para niño escolar que ya come de la olla familiar.
+  Transcripción fiel de la estructura escrita por Paty en fase_3_ensamblaje.md
+  del repositorio original. Las frecuencias y rotaciones son suyas.
+
+# ---------------------------------------------------------------
+# ANATOMÍA DEL DÍA
+# ---------------------------------------------------------------
+comidas:
+  - id: desayuno
+    nombre: Desayuno
+    hora: "7:30 – 8:30"
+    componentes: [cereal, acompanante, grasa, fruta]
+
+  - id: media_manana
+    nombre: Media mañana
+    hora: "10:00 – 10:30"
+    componentes: [base, crujiente]
+
+  - id: almuerzo
+    nombre: Almuerzo
+    hora: "12:30 – 1:30"
+    componentes: [carbohidrato, proteina, menestra, ensalada_grasa, fruta_vitc, bebida]
+
+  - id: media_tarde
+    nombre: Media tarde
+    hora: "3:30 – 4:30"
+    componentes: [base]
+
+  - id: cena
+    nombre: Cena
+    hora: "6:00 – 7:00"
+    componentes: [carbohidrato, proteina, menestra, ensalada_grasa, fruta_vitc, bebida]
+
+# ---------------------------------------------------------------
+# FRECUENCIAS SEMANALES
+# ---------------------------------------------------------------
+frecuencias_semanales:
+  - componente: menestra
+    en: [almuerzo, cena]
+    veces: 3
+    modo: exacto
+
+  - componente: proteina
+    familia: pescado
+    en: [almuerzo, cena]
+    veces: 2
+    modo: exacto
+
+  - componente: proteina
+    familia: res
+    en: [almuerzo, cena]
+    veces: 1
+    modo: maximo
+    cada_dias: 15          # 1 vez cada 15 días
+
+  - componente: proteina
+    familia: pollo
+    en: [almuerzo, cena]
+    modo: relleno          # ocupa los días que no tomaron pescado ni res
+
+  - componente: acompanante
+    familia: huevo
+    en: [desayuno]
+    veces: 4
+    modo: maximo
+    minimo: 3
+
+  - componente: fruta
+    en: [desayuno]
+    veces: 7
+    modo: exacto
+
+  - componente: ensalada_grasa
+    en: [almuerzo, cena]
+    veces: 14
+    modo: exacto           # a diario, en ambas comidas
+
+  - componente: base
+    familia: yogurt
+    en: [media_manana]
+    veces: 3
+    modo: exacto
+
+# ---------------------------------------------------------------
+# ROTACIONES
+# ---------------------------------------------------------------
+rotaciones:
+  - componente: cereal
+    en: [desayuno]
+    reparto: {avena: 2, canihua: 2, harinas: 2, hojuelas: resto}
+
+  - componente: grasa
+    en: [desayuno]
+    reparto: {palta: 2, mantequilla_anacardos: 2, mantequilla_mani: 1, mantequilla_almendras: 1, aceite_oliva: resto}
+
+  - componente: ensalada_grasa
+    en: [almuerzo]
+    reparto: {palta: 3, aceite_oliva: 2, aceite_ajonjoli: 2}
+
+  - componente: ensalada_grasa
+    en: [cena]
+    reparto: {palta: 3, aceite_oliva: 2, aceite_ajonjoli: 2}
+
+  - componente: carbohidrato
+    en: [almuerzo, cena]
+    reparto: {quinua: 1, papa: 2, camote: 2, arroz: resto}
+
+# ---------------------------------------------------------------
+# REGLAS ACOPLADAS
+# ---------------------------------------------------------------
+reglas_acopladas:
+  - si: menestra
+    entonces: fruta_vitc
+    ambito: misma_comida
+    razon: absorción de hierro no hemínico
+
+  - si: desayuno.cereal
+    entonces: desayuno.fruta
+    ambito: misma_comida
+    razon: fruta fresca obligatoria a diario, con prioridad cítrica
+
+# ---------------------------------------------------------------
+# PRIORIDADES DE SELECCIÓN
+# ---------------------------------------------------------------
+prioridades:
+  fruta_vitc:
+    - naranja
+    - mandarina
+    - lima
+    - piña golden
+    - aguaymanto
+    - papaya
+    - kiwi
+    - fresa
+
+  bebida:
+    - agua                 # ½ taza / 4 onzas
+
+# ---------------------------------------------------------------
+# VARIEDAD
+# ---------------------------------------------------------------
+variedad:
+  no_repetir_dia_completo: true
+  max_veces_misma_receta_semana: 2
+  min_recetas_distintas_semana: 12
+  cena_puede_repetir_almuerzo: true      # regla original: "se puede repetir lo del almuerzo"
+
+# ---------------------------------------------------------------
+# AJUSTES POR DIAGNÓSTICO
+# ---------------------------------------------------------------
+preferencias_clinicas:
+  anemia:
+    priorizar_aporta: [hierro, vitamina_c]
+    subir_frecuencia: {componente: menestra, a: 4}
+
+  estrenimiento:
+    priorizar_aporta: [fibra, grasas_saludables]
+    nota_qa: revisar aporte hídrico total del plan
+
+  talla_baja:
+    priorizar_aporta: [proteina, zinc, energia]
+
+  selectividad:
+    max_recetas_nuevas_semana: 3
+    nota_qa: priorizar recetas ya aceptadas por el paciente

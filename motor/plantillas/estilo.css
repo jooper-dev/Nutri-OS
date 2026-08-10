@@ -1,0 +1,214 @@
+/* ==========================================================================
+   Nutri-OS — hoja de estilo de impresión
+   Estética GrowKids: crema, cobre y azul profundo. Sobrio, mucho aire.
+
+   La "Leyenda de énfasis" de P1 vive aquí: en el recetario, la negrita de
+   las cantidades y de los verbos la aplica este archivo automáticamente.
+   Paty ya no resalta nada a mano.
+
+   Tipografías: se declaran Inter y Montserrat por si están instaladas en la
+   máquina; si no, cae en una pila genérica sin romper la maqueta.
+   ========================================================================== */
+
+:root {
+  --crema:      #FBF8F3;
+  --crema-alt:  #F4EFE7;
+  --cobre:      #B0714A;
+  --cobre-claro:#D9A87E;
+  --azul:       #24374E;
+  --tinta:      #2E2A26;
+  --tenue:      #8A8078;
+  --linea:      #E4DCD1;
+}
+
+@page {
+  size: A4;
+  margin: 16mm 14mm 18mm 14mm;
+  @bottom-center {
+    content: counter(page);
+    font-family: "Inter", "Carlito", sans-serif;
+    font-size: 8pt;
+    color: var(--tenue);
+  }
+}
+
+@page :first { margin: 0; }
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: "Inter", "Carlito", "DejaVu Sans", sans-serif;
+  font-size: 9.5pt;
+  line-height: 1.45;
+  color: var(--tinta);
+  margin: 0;
+}
+
+/* ----------------------------------------------------------- Portada ---- */
+
+.portada {
+  page-break-after: always;
+  height: 297mm;
+  padding: 45mm 24mm 24mm 24mm;
+  background: var(--crema);
+}
+
+.portada .marca {
+  font-family: "Montserrat", "Carlito", sans-serif;
+  font-size: 10pt;
+  letter-spacing: .32em;
+  text-transform: uppercase;
+  color: var(--cobre);
+  margin-bottom: 4mm;
+}
+
+.portada h1 {
+  font-family: "Montserrat", "Carlito", sans-serif;
+  font-size: 30pt;
+  font-weight: 600;
+  line-height: 1.12;
+  color: var(--azul);
+  margin: 0 0 3mm 0;
+}
+
+.portada .sub {
+  font-size: 12pt;
+  color: var(--tenue);
+  margin-bottom: 14mm;
+}
+
+.filete { height: 2px; width: 34mm; background: var(--cobre); margin: 10mm 0; }
+
+.datos { width: 100%; border-collapse: collapse; margin-top: 6mm; }
+.datos td { padding: 2.4mm 0; border-bottom: 1px solid var(--linea); vertical-align: top; }
+.datos td.k {
+  width: 38mm; color: var(--tenue); font-size: 8pt;
+  letter-spacing: .1em; text-transform: uppercase;
+}
+.datos td.v { font-size: 10.5pt; color: var(--azul); }
+
+.aviso {
+  margin-top: 16mm; padding: 5mm 6mm;
+  background: var(--crema-alt); border-left: 3px solid var(--cobre-claro);
+  font-size: 8.5pt; color: var(--tenue); line-height: 1.5;
+}
+
+/* -------------------------------------------------------------- Plan ---- */
+
+.seccion { page-break-before: always; }
+
+h2.titulo-seccion {
+  font-family: "Montserrat", "Carlito", sans-serif;
+  font-size: 15pt; font-weight: 600; color: var(--azul);
+  margin: 0 0 1mm 0;
+}
+.kicker {
+  font-size: 8pt; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--cobre); margin-bottom: 5mm;
+}
+
+.dias-grid { column-count: 2; column-gap: 9mm; }
+
+.dia {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  margin-bottom: 5mm;
+  padding-bottom: 1mm;
+}
+
+.dia h3 {
+  font-family: "Montserrat", "Carlito", sans-serif;
+  font-size: 11pt; font-weight: 600; color: var(--azul);
+  margin: 0 0 2mm 0; padding-bottom: 1.4mm;
+  border-bottom: 1.5px solid var(--cobre-claro);
+}
+
+table.comidas { width: 100%; border-collapse: collapse; }
+
+table.comidas td { padding: 1.6mm 1.4mm; vertical-align: top; border-bottom: 1px solid var(--linea); }
+
+td.comida {
+  width: 22mm;
+  font-family: "Montserrat", "Carlito", sans-serif;
+  font-size: 8pt; font-weight: 600; color: var(--azul);
+}
+td.comida .hora {
+  display: block; font-weight: 400; font-size: 6.5pt;
+  color: var(--tenue); letter-spacing: .04em; margin-top: .6mm;
+}
+
+td.detalle { font-size: 8pt; }
+td.detalle .item { display: block; padding: .5mm 0; }
+td.detalle .cant { color: var(--tenue); }
+td.detalle .ref  { color: var(--cobre); font-size: 7.5pt; }
+
+.nota-marco {
+  margin: 4mm 0 6mm 0; padding: 3.5mm 5mm;
+  background: var(--crema-alt); border-left: 3px solid var(--cobre-claro);
+  font-size: 8.5pt; color: var(--tinta);
+}
+
+/* --------------------------------------------------------- Recetario ---- */
+
+.receta { page-break-before: always; }
+
+.receta .acento { height: 3mm; width: 100%; margin-bottom: 8mm; }
+
+.receta h2 {
+  font-family: "Montserrat", "Carlito", sans-serif;
+  font-size: 20pt; font-weight: 600; color: var(--azul);
+  margin: 0 0 1mm 0;
+}
+.receta .subtitulo { font-size: 11pt; color: var(--tenue); margin-bottom: 3mm; }
+
+.receta .stats {
+  font-size: 9pt; color: var(--azul); letter-spacing: .04em;
+  padding: 2mm 0; border-top: 1px solid var(--linea); border-bottom: 1px solid var(--linea);
+  margin-bottom: 2mm;
+}
+.receta .etiquetas { font-size: 7.5pt; color: var(--tenue); margin-bottom: 7mm; }
+
+.receta h3 {
+  font-family: "Montserrat", "Carlito", sans-serif;
+  font-size: 8pt; font-weight: 600; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--cobre);
+  margin: 6mm 0 2.5mm 0;
+}
+
+.receta .nota-nutri {
+  font-size: 10pt; line-height: 1.6; color: var(--tinta);
+  padding-left: 5mm; border-left: 2px solid var(--cobre-claro);
+  margin-bottom: 2mm;
+}
+
+.receta ul { margin: 0; padding-left: 4.5mm; }
+.receta li { margin-bottom: 1.4mm; }
+.receta li strong { color: var(--azul); font-weight: 600; }
+
+.receta ol.pasos { margin: 0; padding: 0; list-style: none; counter-reset: paso; }
+.receta ol.pasos li {
+  counter-increment: paso; position: relative;
+  padding-left: 9mm; margin-bottom: 2.6mm;
+}
+.receta ol.pasos li::before {
+  content: counter(paso, decimal-leading-zero);
+  position: absolute; left: 0; top: 0;
+  font-family: "Montserrat", "Carlito", sans-serif;
+  font-size: 8.5pt; color: var(--cobre-claro); font-weight: 600;
+}
+.receta ol.pasos li strong { color: var(--azul); font-weight: 600; }
+
+.receta .conservacion {
+  margin-top: 7mm; padding-top: 2.5mm; border-top: 1px solid var(--linea);
+  font-size: 8pt; color: var(--tenue); letter-spacing: .04em;
+}
+
+/* ---------------------------------------------------------- Índice ------ */
+
+.indice { page-break-after: always; }
+.indice ul { list-style: none; padding: 0; }
+.indice li {
+  padding: 2mm 0; border-bottom: 1px solid var(--linea);
+  font-size: 10pt; color: var(--azul);
+}
+.indice li .meta { float: right; color: var(--tenue); font-size: 8.5pt; }

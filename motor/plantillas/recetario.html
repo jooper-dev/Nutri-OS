@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><title>Recetario · {{ p.paciente }}</title></head>
+<body>
+
+<section class="portada">
+  <div class="marca">GrowKids · Nutrición pediátrica</div>
+  <h1>Recetario</h1>
+  <div class="sub">{{ p.paciente }}</div>
+  <div class="filete"></div>
+
+  <table class="datos">
+    <tr><td class="k">Edad</td><td class="v">{{ p.edad_texto }}</td></tr>
+    <tr><td class="k">Fecha</td><td class="v">{{ p.fecha }}</td></tr>
+    <tr><td class="k">Recetas</td><td class="v">{{ recetas|length }}</td></tr>
+  </table>
+
+  <div class="aviso">
+    Estas son las preparaciones que aparecen en el plan de {{ p.paciente }},
+    ajustadas a su edad y a sus restricciones. Las cantidades del plan mandan
+    sobre el rendimiento de la receta.
+    <br><br>
+    Nut. Patricia López · GrowKids
+  </div>
+</section>
+
+<section class="indice">
+  <div class="kicker">Contenido</div>
+  <h2 class="titulo-seccion">Recetas de este plan</h2>
+  <ul>
+    {% for r in recetas %}
+    <li>{{ r.meta.titulo }}<span class="meta">{{ r.stats }}</span></li>
+    {% endfor %}
+  </ul>
+</section>
+
+{% for r in recetas %}
+<section class="receta">
+  <div class="acento" style="background: {{ r.meta.acento or '#D9A87E' }}"></div>
+  <h2>{{ r.meta.titulo }}</h2>
+  {% if r.meta.subtitulo %}<div class="subtitulo">{{ r.meta.subtitulo }}</div>{% endif %}
+  <div class="stats">{{ r.stats }}</div>
+  {% if r.etiquetas %}<div class="etiquetas">{{ r.etiquetas }}</div>{% endif %}
+
+  {% if r.nota %}
+  <h3>Nota de la nutricionista</h3>
+  <div class="nota-nutri">{{ r.nota }}</div>
+  {% endif %}
+
+  <h3>Ingredientes</h3>
+  <ul>{% for i in r.ingredientes %}<li>{{ i|safe }}</li>{% endfor %}</ul>
+
+  <h3>Preparación</h3>
+  <ol class="pasos">{% for s in r.pasos %}<li>{{ s|safe }}</li>{% endfor %}</ol>
+
+  {% if r.ideas %}
+  <h3>Ideas</h3>
+  <ul>{% for i in r.ideas %}<li>{{ i|safe }}</li>{% endfor %}</ul>
+  {% endif %}
+
+  {% if r.conservacion %}<div class="conservacion">{{ r.conservacion }}</div>{% endif %}
+</section>
+{% endfor %}
+
+</body></html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><title>Plan · {{ p.paciente }}</title></head>
+<body>
+
+<section class="portada">
+  <div class="marca">GrowKids · Nutrición pediátrica</div>
+  <h1>Plan de alimentación</h1>
+  <div class="sub">{{ p.paciente }}</div>
+  <div class="filete"></div>
+
+  <table class="datos">
+    <tr><td class="k">Edad</td><td class="v">{{ p.edad_texto }}</td></tr>
+    <tr><td class="k">Fecha</td><td class="v">{{ p.fecha }}</td></tr>
+    <tr><td class="k">Duración</td><td class="v">{{ p.semanas|length }} semana{{ 's' if p.semanas|length > 1 else '' }}</td></tr>
+    {% if p.diagnostico_texto %}<tr><td class="k">Enfoque</td><td class="v">{{ p.diagnostico_texto|trim }}</td></tr>{% endif %}
+    {% if p.alergias %}<tr><td class="k">Alergias</td><td class="v">{{ p.alergias|join(', ') }}</td></tr>{% endif %}
+    {% if p.rechazos %}<tr><td class="k">No consume</td><td class="v">{{ p.rechazos|join(', ') }}</td></tr>{% endif %}
+  </table>
+
+  <div class="aviso">
+    Plan individual, elaborado a partir de la evaluación clínica de {{ p.paciente }}.
+    No es transferible a otro niño ni sustituye el seguimiento en consulta.
+    Ante cualquier reacción o duda, comunícate antes de continuar.
+    <br><br>
+    Nut. Patricia López · GrowKids
+  </div>
+</section>
+
+{% if p.marco_diario and p.marco_diario.nota_plan %}
+<div class="nota-marco">{{ p.marco_diario.nota_plan|trim }}</div>
+{% endif %}
+
+{% for s in p.semanas %}
+<section class="seccion">
+  <div class="kicker">Plan de alimentación</div>
+  <h2 class="titulo-seccion">Semana {{ s.semana }}</h2>
+
+  <div class="dias-grid">
+  {% for dia, comidas in s.dias.items() %}
+  <div class="dia">
+    <h3>{{ dia }}</h3>
+    <table class="comidas">
+      {% for cid, c in comidas.items() %}
+      <tr>
+        <td class="comida">{{ c.nombre }}{% if c.hora %}<span class="hora">{{ c.hora }}</span>{% endif %}</td>
+        <td class="detalle">
+          {% for i in c['items'] %}
+          <span class="item">{{ i.nombre }}{% if i.cantidad %}<span class="cant">, {{ i.cantidad }}</span>{% endif %}{% if i.receta_id %} <span class="ref">· receta</span>{% endif %}</span>
+          {% endfor %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endfor %}
+  </div>
+</section>
+{% endfor %}
+
+</body></html>
