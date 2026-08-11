@@ -76,6 +76,40 @@ DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Doming
 # decisión clínica, y tiene que poder discutirse leyendo esta línea.
 COMPONENTES_SIN_FILTRO_TEXTURA = {"bebida", "grasa", "ensalada_grasa"}
 
+# Componentes que NO exigen variedad: pueden repetirse sin límite y no cuentan
+# para la comprobación de suficiencia de la biblioteca.
+#
+# El motor confundía dos cosas distintas bajo una sola condición ("¿es receta o
+# alimento base?"). Que el arroz vaya a diario y que el agua vaya dos veces al
+# día es normal: son fondo de plato y bebida, y nadie espera variedad ahí. Que
+# el snack de media mañana sea el mismo las 14 veces de la quincena no lo es —
+# y en selectividad severa no es solo aburrido, es contraproducente: la
+# monotonía impuesta encoge el repertorio que el plan tendría que ampliar.
+#
+#   fondo de plato, guarnición y bebida
+#       carbohidrato · base_energetica · grasa · ensalada_grasa · bebida
+#   el plato en sí
+#       base · acompanante · crujiente · cereal · proteina · proteina_hierro ·
+#       menestra · fruta · fruta_vitc · verdura
+#
+# `ensalada_grasa` está en la primera lista por su papel, no por su nombre:
+# cumple exactamente el de `grasa` —vehículo de grasa que acompaña al plato—,
+# hasta el punto de que escolar_eliminacion_4 sustituye una por la otra. Pedir
+# que "ensalada con palta" no se repita más de dos veces por semana no protege
+# a nadie; solo hace imposible un protocolo que la pide a diario.
+#
+# Solo la primera lista vive aquí, porque es la excepción. Todo lo demás exige
+# variedad, incluido lo que no aparezca en ninguna de las dos: si mañana se
+# añade un componente y nadie se acuerda de clasificarlo, el sistema pecará de
+# exigente y lo dirá, que es el lado correcto por el que equivocarse.
+COMPONENTES_SIN_EXIGENCIA_DE_VARIEDAD = {
+    "carbohidrato",
+    "base_energetica",
+    "grasa",
+    "ensalada_grasa",
+    "bebida",
+}
+
 
 class ErrorNutriOS(Exception):
     """Fallo controlado del motor. Se imprime limpio, sin traza."""

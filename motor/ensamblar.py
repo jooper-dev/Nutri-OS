@@ -22,6 +22,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from comun import (
+    COMPONENTES_SIN_EXIGENCIA_DE_VARIEDAD,
     DIAS,
     DIR_PACIENTES,
     ErrorNutriOS,
@@ -265,8 +266,12 @@ def construir_semana(
         demanda[(comp, c)] += 1
     for (comp, c), n in demanda.items():
         opciones = rep.candidatas(comp, c)
-        if any(not o.es_receta for o in opciones):
-            continue  # los alimentos base no tienen tope de repetición
+        # Antes se saltaba cualquier componente que tuviera un alimento base,
+        # dándolo por resuelto. Eso hacía invisible el peor hueco posible: un
+        # solo alimento base cubriendo 14 ranuras. Ahora la exención es por
+        # componente y está escrita en comun.py, con el porqué.
+        if comp in COMPONENTES_SIN_EXIGENCIA_DE_VARIEDAD:
+            continue
         techo = len(opciones) * tope
         if opciones and n > techo:
             raise ErrorNutriOS(
