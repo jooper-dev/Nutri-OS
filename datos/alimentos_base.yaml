@@ -30,12 +30,12 @@
 
 carbohidrato:
   # Cajones: grano · grano_andino · tuberculo · raiz · pasta
-  - {id: arroz,    nombre: "Arroz",             edad_min_meses: 6,  alergenos: [], textura: seca}
-  - {id: papa,     nombre: "Papa sancochada",   edad_min_meses: 6,  alergenos: [], textura: blanda}
-  - {id: camote,   nombre: "Camote sancochado", edad_min_meses: 6,  alergenos: [], aporta: [fibra, betacarotenos], textura: blanda}
-  - {id: quinua,   nombre: "Quinua",            edad_min_meses: 6,  alergenos: [], aporta: [proteina], textura: humeda}
-  - {id: fideos,   nombre: "Fideos",            edad_min_meses: 8,  alergenos: [gluten], textura: humeda}
-  - {id: yuca,     nombre: "Yuca sancochada",   edad_min_meses: 8,  alergenos: [], textura: blanda}
+  - {id: arroz,    nombre: "Arroz",             edad_min_meses: 6,  alergenos: [], familia: grano,        textura: seca}
+  - {id: papa,     nombre: "Papa sancochada",   edad_min_meses: 6,  alergenos: [], familia: tuberculo,    textura: blanda}
+  - {id: camote,   nombre: "Camote sancochado", edad_min_meses: 6,  alergenos: [], familia: tuberculo,    aporta: [fibra, betacarotenos], textura: blanda}
+  - {id: quinua,   nombre: "Quinua",            edad_min_meses: 6,  alergenos: [], familia: grano_andino, aporta: [proteina], textura: humeda}
+  - {id: fideos,   nombre: "Fideos",            edad_min_meses: 8,  alergenos: [gluten], familia: pasta,  textura: humeda}
+  - {id: yuca,     nombre: "Yuca sancochada",   edad_min_meses: 8,  alergenos: [], familia: raiz,         textura: blanda}
 
 base_energetica:
   - {id: papa_pure,    nombre: "Papa aplastada",    edad_min_meses: 6, alergenos: [], textura: humeda}
@@ -49,7 +49,7 @@ cereal:
   # 'hojuelas: resto' y aparecer tres veces por semana en vez de dos, que es lo
   # que dice la rotación. No se gana nada y se pierde una frecuencia escrita.
   - {id: avena,      nombre: "Avena",              edad_min_meses: 6, alergenos: [], familia: avena,    aporta: [fibra], textura: humeda}
-  - {id: canihua,    nombre: "Cañihua",            edad_min_meses: 6, alergenos: [], familia: canihua,  aporta: [hierro, proteina], textura: humeda}
+  - {id: canihua,    nombre: "Cañihua",            edad_min_meses: 6, alergenos: [], familia: grano_andino, aporta: [hierro, proteina], textura: humeda}
   - {id: maca,       nombre: "Harina de maca",     edad_min_meses: 12, alergenos: [], familia: harinas, textura: humeda}
   - {id: algarrobo,  nombre: "Harina de algarrobo", edad_min_meses: 12, alergenos: [], familia: harinas, aporta: [hierro], textura: humeda}
   - {id: siete_sem,  nombre: "Harina 7 semillas",  edad_min_meses: 12, alergenos: [ajonjoli, soya], familia: harinas, textura: humeda}
@@ -96,8 +96,8 @@ grasa:
   # Cajones: aceite · fruto_graso · una familia propia por mantequilla.
   # Las tres mantequillas NO se unifican: comparten alérgeno pero la rotación
   # las reparte 2/1/1 a propósito, y una ficha puede rechazar solo una.
-  - {id: aceite_oliva_g, nombre: "Aceite de oliva",  edad_min_meses: 6,  alergenos: [], familia: aceite_oliva, aporta: [grasas_saludables], textura: liquida}
-  - {id: palta_g,        nombre: "Palta",            edad_min_meses: 6,  alergenos: [], familia: palta,        aporta: [grasas_saludables], textura: humeda}
+  - {id: aceite_oliva_g, nombre: "Aceite de oliva",  edad_min_meses: 6,  alergenos: [], familia: aceite,       aporta: [grasas_saludables], textura: liquida}
+  - {id: palta_g,        nombre: "Palta",            edad_min_meses: 6,  alergenos: [], familia: fruto_graso,  aporta: [grasas_saludables], textura: humeda}
   - {id: mant_anacardo,  nombre: "Mantequilla de anacardos", edad_min_meses: 12, alergenos: [frutos_secos], familia: mantequilla_anacardos, textura: humeda}
   - {id: mant_mani,      nombre: "Mantequilla de maní",      edad_min_meses: 12, alergenos: [frutos_secos], familia: mantequilla_mani, textura: humeda}
   - {id: mant_almendra,  nombre: "Mantequilla de almendras", edad_min_meses: 12, alergenos: [frutos_secos], familia: mantequilla_almendras, textura: humeda}

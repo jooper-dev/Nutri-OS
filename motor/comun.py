@@ -85,6 +85,25 @@ class Opcion:
     validada_en_cocina: bool = False
     ruta: str = ""
 
+    def responde_a(self, clave: str) -> bool:
+        """¿Este alimento responde a una clave del protocolo? Familia o id.
+
+        El protocolo nombra alimentos en dos niveles, y los dos son legítimos:
+
+          {tuberculo: 4}   el cajón — "cuatro tubérculos por semana", y que el
+                           catálogo decida cuál según el paciente y su región.
+          {camote: 2}      el alimento — cuando hay una razón clínica para ESE
+                           alimento y no para su cajón.
+
+        Sin el segundo nivel, escribir un protocolo obligaría a elegir entre
+        abrirlo a la región o conservar el criterio clínico fino. Con los dos,
+        una misma rotación puede mezclarlos: {camote: 2, tuberculo: 2, grano: resto}.
+        """
+        if not clave:
+            return True
+        c = normalizar(clave)
+        return c == normalizar(self.familia) or c == normalizar(self.id)
+
     def apta_para(self, ficha: dict) -> tuple[bool, str]:
         """¿Puede esta opción entrar en el plan de este paciente?"""
         if self.edad_min_meses > ficha["edad_meses"]:

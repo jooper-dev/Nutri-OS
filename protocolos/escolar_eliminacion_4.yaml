@@ -95,16 +95,21 @@ rotaciones:
 
   - componente: grasa
     en: [desayuno]
-    reparto: {palta: 3, aceite_oliva: resto}
+    reparto: {fruto_graso: 3, aceite: resto}
 
   - componente: grasa
     en: [almuerzo]
-    reparto: {palta: 3, aceite_oliva: resto}
+    reparto: {fruto_graso: 3, aceite: resto}
 
   - componente: grasa
     en: [cena]
-    reparto: {palta: 3, aceite_oliva: resto}
+    reparto: {fruto_graso: 3, aceite: resto}
 
+  # Aquí NO se abre el cajón 'tuberculo', a diferencia de escolar_6_11: el 4/2
+  # a favor de la papa no es un reparto cualquiera, es un alimento aceptado por
+  # un paciente con ocho. Sustituirlo por 'tuberculo: 6' lo repartiría 3/3 y
+  # cambiaría el plan. Cuando haya alimentos regionales en el catálogo, abrir
+  # esta rotación es una decisión clínica de Paty, no una consecuencia técnica.
   - componente: carbohidrato
     en: [almuerzo, cena]
     reparto: {papa: 4, camote: 2, quinua: 1, arroz: resto}

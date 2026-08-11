@@ -72,7 +72,9 @@ class Repertorio:
     def candidatas(self, componente: str, comida: str, familia: str = "") -> list[Opcion]:
         salida = []
         for o in self.por_componente.get(componente, []):
-            if familia and normalizar(o.familia) != normalizar(familia):
+            # Dos niveles: la clave del protocolo puede ser un cajón (familia)
+            # o un alimento concreto (id). Ver Opcion.responde_a.
+            if familia and not o.responde_a(familia):
                 continue
             # Una receta solo entra en los momentos que declara.
             if o.es_receta and o.momento and comida not in o.momento:

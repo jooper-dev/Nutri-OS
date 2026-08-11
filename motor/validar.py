@@ -184,7 +184,7 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
     for s in plan["semanas"]:
         n = s["semana"]
         conteo_comp: Counter = Counter()
-        conteo_fam: Counter = Counter()
+        opciones_en: dict[tuple[str, str], list] = {}
         for dia, comidas in s["dias"].items():
             for cid, comida in comidas.items():
                 for item in comida["items"]:
@@ -193,7 +193,7 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
                         (o for o in catalogo.values() if o.nombre == item["nombre"]), None
                     )
                     if op:
-                        conteo_fam[(item["componente"], normalizar(op.familia), cid)] += 1
+                        opciones_en.setdefault((item["componente"], cid), []).append(op)
 
         for regla in protocolo.get("frecuencias_semanales") or []:
             if regla.get("cada_dias") or regla.get("modo") == "relleno":
@@ -206,7 +206,17 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
                 continue
 
             if fam:
-                real = sum(conteo_fam[(comp, normalizar(fam), c)] for c in ambito)
+                # Se cuenta con el mismo criterio de dos niveles que usa el
+                # ensamblador (familia o id). Si aquí se contara solo por
+                # familia, una regla escrita con un alimento concreto —
+                # 'proteina/pavita'— daría siempre cero y bloquearía un plan
+                # que en realidad la cumple.
+                real = sum(
+                    1
+                    for c in ambito
+                    for op in opciones_en.get((comp, c), [])
+                    if op.responde_a(fam)
+                )
                 etiqueta = f"{comp}/{fam}"
             else:
                 real = sum(conteo_comp[(comp, c)] for c in ambito)

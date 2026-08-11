@@ -95,9 +95,13 @@ rotaciones:
     en: [desayuno]
     reparto: {avena: 2, canihua: 2, harinas: 2, hojuelas: resto}
 
+  # Una rotación puede mezclar cajones y alimentos concretos. Aquí 'fruto_graso'
+  # y 'aceite' son cajones —para que una grasa regional pueda entrar sin tocar
+  # este archivo— y las tres mantequillas van por su nombre, porque el 2/1/1
+  # entre ellas es una decisión de variedad, no del cajón.
   - componente: grasa
     en: [desayuno]
-    reparto: {palta: 2, mantequilla_anacardos: 2, mantequilla_mani: 1, mantequilla_almendras: 1, aceite_oliva: resto}
+    reparto: {fruto_graso: 2, mantequilla_anacardos: 2, mantequilla_mani: 1, mantequilla_almendras: 1, aceite: resto}
 
   - componente: ensalada_grasa
     en: [almuerzo]
@@ -107,9 +111,14 @@ rotaciones:
     en: [cena]
     reparto: {palta: 3, aceite_oliva: 2, aceite_ajonjoli: 2}
 
+  # 'papa: 2, camote: 2' pasa a ser 'tuberculo: 4': hoy el cajón solo contiene
+  # esos dos y el reparto sale igual (2 y 2), pero cuando el catálogo tenga
+  # olluco, oca o chuño, una familia de la sierra los recibe sin que haya que
+  # escribir un protocolo aparte. La quinua y el arroz siguen por su nombre:
+  # la quinua está por su proteína, y abrir el arroz a su cajón metería fideos.
   - componente: carbohidrato
     en: [almuerzo, cena]
-    reparto: {quinua: 1, papa: 2, camote: 2, arroz: resto}
+    reparto: {quinua: 1, tuberculo: 4, arroz: resto}
 
 # ---------------------------------------------------------------
 # REGLAS ACOPLADAS

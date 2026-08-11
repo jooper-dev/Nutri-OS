@@ -48,6 +48,7 @@ from comun import (  # noqa: E402
     DIR_PACIENTES,
     DIR_PROTOCOLOS,
     ErrorNutriOS,
+    cargar_alimentos_base,
     cargar_biblioteca,
     leer_front_matter,
 )
@@ -100,6 +101,40 @@ try:
 except ErrorNutriOS as e:
     linea(False, str(e))
     errores.append("biblioteca")
+
+print("\n— Claves de los protocolos —")
+# Una clave de rotación o de frecuencia que no corresponde a ningún alimento no
+# falla en ninguna parte: el motor no encuentra candidatos, degrada la ranura y
+# el plan sale con otra cosa. Un 'camotes' por 'camote' se pierde así. Se
+# comprueba aquí, que es lo que se ejecuta después de editar un protocolo.
+if "biblioteca" in errores:
+    linea(False, "no se puede comprobar: la biblioteca no cargó")
+else:
+    universo = recetas + cargar_alimentos_base()
+    for ruta in sorted(DIR_PROTOCOLOS.glob("*.yaml")):
+        d = yaml.safe_load(ruta.read_text(encoding="utf-8")) or {}
+        claves = [
+            (r["componente"], k)
+            for r in (d.get("rotaciones") or [])
+            for k in (r.get("reparto") or {})
+        ]
+        claves += [
+            (r["componente"], r["familia"])
+            for r in (d.get("frecuencias_semanales") or [])
+            if r.get("familia")
+        ]
+        huerfanas = sorted(
+            {
+                f"{comp}/{clave}"
+                for comp, clave in claves
+                if not any(o.componente == comp and o.responde_a(clave) for o in universo)
+            }
+        )
+        if huerfanas:
+            linea(False, f"{ruta.name} — sin ningún alimento detrás: {', '.join(huerfanas)}")
+            errores.append(ruta.name)
+        else:
+            linea(True, f"{ruta.name} — {len(claves)} clave(s) de rotación/frecuencia resuelven")
 
 print("\n— Fotografía —")
 try:
