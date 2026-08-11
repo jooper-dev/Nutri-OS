@@ -30,6 +30,7 @@ CONTEXTO:
   diagnostico: anemia ferropénica leve
   momento_objetivo: desayuno
   texturas_excluidas: [humeda, liquida, mixta]
+  riesgo_disfagia: true
 ```
 
 Cómo se aplica cada campo:
@@ -40,6 +41,18 @@ Cómo se aplica cada campo:
 - **`diagnostico`** — orienta qué beneficio destacas en la Nota de la Nutricionista y qué priorizas al elegir entre variantes equivalentes. No cambia la seguridad ni inventa propiedades.
 - **`momento_objetivo`** — el momento del día donde el plan usará esta receta. Condiciona el formato (portátil, tibio, cuchara) y el rendimiento.
 - **`texturas_excluidas`** — texturas que el paciente no tolera. Se tratan como las alergias en un punto: **no se maquillan**. No entregues una versión "menos húmeda" de una crema; si la preparación no puede existir en una textura tolerada, dilo en la Nota para Paty y detente. Y declara la `textura` real de lo que escribiste, no la que convendría.
+- **`riesgo_disfagia: true`** — el bolo de este paciente puede atascarse al bajar. Lo produce una esofagitis eosinofílica, una estenosis, una impactación previa o una disfagia descrita. **No cambia la textura que declaras: cambia cómo se prepara y cómo se come.** No es lo mismo que `texturas_excluidas`, y de hecho suele contradecirla — lo seco es a la vez lo que este niño acepta y lo que se le atasca.
+
+  Cuando lo recibas, ajusta la receta en estos cuatro frentes y deja constancia de cada ajuste en la Nota para Paty:
+
+  1. **Humectación.** Todo lo seco lleva algo que lo ablande en boca: un aceite, un puré de fruta, una pasta que se disuelva. Prefiere el horneado tierno al horneado quebradizo, y la carne cocida en su jugo a la carne dorada hasta secar.
+  2. **Tamaño de bocado.** Piezas pequeñas, de un bocado, que no obliguen a morder y arrastrar. Nada que se coma a mordiscos de una pieza grande.
+  3. **Corte.** La carne siempre **a través de la fibra**, nunca a lo largo: la fibra larga es el bolo que se atasca. Lo fibroso —carne, algunas verduras de tallo— se corta corto o se deshilacha.
+  4. **Líquido acompañante.** Indica en Preparación o en Ideas que se sirva con agua u otra bebida tolerada al lado. Una línea, sin dramatismo.
+
+  **Alimentos de riesgo alto de impactación**, a evitar salvo que la receta los transforme: pan y masas densas, carne en trozo, arroz suelto en volumen, frutos secos enteros, trozos de fruta seca dentro de una preparación crujiente (dos texturas y bolo pegajoso a la vez).
+
+  Y una regla que está por encima de las cuatro: **si la preparación no puede existir sin ser un bolo seco y compacto, dilo y detente.** Es preferible devolver "esta receta no es segura para este paciente" que entregar una con advertencias al pie. La alerta de seguridad pediátrica va primera en la Nota para Paty, como siempre.
 
 **Si no recibes bloque `CONTEXTO:`, operas en modo biblioteca general:** audita con criterio abierto y deriva la edad desde los ingredientes, como siempre.
 

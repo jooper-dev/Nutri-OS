@@ -25,6 +25,7 @@ diagnostico_texto: >
 alergias: [lacteos, gluten, huevo, soya, carne_mamifero, frutos_secos]
 rechazos: [brocoli, espinaca, vainita, betarraga, zanahoria, zapallo, ensalada]
 texturas_excluidas: [humeda, liquida, mixta]
+riesgo_disfagia: true
 favoritos: [arroz, papa, platano, pollo, pescado, manzana]
 
 porciones:

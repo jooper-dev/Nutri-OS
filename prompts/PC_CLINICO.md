@@ -61,6 +61,7 @@ alergias: [lacteos]            # lacteos | huevo | gluten | frutos_secos | pesca
                                # soya | ajonjoli | mariscos
 rechazos: [pescado, brocoli]   # aversiones declaradas, no alergias
 texturas_excluidas: []         # seca | crujiente | blanda | humeda | liquida | mixta
+riesgo_disfagia: false         # true si el paso del bolo por el esófago es un riesgo
 favoritos: [pollo, palta]
 
 porciones:                     # medidas caseras, derivadas del requerimiento
@@ -86,6 +87,20 @@ bloqueantes: []                # lista de datos vitales ausentes; si NO está va
 - **`alergias`** es la lista más delicada del sistema. Ante cualquier mención ambigua ("le cae mal la leche"), **inclúyela** y anótalo en la Nota para Paty para que Paty decida. Un falso positivo quita una receta; un falso negativo es un evento adverso.
 - **`texturas_excluidas`** es el campo que más se olvida y el que más planes tira a la basura. Cuando la familia diga "nada aguado", "nada mezclado", "solo cosas secas" o "le da arcada la sopa", **tradúcelo aquí**, no a `rechazos`: un rechazo excluye un alimento concreto, esto excluye una forma de comer. Si no lo escribes, el motor no puede verlo — el nombre de un plato nunca dice qué textura tiene.
   Traducción habitual: "nada aguado" → `humeda`, `liquida`; "nada mezclado" o "nada con salsa encima" → `mixta`; "solo seco" → `humeda`, `liquida`, `mixta`.
+- **`riesgo_disfagia`** es un campo distinto de `texturas_excluidas`, y confundirlos es peligroso porque suelen apuntar en direcciones opuestas. `texturas_excluidas` dice **lo que el niño no se va a comer**; `riesgo_disfagia` dice **lo que le puede hacer daño al tragar**. Un niño con aversión textural acepta justo lo seco y lo crujiente, que es el perfil que se atasca en un esófago estrecho o inflamado: el plan puede acabar siendo, a la vez, el único que se come y el que más riesgo tiene.
+
+  Ponlo en `true` cuando el material del caso mencione cualquiera de estas cosas, aunque sea de pasada y aunque nadie las llame por su nombre:
+
+  - esofagitis eosinofílica, estenosis o anillo esofágico, acalasia, atresia esofágica operada, o cualquier estrechez descrita en una endoscopía;
+  - un episodio de **impactación alimentaria** —comida atascada, atragantamiento que necesitó ayuda, una visita a emergencias por eso—, aunque sea antiguo;
+  - disfagia descrita en cualquier registro, incluso intermitente;
+  - la conducta que la delata en casa: comer muy despacio, beber mucha agua para "empujar" la comida, escupir la carne o el pan después de masticarlos largo rato, arcadas con alimentos secos, evitar el arroz o el pan sin saber explicar por qué;
+  - antecedente neurológico o de parálisis cerebral con dificultad para tragar.
+
+  Ante la duda, `true`: el coste de un falso positivo es que el plan lleva más humectación y trozos más chicos, que no le hace daño a nadie. **Y aunque lo pongas en `true`, describe el cuadro en `diagnostico_texto`:** el campo es una bandera para el motor, no un sustituto de contarlo.
+
+  Cuando lo actives, dilo también en la Nota para Paty y señala si el riesgo choca con `texturas_excluidas`. Ese choque no lo resuelve el sistema: lo resuelve ella, y a veces la respuesta es derivar antes de dar un plan.
+
 - **`rechazos`** son aversiones, no riesgos. Van separados porque el ensamblador los trata distinto: un rechazo se puede ofrecer una vez en el plan como reintroducción; una alergia jamás.
 - **`porciones`** traduce el requerimiento calórico a medidas caseras ejecutables. Las llaves deben coincidir con los `componentes` del protocolo elegido. Sin corchetes, sin rangos: un valor concreto por componente.
 - **`protocolo_sugerido`** se elige por edad, salvo que el diagnóstico justifique otro. Si te apartas del protocolo por edad, explica por qué en la Nota para Paty — Paty tiene la última palabra.
