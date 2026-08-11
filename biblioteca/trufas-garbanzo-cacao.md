@@ -11,6 +11,7 @@ dificultad: Fácil
 momento: [media_tarde]
 componente: base
 familia: 
+textura: blanda
 aporta: [fibra, hierro]
 alergenos_presentes: [frutos_secos]
 etiquetas: [sin-gluten, sin-huevo]

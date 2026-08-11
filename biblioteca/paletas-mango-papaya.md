@@ -11,6 +11,7 @@ dificultad: Muy fácil
 momento: [media_manana, media_tarde]
 componente: base
 familia: 
+textura: humeda
 aporta: [vitamina_c, betacarotenos]
 alergenos_presentes: []
 etiquetas: [sin-gluten, sin-huevo, sin-azucar-anadida]

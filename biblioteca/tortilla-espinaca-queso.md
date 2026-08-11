@@ -11,6 +11,7 @@ dificultad: Muy fácil
 momento: [desayuno]
 componente: acompanante
 familia: huevo
+textura: blanda
 aporta: [proteina, hierro]
 alergenos_presentes: [huevo, lacteos]
 etiquetas: [sin-gluten]

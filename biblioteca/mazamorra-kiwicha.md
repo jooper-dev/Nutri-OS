@@ -11,6 +11,7 @@ dificultad: Muy fácil
 momento: [media_tarde, media_manana]
 componente: base
 familia: 
+textura: humeda
 aporta: [hierro, fibra]
 alergenos_presentes: []
 etiquetas: [sin-gluten, sin-huevo]

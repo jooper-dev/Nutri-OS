@@ -11,6 +11,7 @@ dificultad: Muy fácil
 momento: [desayuno]
 componente: acompanante
 familia: 
+textura: humeda
 aporta: [proteina, fibra]
 alergenos_presentes: []
 etiquetas: [sin-gluten, sin-huevo]

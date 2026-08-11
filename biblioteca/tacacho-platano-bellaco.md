@@ -11,6 +11,7 @@ dificultad: Fácil
 momento: [desayuno]
 componente: acompanante
 familia:
+textura: seca
 aporta: [energia, grasas_saludables, potasio]
 alergenos_presentes: []
 etiquetas: [apto-aplv, sin-gluten, sin-huevo]

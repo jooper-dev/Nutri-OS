@@ -11,6 +11,7 @@ dificultad: Fácil
 momento: [desayuno, media_tarde]
 componente: acompanante
 familia: 
+textura: blanda
 aporta: [fibra, betacarotenos]
 alergenos_presentes: [gluten]
 etiquetas: [sin-huevo, sin-azucar-anadida]

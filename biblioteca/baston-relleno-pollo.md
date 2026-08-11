@@ -11,6 +11,7 @@ dificultad: Muy fácil
 momento: [desayuno]
 componente: acompanante
 familia: 
+textura: mixta
 aporta: [proteina, hierro]
 alergenos_presentes: [gluten]
 etiquetas: [sin-huevo]

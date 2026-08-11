@@ -11,6 +11,7 @@ dificultad: Muy fácil
 momento: [media_manana, media_tarde]
 componente: base
 familia: 
+textura: humeda
 aporta: [fibra]
 alergenos_presentes: []
 etiquetas: [sin-huevo]
