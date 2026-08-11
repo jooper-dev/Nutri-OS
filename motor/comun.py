@@ -9,12 +9,42 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 import unicodedata
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
 import yaml
+
+
+def consola_utf8() -> None:
+    """Deja la salida en UTF-8 para que un ✓ no tumbe un script entero.
+
+    En Windows, cuando la salida va a un archivo o a una tubería —o la consola
+    está en cp1252—, Python elige esa codificación y cualquier símbolo de los
+    que usa el sistema (✓ ✗ ⚠ · → —) lanza UnicodeEncodeError.
+
+    No es un problema estético. `ensamblar.py` guarda plan.json ANTES de
+    imprimir su resumen: el plan salía correcto, el script moría en el `print`
+    siguiente, y quien lo ejecutaba veía una traza roja y daba por hecho que el
+    sistema había fallado.
+
+    `errors="replace"` es la red por debajo: si ni siquiera se puede pasar a
+    UTF-8, es preferible un símbolo sustituido por '?' que una traza.
+
+    Se llama al importar este módulo, que es lo primero que hace cualquier
+    script del motor. Es un efecto de importación deliberado: la alternativa
+    era repetir estas seis líneas en los diez puntos de entrada.
+    """
+    for flujo in (sys.stdout, sys.stderr):
+        try:
+            flujo.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError, OSError):
+            pass
+
+
+consola_utf8()
 
 RAIZ = Path(__file__).resolve().parent.parent
 

@@ -18,6 +18,15 @@ from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
 
+# Lo mismo que hace comun.consola_utf8, repetido aquí a propósito: este script
+# tiene que poder decir "falta PyYAML" con sus ✓ y ✗, y comun.py importa yaml
+# en su cabecera, así que no se le puede pedir ayuda antes de comprobarlo.
+for _flujo in (sys.stdout, sys.stderr):
+    try:
+        _flujo.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError, OSError):
+        pass
+
 errores: list[str] = []
 avisos: list[str] = []
 
