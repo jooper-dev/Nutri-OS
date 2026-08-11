@@ -1,0 +1,181 @@
+id: escolar_eliminacion_4
+nombre: Escolar 6–11 años · dieta de eliminación de 4 alimentos
+edad_min_meses: 72
+edad_max_meses: 143
+reglas_exclusion: reglas_6_11_anos.md
+descripcion: >
+  Copia de escolar_6_11 adaptada a niño escolar en dieta de eliminación empírica
+  de cuatro alimentos (leche de vaca, trigo, huevo, soya) por esofagitis
+  eosinofílica, con selectividad alimentaria severa y recuperación ponderal
+  pendiente.
+
+  Tres diferencias con el protocolo de origen, todas forzadas por el cuadro:
+  se retiran las frecuencias mínimas de huevo y de yogurt, porque ambos son
+  alimentos eliminados y un mínimo sobre un alérgeno es una regla imposible;
+  'ensalada_grasa' se sustituye por 'grasa' en almuerzo y cena, porque el perfil
+  de aversión textural de estos pacientes rechaza la ensalada y porque la grasa
+  suelta rinde más energía por bocado; y la variedad se relaja, porque en
+  selectividad severa la repetición es terapéutica y la novedad es el riesgo.
+
+# ---------------------------------------------------------------
+# ANATOMÍA DEL DÍA
+# ---------------------------------------------------------------
+comidas:
+  - id: desayuno
+    nombre: Desayuno
+    hora: "7:30 – 8:30"
+    componentes: [cereal, acompanante, grasa, fruta]
+
+  - id: media_manana
+    nombre: Media mañana
+    hora: "10:00 – 10:30"
+    componentes: [base, crujiente]
+
+  - id: almuerzo
+    nombre: Almuerzo
+    hora: "12:30 – 1:30"
+    componentes: [carbohidrato, proteina, menestra, grasa, fruta_vitc, bebida]
+
+  - id: media_tarde
+    nombre: Media tarde
+    hora: "3:30 – 4:30"
+    componentes: [base]
+
+  - id: cena
+    nombre: Cena
+    hora: "6:00 – 7:00"
+    componentes: [carbohidrato, proteina, menestra, grasa, fruta_vitc, bebida]
+
+# ---------------------------------------------------------------
+# FRECUENCIAS SEMANALES
+# ---------------------------------------------------------------
+frecuencias_semanales:
+  - componente: menestra
+    en: [almuerzo, cena]
+    veces: 3
+    modo: exacto
+
+  - componente: proteina
+    familia: pescado
+    en: [almuerzo, cena]
+    veces: 2
+    modo: exacto
+
+  - componente: proteina
+    familia: pollo
+    en: [almuerzo, cena]
+    modo: relleno
+
+  # Sin regla de carne de res: en eliminación de cuatro alimentos la carne roja
+  # no aporta nada que no cubran pollo, pescado y menestra, y en los casos con
+  # sospecha de alfa-gal es directamente un riesgo.
+
+  # Sin frecuencia mínima de huevo en el desayuno: el huevo está eliminado.
+  # El componente 'acompanante' se mantiene, pero lo llenan recetas sin huevo.
+
+  - componente: fruta
+    en: [desayuno]
+    veces: 7
+    modo: exacto
+
+  - componente: grasa
+    en: [almuerzo, cena]
+    veces: 14
+    modo: exacto           # a diario, en ambas comidas: densidad calórica
+
+  # Sin frecuencia de yogurt en media mañana: los lácteos están eliminados.
+
+# ---------------------------------------------------------------
+# ROTACIONES
+# ---------------------------------------------------------------
+rotaciones:
+  - componente: cereal
+    en: [desayuno]
+    reparto: {avena: 2, canihua: 2, hojuelas: 2, harinas: resto}
+
+  - componente: grasa
+    en: [desayuno]
+    reparto: {palta: 3, aceite_oliva: resto}
+
+  - componente: grasa
+    en: [almuerzo]
+    reparto: {palta: 3, aceite_oliva: resto}
+
+  - componente: grasa
+    en: [cena]
+    reparto: {palta: 3, aceite_oliva: resto}
+
+  - componente: carbohidrato
+    en: [almuerzo, cena]
+    reparto: {papa: 4, camote: 2, quinua: 1, arroz: resto}
+
+# ---------------------------------------------------------------
+# REGLAS ACOPLADAS
+# ---------------------------------------------------------------
+reglas_acopladas:
+  - si: menestra
+    entonces: fruta_vitc
+    ambito: misma_comida
+    razon: absorción de hierro no hemínico
+
+  - si: desayuno.cereal
+    entonces: desayuno.fruta
+    ambito: misma_comida
+    razon: fruta fresca obligatoria a diario, con prioridad cítrica
+
+# ---------------------------------------------------------------
+# PRIORIDADES DE SELECCIÓN
+# ---------------------------------------------------------------
+prioridades:
+  fruta_vitc:
+    - naranja
+    - mandarina
+    - papaya
+    - piña golden
+    - lima
+    - aguaymanto
+    - kiwi
+    - fresa
+
+  bebida:
+    - agua
+
+# ---------------------------------------------------------------
+# VARIEDAD
+# ---------------------------------------------------------------
+# En selectividad severa la variedad deja de ser una virtud. Un niño con ocho
+# alimentos aceptados no necesita doce recetas distintas por semana: necesita
+# pocas, repetidas, predecibles y densas. Los topes se relajan a propósito.
+variedad:
+  no_repetir_dia_completo: true
+  max_veces_misma_receta_semana: 3
+  min_recetas_distintas_semana: 6
+  cena_puede_repetir_almuerzo: true
+
+# ---------------------------------------------------------------
+# AJUSTES POR DIAGNÓSTICO
+# ---------------------------------------------------------------
+preferencias_clinicas:
+  anemia:
+    priorizar_aporta: [hierro, vitamina_c]
+    subir_frecuencia: {componente: menestra, a: 4}
+
+  estrenimiento:
+    priorizar_aporta: [fibra, grasas_saludables]
+    nota_qa: revisar aporte hídrico total del plan
+
+  talla_baja:
+    priorizar_aporta: [proteina, zinc, energia]
+
+  selectividad:
+    max_recetas_nuevas_semana: 3
+    nota_qa: priorizar recetas ya aceptadas por el paciente
+
+  # Ausente en escolar_6_11 y necesario aquí: sin esta entrada, el diagnóstico
+  # más urgente del caso no produce ningún ajuste en el motor.
+  bajo_peso:
+    priorizar_aporta: [energia, grasas_saludables, proteina]
+    nota_qa: >
+      Plan de recuperación ponderal. Verificar densidad calórica por bocado, no
+      volumen de la ración: el paciente come poco y lento. Controlar peso cada
+      2 semanas y avisar si no hay ganancia al mes.

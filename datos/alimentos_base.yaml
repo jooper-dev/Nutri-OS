@@ -34,7 +34,7 @@ cereal:
   - {id: canihua,    nombre: "Cañihua",            edad_min_meses: 6, alergenos: [], familia: canihua,  aporta: [hierro, proteina]}
   - {id: maca,       nombre: "Harina de maca",     edad_min_meses: 12, alergenos: [], familia: harinas}
   - {id: algarrobo,  nombre: "Harina de algarrobo", edad_min_meses: 12, alergenos: [], familia: harinas, aporta: [hierro]}
-  - {id: siete_sem,  nombre: "Harina 7 semillas",  edad_min_meses: 12, alergenos: [ajonjoli], familia: harinas}
+  - {id: siete_sem,  nombre: "Harina 7 semillas",  edad_min_meses: 12, alergenos: [ajonjoli, soya], familia: harinas}
   - {id: kiwicha,    nombre: "Hojuelas de kiwicha", edad_min_meses: 6, alergenos: [], familia: hojuelas, aporta: [hierro]}
   - {id: quinua_hoj, nombre: "Hojuelas de quinua",  edad_min_meses: 6, alergenos: [], familia: hojuelas, aporta: [proteina]}
 
@@ -48,14 +48,14 @@ menestra:
 proteina:
   - {id: pollo,     nombre: "Pollo",          edad_min_meses: 6,  alergenos: [],         familia: pollo,   aporta: [proteina, hierro]}
   - {id: pescado,   nombre: "Pescado",        edad_min_meses: 6,  alergenos: [pescado],  familia: pescado, aporta: [proteina, omega3]}
-  - {id: res,       nombre: "Carne de res",   edad_min_meses: 7,  alergenos: [],         familia: res,     aporta: [proteina, hierro, zinc]}
+  - {id: res,       nombre: "Carne de res",   edad_min_meses: 7,  alergenos: [carne_mamifero], familia: res, aporta: [proteina, hierro, zinc]}
   - {id: huevo,     nombre: "Huevo",          edad_min_meses: 6,  alergenos: [huevo],    familia: huevo,   aporta: [proteina]}
   - {id: pavita,    nombre: "Pavita",         edad_min_meses: 6,  alergenos: [],         familia: pollo,   aporta: [proteina]}
 
 proteina_hierro:
   - {id: higado_pollo, nombre: "Hígado de pollo", edad_min_meses: 6, alergenos: [], familia: higado, aporta: [hierro, vitamina_a]}
   - {id: sangrecita,   nombre: "Sangrecita",      edad_min_meses: 6, alergenos: [], familia: higado, aporta: [hierro]}
-  - {id: bazo,         nombre: "Bazo",            edad_min_meses: 7, alergenos: [], familia: higado, aporta: [hierro]}
+  - {id: bazo,         nombre: "Bazo",            edad_min_meses: 7, alergenos: [carne_mamifero], familia: higado, aporta: [hierro]}
   - {id: pollo_desm,   nombre: "Pollo deshilachado", edad_min_meses: 6, alergenos: [], familia: pollo, aporta: [proteina, hierro]}
   - {id: lentejas_pure, nombre: "Lentejas aplastadas",      edad_min_meses: 7, alergenos: [], familia: menestra, aporta: [hierro, fibra]}
   - {id: panamito_pure, nombre: "Frejol panamito aplastado", edad_min_meses: 8, alergenos: [], familia: menestra, aporta: [hierro, fibra]}

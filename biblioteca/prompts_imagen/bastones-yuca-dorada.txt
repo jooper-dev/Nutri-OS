@@ -1,0 +1,26 @@
+Crea una fotografía gastronómica editorial para un recetario contemporáneo premium.
+
+SUJETO
+Bastones de yuca sancochada y luego dorada en sartén, rectos y del grosor de un dedo, de unos 8 cm de largo. Diez piezas sueltas y bien separadas sobre un plato claro, sin tocarse entre ellas. Color dorado parejo, con algunas caras más tostadas donde apoyaron en la sartén, y superficie mate y seca, sin brillo de aceite ni gotas. En los extremos cortados se ve el interior blanco marfil, harinoso y compacto. Sin salsas, sin cremas, sin polvos ni hierbas encima, y nada verde en el encuadre. Varias unidades iguales, y una de ellas partida o volteada para mostrar con claridad su corte interior y sus capas.
+
+FORMATO
+A4 vertical, relación 210:297, full bleed.
+
+CÁMARA
+Plano cenital exacto de 90°.
+
+COMPOSICIÓN
+Dispón las unidades en una hilera vertical ligeramente irregular que recorra la mitad inferior del encuadre, algunas cortadas por los bordes laterales o inferior.
+Evita filas perfectas, simetría rígida y presentación tipo catálogo.
+Coloca la pieza partida hacia el centro de la hilera, como punto focal.
+Apoya todo sobre una hoja de papel de horno blanco roto, ligeramente arrugada, dejando ver el fondo alrededor.
+Permite solo las migas o partículas que caen naturalmente del propio alimento.
+Tercio superior limpio.
+
+FONDO
+Superficie clara mate de crema mantequilla suave #EDE2C4, uniforme y ligeramente desaturada. El tono debe distinguirse con claridad del papel de horno.
+
+ILUMINACIÓN
+Luz cenital-lateral suave desde arriba-izquierda. Sombras mínimas pero naturales, excelente definición de texturas.
+
+Genera exclusivamente la fotografía base. No incluyas texto, iconos, líneas, gráficos, logos ni elementos de maquetación.
