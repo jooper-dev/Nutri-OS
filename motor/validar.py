@@ -154,8 +154,11 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
 
     # --- 2b. Texturas -------------------------------------------------------
     # Una textura excluida en la ficha solo filtra a los alimentos que la
-    # declaran. Los que no la declaran pasan sin que nadie los mire: hay que
-    # decirlo, o el plan parece respetar una restricción que no respetó.
+    # declaran. Los que no la declaran pasan sin que nadie los mire, y el plan
+    # sale con sello de válido sin que la restricción se haya comprobado nunca.
+    # Eso es un ERROR y detiene el pipeline, con el mismo criterio que una
+    # alergia sin etiqueta en el catálogo: cuando el sistema no puede verificar
+    # una restricción de seguridad, se para en vez de firmar.
     excluidas = {normalizar(t) for t in ficha.get("texturas_excluidas") or []}
     if excluidas:
         sin_declarar: set[str] = set()
@@ -178,12 +181,16 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
             elif not op.textura:
                 sin_declarar.add(item["nombre"])
         if sin_declarar:
-            r.aviso(
+            r.error(
                 "La ficha excluye texturas ("
                 + ", ".join(sorted(excluidas))
-                + ") pero estos alimentos del plan no declaran la suya, así que el "
-                "filtro no los ha mirado: "
+                + ") y estos alimentos del plan no declaran la suya, así que el "
+                "filtro no los ha mirado y la restricción NO está comprobada: "
                 + ", ".join(sorted(sin_declarar))
+                + ".\n    Declara `textura` en el front-matter de esas recetas "
+                "—python motor/migrar_textura.py— o en datos/alimentos_base.yaml. "
+                "No se firma un plan cuya restricción de textura nadie ha podido "
+                "verificar."
             )
 
     # --- 3. Frecuencias del protocolo, recontadas ---------------------------
