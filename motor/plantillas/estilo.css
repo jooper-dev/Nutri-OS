@@ -150,9 +150,27 @@ td.detalle .ref  { color: var(--cobre); font-size: 7.5pt; }
 
 /* --------------------------------------------------------- Recetario ---- */
 
-.receta { page-break-before: always; }
+/* Página propia sin márgenes para que la fotografía sangre hasta el borde;
+   el aire lo pone el padding interno. */
+@page receta { size: A4 portrait; margin: 0; }
+
+.receta {
+  page: receta;
+  page-break-before: always;
+  padding: 16mm 14mm 18mm 14mm;
+}
+.receta.con-foto { padding-top: 0; }
 
 .receta .acento { height: 3mm; width: 100%; margin-bottom: 8mm; }
+
+/* La foto ocupa el tercio superior de la página: la misma zona que la
+   biblioteca de prompts reserva limpia en la imagen generada. */
+.receta .foto {
+  height: 82mm; overflow: hidden;
+  margin: 0 -14mm 7mm -14mm;
+  width: calc(100% + 28mm);
+}
+.receta .foto img { width: 100%; height: 82mm; object-fit: cover; display: block; }
 
 .receta h2 {
   font-family: "Montserrat", "Carlito", sans-serif;

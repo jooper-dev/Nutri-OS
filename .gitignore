@@ -22,6 +22,9 @@ token.json
 *.pem
 *.key
 
+# Nota: biblioteca/imagenes/ y biblioteca/prompts_imagen/ SÍ se versionan.
+# Regenerar una imagen cuesta dinero y la receta ya no cambia: son activos.
+
 # ==========================================================================
 # ENTORNO
 # ==========================================================================

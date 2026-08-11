@@ -1,4 +1,4 @@
-# P1 · PROMPT MAESTRO DE RECETAS v4.1 — Nutri-OS · GrowKids
+# P1 · PROMPT MAESTRO DE RECETAS v4.2 — Nutri-OS · GrowKids
 
 *Adaptación de P1 v3.8 para el pipeline Nutri-OS. Se ejecuta en contexto limpio, una receta por llamada. Búsqueda web desactivada. Salida: front-matter YAML + markdown, lista para la biblioteca y para el renderizador HTML→PDF.*
 
@@ -116,6 +116,8 @@ conservacion:
 origen: creada                        # auditada | creada
 validada_en_cocina: false             # siempre false al generar; Paty lo cambia a mano
 acento: "#F2C4A0"
+variante_foto: F                      # letra A–K de la biblioteca de fotografía
+props_foto:                           # opcional: props concretos que pida el plato
 ---
 ```
 
@@ -126,6 +128,9 @@ Reglas del front-matter:
 - `aporta` alimenta la priorización clínica (anemia → hierro, estreñimiento → fibra). Solo nutrientes que los ingredientes sostienen de verdad.
 - `alergenos_presentes` se deriva de la lista final completa, incluidas opciones y Evolución. Es lo que usa el filtro de seguridad: **ante duda, incluye el alérgeno.** Un falso positivo descarta una receta; un falso negativo llega al plato de un niño alérgico.
 - `etiquetas` sigue la lógica inversa: **ante duda, omite.**
+- `variante_foto` se elige por la **forma física del plato**, no por su categoría culinaria (tabla abajo). En este sistema las recetas nacen sueltas, en momentos distintos y para pacientes distintos: **no existe un "libro" ni recetas contiguas**, así que la regla de no repetir variante entre vecinas no aplica. Elige la que mejor describa este plato y ya.
+- `props_foto` solo se rellena si la receta pide un objeto concreto en la foto (un molde, unos palitos, una hoja de plátano). Déjalo vacío en la inmensa mayoría de los casos: la biblioteca ya trae props coherentes.
+- `acento` decide también el fondo de la fotografía, un punto más apagado. Elígelo pensando en las dos cosas.
 
 ---
 
@@ -204,6 +209,34 @@ Línea final, discreta — se consulta después de cocinar.
 
 Usa la casilla que corresponda al alimento real: si se guarda a temperatura ambiente (galletas secas, granolas), escribe `Dura: [X] días en frasco · [X] congelador`. Nunca mandes a la refrigeradora algo que se guarda en la mesa. Si no debe guardarse: `Dura: consumir el mismo día`.
 
+### 6) Foto *(sección interna — alimenta el prompt de imagen, no se imprime)*
+
+Cierra el cuerpo con `## Foto` y **un solo párrafo** que describa el plato terminado, para que un generador de imágenes pueda fotografiarlo sin haberlo visto nunca.
+
+Debe sostenerse solo. Incluye, en este orden y en prosa continua: qué es, forma y tamaño aproximado, número de piezas visibles, color, acabado de la superficie y, si lo hay, el corte o el interior a la vista.
+
+- Descríbelo **como queda después de tu preparación auditada**, no como venía en la fuente.
+- Nada de manos, niños ni personas: eso lo decide la variante, no tú.
+- Cero texto, letras o logos dentro de la escena.
+- **Si la auditoría corrigió un riesgo** (quitaste el mondadientes, partiste la uva, retiraste el fruto seco entero), el elemento corregido **no puede aparecer en la descripción**. La foto nunca contradice la ficha.
+- Sin marcas comerciales ni vajilla llamativa.
+
+Tabla de variantes, por forma física:
+
+| Forma del alimento | `variante_foto` |
+|---|---|
+| Unidades repetidas (galletas, barras, bocaditos) | E |
+| Postre con volumen o capas donde importa el perfil | F |
+| Plato servido con relieve + acompañamiento | A |
+| Conjunto plano que se entiende desde arriba | B |
+| Identidad cultural o utensilio propio | C |
+| Plato con salsa, crema o topping aparte | D |
+| El gesto explica el plato (espolvorear, verter) | G |
+| Untables, dips, cremas, todo lo que se moja | H |
+| Bebidas, batidos, refrescos | I |
+| Bases de uso múltiple o con variaciones a rotular | J |
+| Pastas y salteados que ganan al levantarse | K |
+
 ---
 
 ## NOTA PARA PATY *(sección interna — el renderizador la excluye del PDF)*
@@ -215,7 +248,8 @@ Cierra con `--- NOTA PARA PATY ---` y, en este orden:
 3. **Correcciones:** cada dato de la fuente que corregiste, en formato `[dato]: decía X → puse Y, porque [razón corta]`. Incluye la edad si tu auditoría difiere de la declarada. Si no corregiste nada: `Sin correcciones`.
 4. **Etiquetas asignadas:** cada etiqueta con su justificación en una línea, y cualquier etiqueta que omitiste por duda y por qué. SIEMPRE va. Si no asignaste ninguna: `Sin etiquetas` y la razón.
 5. **Datos asumidos:** cada dato que NO venía en la receta y asumiste con valor estándar. NO reportes los datos *derivados* por cálculo directo (unidades totales, conversiones): eso es aritmética, no asunción. Si no asumiste nada: `Sin datos asumidos`.
-6. **Acento de color**, de esta paleta cerrada, según el carácter del plato: durazno `#F2C4A0` · rosa empolvado `#EFC7C2` · menta `#CDE3D2` · mantequilla `#F2E3B3` · lavanda gris `#D7D3E0`. Una línea: color + por qué.
+6. **Variante de foto elegida** y por qué, en una línea: qué forma física tiene el plato.
+7. **Acento de color**, de esta paleta cerrada, según el carácter del plato: durazno `#F2C4A0` · rosa empolvado `#EFC7C2` · menta `#CDE3D2` · mantequilla `#F2E3B3` · lavanda gris `#D7D3E0`. Una línea: color + por qué.
 
 ---
 

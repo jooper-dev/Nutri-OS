@@ -20,6 +20,8 @@ conservacion:
   congelador_meses: 0
 origen: creada
 validada_en_cocina: false
+variante_foto: A
+props_foto:
 acento: "#CDE3D2"
 ---
 
@@ -55,6 +57,10 @@ Dorada por fuera, tierna por dentro, y lista antes de que termine de calentar el
 ## Conservación
 
 Dura: 2 días refri
+
+## Foto
+
+Una tortilla redonda de unos 14 cm de diámetro, cortada en cuatro porciones triangulares, con dos de ellas ligeramente separadas del conjunto para dejar ver el interior: masa de huevo cuajada de color amarillo pálido con hebras verdes de espinaca repartidas y motas blancas de queso fresco. Superficie superior levemente dorada y mate, bordes redondeados, sin brillo graso.
 
 --- NOTA PARA PATY ---
 

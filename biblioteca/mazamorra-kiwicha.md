@@ -20,6 +20,8 @@ conservacion:
   congelador_meses: 0
 origen: creada
 validada_en_cocina: false
+variante_foto: H
+props_foto:
 acento: "#EFC7C2"
 ---
 
@@ -54,6 +56,10 @@ Sedosa, de color cálido y con el punto justo de dulzor de la fruta. La kiwicha 
 ## Conservación
 
 Dura: 2 días refri
+
+## Foto
+
+Mazamorra sedosa de color anaranjado suave, homogénea y sin grumos, con brillo mate y una consistencia que se sostiene en la cuchara. Servida en un cuenco pequeño de cerámica mate, superficie ligeramente ondulada, sin toppings ni espolvoreado.
 
 --- NOTA PARA PATY ---
 

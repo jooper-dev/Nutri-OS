@@ -16,6 +16,7 @@ personalizado con solo las recetas que ese plan usa.
 | F1 | Lee el caso clínico y escribe `ficha.md` | modelo |
 | F2 | Elige protocolo y detecta huecos de biblioteca | código |
 | F3 | Genera las recetas que faltan | modelo (P1) |
+| F3b | Fotografía de cada receta nueva | prompt por código, imagen por modelo |
 | F4 | Ensambla el plan | **código** |
 | F5 | Valida | **código** |
 | F6 | Revisión y firma | **Paty** |
@@ -33,6 +34,7 @@ revisan después.
 
 ```bash
 pip install -r requirements.txt
+python motor/revisar.py     # comprueba entorno, protocolos, biblioteca y fichas
 ```
 
 WeasyPrint necesita algunas librerías de sistema. En Debian/Ubuntu:
@@ -59,10 +61,15 @@ python motor/correr.py Mateo
 # 4. Paty revisa reporte_qa.md y da el visto bueno
 
 # 5. PDF
-python motor/render.py Mateo
+python motor/render.py Mateo             # horario apaisado, una hoja por semana
+python motor/render.py Mateo --caras     # dos hojas por semana, letra más grande
 
-# 6. Registro
-python motor/registrar.py Mateo --costo 189
+# 6. Fotos de las recetas nuevas (opcional)
+python motor/fotos.py Mateo              # escribe los prompts listos para pegar
+
+# 7. Registro y métricas
+python motor/registrar.py Mateo --costo 189 --tipo primera_vez
+python motor/metricas.py
 ```
 
 Hay un caso completo de ejemplo en `pacientes/_EJEMPLO_Mateo/` con datos
@@ -77,10 +84,41 @@ prompts/           PC_CLINICO (F1) · P1_RECETAS (F3)
 protocolos/        un .yaml por tipo de plan — estructura y frecuencias
 reglas_exclusion/  restricciones por edad, con evidencia
 biblioteca/        una receta por archivo, crece con el uso
-datos/             alimentos base · registro de consultas
-motor/             ensamblar · validar · render · registrar
+  prompts_imagen/  prompt de foto de cada receta (generado)
+  imagenes/        la foto de cada receta (una vez y para siempre)
+datos/             alimentos base · biblioteca de fotografía · registro de consultas
+motor/             revisar · ensamblar · validar · fotos · render · registrar · metricas
 pacientes/         casos reales (fuera de Git)
 ```
+
+---
+
+## Los dos entregables
+
+**`Plan_[Paciente].pdf`** — A4 apaisado, formato horario: los días en columnas y
+las comidas en filas, con sus horas. Pensado para imprimir y pegar en la nevera.
+Una hoja por semana; con `--caras`, dos hojas por semana (lun–jue / vie–dom) y
+letra mayor. En cobre van las preparaciones que tienen receta en el recetario.
+
+**`Recetario_[Paciente].pdf`** — A4 vertical, una receta por página, solo las que
+ese plan usa. La negrita de cantidades y verbos la aplica la hoja de estilo: no
+hay que resaltar nada a mano. Si la receta tiene foto en `biblioteca/imagenes/`,
+va a sangre en el tercio superior; si no la tiene, va una banda del color de
+acento y la página se maqueta igual.
+
+---
+
+## Fotografía
+
+Cada receta lleva en su front-matter la variante A–K de la biblioteca editorial
+y su color de acento. `motor/fotos.py` rellena la plantilla correspondiente y
+deja el prompt listo para pegar en el generador; la imagen se guarda como
+`biblioteca/imagenes/[id].png` y **se genera una sola vez en la vida de la
+receta**. A partir de ahí, cualquier paciente que la use la recibe con foto sin
+coste adicional.
+
+Esto no reemplaza el flujo de Canva de los recetarios que se venden: son
+productos distintos. Aquí se trata del anexo personalizado de cada paciente.
 
 ---
 

@@ -20,6 +20,8 @@ conservacion:
   congelador_meses: 1
 origen: creada
 validada_en_cocina: false
+variante_foto: H
+props_foto:
 acento: "#CDE3D2"
 ---
 
@@ -55,6 +57,10 @@ Tibia, sedosa y con el dulzor limpio de la pera cocida. La avena la espesa lo ju
 ## Conservación
 
 Dura: 3 días refri · 1 congelador
+
+## Foto
+
+Compota espesa de pera de color beige dorado, con trozos deshechos apenas reconocibles y una textura granulada suave por la avena. Servida en un cuenco pequeño de cerámica mate, superficie irregular y sin brillo, sin canela espolvoreada visible.
 
 --- NOTA PARA PATY ---
 

@@ -1,0 +1,26 @@
+Crea una fotografía gastronómica editorial dinámica para un recetario contemporáneo premium.
+
+SUJETO
+Un pan alargado integral de unos 15 cm, abierto a lo largo y sostenido en alto, con el relleno visible: hebras finas de pollo cocido de color claro mezcladas con palta aplastada de verde intenso. Miga visible en el corte, corteza mate de tono tostado, sin salsas que escurran. Servido generosamente en un bol o plato hondo de cerámica blanca mate, y una porción del mismo alimento levantada en el aire por un utensilio.
+
+FORMATO
+A4 vertical, relación 210:297, full bleed.
+
+CÁMARA
+Ángulo frontal, casi a la altura de la mesa, aproximadamente 10-20° sobre la superficie, para que la porción suspendida se recorte contra el fondo limpio.
+
+COMPOSICIÓN
+El bol principal ocupa la zona inferior del encuadre, muy cerca del observador, cortado por el borde inferior y sin que se vea completo.
+Desde un lateral entra el utensilio —tenedor, cuchara o palillos, según la receta— sosteniendo una porción del alimento suspendida a media altura, por encima del bol.
+Esa porción suspendida es el punto focal absoluto y debe conectar visualmente con el bol mediante una caída natural: hebras colgando, salsa goteando o piezas a punto de caer.
+El gesto tiene que sentirse físicamente creíble, capturado en movimiento.
+No aparece ninguna mano ni persona: solo el utensilio entrando en el encuadre.
+Deja limpio el tercio superior, por encima de la porción suspendida.
+
+FONDO
+Superficie continua y mate de rosa polvo apagado #E5C9C6, sin horizonte visible, especialmente limpia en la parte superior. El tono debe leerse con claridad y contrastar con el alimento.
+
+ILUMINACIÓN
+Luz difusa amplia desde arriba y ligeramente lateral. Enfoque nítido en la porción suspendida; el bol inferior puede quedar apenas más suave. Sin bokeh exagerado ni estética publicitaria.
+
+Genera exclusivamente la fotografía base. No incluyas texto, iconos, líneas, gráficos, logos ni elementos de maquetación.

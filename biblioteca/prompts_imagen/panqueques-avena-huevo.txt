@@ -1,0 +1,24 @@
+Crea una fotografía gastronómica editorial para un recetario contemporáneo premium.
+
+SUJETO
+Cuatro panqueques redondos de unos 8 cm de diámetro y algo más de un centímetro de grosor, apilados en dos torres de dos. Color dorado cálido con motas más oscuras de avena, bordes irregulares y ligeramente esponjosos, superficie mate. Sin sirope ni cobertura. Presentado en dos porciones servidas en platos individuales, de modo que se aprecien con nitidez la altura y las capas laterales.
+
+FORMATO
+A4 vertical, relación 210:297, full bleed.
+
+CÁMARA
+Ángulo de tres cuartos bajo, aproximadamente 25-35° sobre la superficie.
+
+COMPOSICIÓN
+La porción principal ocupa la zona inferior del encuadre, cerca del observador y desplazada a un lateral.
+La segunda porción se sitúa detrás y hacia el lado contrario, más arriba en el encuadre y más pequeña por perspectiva, ligeramente desenfocada.
+El escalonado entre ambas crea la profundidad de la escena.
+Tercio superior completamente limpio.
+
+FONDO
+Superficie continua y mate de beige durazno cálido #EBD3C0, sin horizonte visible, con el mismo tono en plano horizontal y vertical. El color debe leerse saturado, nunca lavado.
+
+ILUMINACIÓN
+Luz de estudio grande y difusa desde arriba-izquierda. Sombra proyectada suave y visible bajo los platos, profundidad de campo moderada.
+
+Genera exclusivamente la fotografía base. No incluyas texto, iconos, líneas, gráficos, logos ni elementos de maquetación.

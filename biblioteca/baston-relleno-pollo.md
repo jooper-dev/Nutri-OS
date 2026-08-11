@@ -20,6 +20,8 @@ conservacion:
   congelador_meses: 0
 origen: creada
 validada_en_cocina: false
+variante_foto: K
+props_foto:
 acento: "#EFC7C2"
 ---
 
@@ -54,6 +56,10 @@ Se agarra con una mano y se come caminando, que es como desayunan de verdad los 
 ## Conservación
 
 Dura: 2 días refri
+
+## Foto
+
+Un pan alargado integral de unos 15 cm, abierto a lo largo y sostenido en alto, con el relleno visible: hebras finas de pollo cocido de color claro mezcladas con palta aplastada de verde intenso. Miga visible en el corte, corteza mate de tono tostado, sin salsas que escurran.
 
 --- NOTA PARA PATY ---
 

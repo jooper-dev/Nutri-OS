@@ -20,6 +20,8 @@ conservacion:
   congelador_meses: 1
 origen: creada
 validada_en_cocina: false
+variante_foto: H
+props_foto:
 acento: "#F2E3B3"
 ---
 
@@ -55,6 +57,10 @@ Espesa, tibia y con el dulzor discreto de la manzana cocida. Es de esas cucharad
 ## Conservación
 
 Dura: 2 días refri · 1 congelador
+
+## Foto
+
+Crema espesa de quinua de color beige claro con puntos translúcidos de grano cocido y trozos deshechos de manzana algo más pálidos. Servida en un cuenco hondo de cerámica mate, superficie lisa con una ligera ondulación en el centro, sin brillo ni decoración.
 
 --- NOTA PARA PATY ---
 

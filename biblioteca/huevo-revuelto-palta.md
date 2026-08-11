@@ -20,6 +20,8 @@ conservacion:
   congelador_meses: 0
 origen: creada
 validada_en_cocina: false
+variante_foto: D
+props_foto:
 acento: "#F2E3B3"
 ---
 
@@ -53,6 +55,10 @@ Cremoso, suave y de sabor amable: suele ser de los primeros platos que un bebé 
 ## Conservación
 
 Dura: 1 días refri
+
+## Foto
+
+Huevo revuelto de textura cremosa y grumo suave, color amarillo mantequilla, formando un montículo bajo de unos 8 cm de ancho, con vetas verdes de palta aplastada integradas de forma irregular. Superficie mate y húmeda, sin dorado ni bordes secos.
 
 --- NOTA PARA PATY ---
 

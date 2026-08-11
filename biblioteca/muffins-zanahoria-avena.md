@@ -20,6 +20,8 @@ conservacion:
   congelador_meses: 2
 origen: creada
 validada_en_cocina: false
+variante_foto: E
+props_foto:
 acento: "#F2C4A0"
 ---
 
@@ -60,6 +62,10 @@ Necesitas también: molde para muffins, rallador fino.
 ## Conservación
 
 Dura: 2 días en frasco · 3 días refri · 2 congelador
+
+## Foto
+
+Seis muffins de unos 5 cm de diámetro alineados en hilera, de color marrón anaranjado con hebras finas de zanahoria visibles en la superficie. Copete redondeado y ligeramente agrietado, textura mate y rústica. Uno de ellos partido por la mitad, mostrando la miga húmeda y densa del interior. Sin papel de molde ni cobertura.
 
 --- NOTA PARA PATY ---
 

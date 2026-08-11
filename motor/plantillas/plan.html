@@ -26,34 +26,50 @@
   </div>
 </section>
 
-{% if p.marco_diario and p.marco_diario.nota_plan %}
-<div class="nota-marco">{{ p.marco_diario.nota_plan|trim }}</div>
-{% endif %}
+{% for h in hojas %}
+<section class="hoja {{ 'g4' if h.dias|length <= 4 else 'g7' }}">
 
-{% for s in p.semanas %}
-<section class="seccion">
-  <div class="kicker">Plan de alimentación</div>
-  <h2 class="titulo-seccion">Semana {{ s.semana }}</h2>
+  <div class="encabezado-hoja">
+    <div class="izq">
+      <h2>Semana {{ h.semana }}</h2>
+      {% if h.cara %}<span class="cara">{{ h.cara }}</span>{% endif %}
+    </div>
+    <div class="der">
+      <strong>{{ p.paciente }}</strong> · {{ p.edad_texto }}{% if p.alergias %} · sin {{ p.alergias|join(', ') }}{% endif %}
+    </div>
+  </div>
 
-  <div class="dias-grid">
-  {% for dia, comidas in s.dias.items() %}
-  <div class="dia">
-    <h3>{{ dia }}</h3>
-    <table class="comidas">
-      {% for cid, c in comidas.items() %}
-      <tr>
-        <td class="comida">{{ c.nombre }}{% if c.hora %}<span class="hora">{{ c.hora }}</span>{% endif %}</td>
-        <td class="detalle">
-          {% for i in c['items'] %}
-          <span class="item">{{ i.nombre }}{% if i.cantidad %}<span class="cant">, {{ i.cantidad }}</span>{% endif %}{% if i.receta_id %} <span class="ref">· receta</span>{% endif %}</span>
-          {% endfor %}
-        </td>
-      </tr>
+  {% if loop.first and p.marco_diario and p.marco_diario.nota_plan %}
+  <div class="nota-marco">{{ p.marco_diario.nota_plan|trim }}</div>
+  {% endif %}
+
+  <table class="horario">
+    <tr>
+      <th class="esquina"></th>
+      {% for d in h.dias %}<th class="dia">{{ d }}</th>{% endfor %}
+    </tr>
+    {% for f in h.franjas %}
+    <tr>
+      <td class="franja"{% if h.alto_fila %} style="height: {{ h.alto_fila }}mm"{% endif %}>
+        <span class="nombre">{{ f.nombre }}</span>
+        {% if f.hora %}<span class="hora">{{ f.hora }}</span>{% endif %}
+      </td>
+      {% for d in h.dias %}
+      <td class="celda"{% if h.alto_fila %} style="height: {{ h.alto_fila }}mm"{% endif %}>
+        {% for i in h.celdas[d][f.id] %}
+        <span class="it{{ ' rec' if i.receta_id else '' }}">{{ i.nombre }}{% if i.cantidad %}<span class="cant">, {{ i.cantidad }}</span>{% endif %}</span>
+        {% endfor %}
+      </td>
       {% endfor %}
-    </table>
-  </div>
-  {% endfor %}
-  </div>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <table class="leyenda"><tr>
+    <td><span class="marca-color">En cobre</span>, las preparaciones que tienen su receta en el recetario adjunto.</td>
+    <td class="der">GrowKids · Nut. Patricia López</td>
+  </tr></table>
+
 </section>
 {% endfor %}
 

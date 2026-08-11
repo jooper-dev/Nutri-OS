@@ -20,6 +20,8 @@ conservacion:
   congelador_meses: 2
 origen: creada
 validada_en_cocina: false
+variante_foto: E
+props_foto:
 acento: "#F2E3B3"
 ---
 
@@ -57,6 +59,10 @@ Necesitas también: molde rectangular, papel manteca.
 ## Conservación
 
 Dura: 4 días en frasco · 5 días refri · 2 congelador
+
+## Foto
+
+Cinco barras rectangulares de unos 9 por 3 cm y algo más de un centímetro de grosor, alineadas en hilera. Color marrón claro con textura visiblemente granulada por los granos de kiwicha inflada. Cortes limpios y rectos, superficie mate y compacta. Una de ellas partida, mostrando el interior denso.
 
 --- NOTA PARA PATY ---
 

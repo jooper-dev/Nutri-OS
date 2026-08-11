@@ -17,6 +17,7 @@ Este sistema divide el trabajo así, y la división no es negociable:
 | Leer el caso clínico | Contar frecuencias |
 | Escribir y auditar recetas | Filtrar por alergias y edad |
 | Redactar la voz de la marca | Validar el plan |
+| Describir el plato para la foto | Armar el prompt de imagen |
 | — | Maquetar los PDF |
 
 **Nunca cuentes tú.** Si te descubres verificando "¿hay 3 menestras esta semana?",
@@ -61,6 +62,35 @@ Por **cada** receta que falte:
 
 Vuelve a F2.
 
+### F3b · Fotografía de las recetas nuevas
+
+```bash
+python motor/fotos.py [carpeta]        # solo las recetas de este plan
+python motor/fotos.py --todas          # toda la biblioteca
+```
+
+El script no decide nada: la variante A–K y el color los fijó P1 en el
+front-matter, y aquí solo se rellena la plantilla de la biblioteca. Escribe los
+prompts en `biblioteca/prompts_imagen/[id].txt`.
+
+Después, por cada prompt sin imagen:
+
+1. Genera la imagen con el generador disponible, **sin modificar el texto del
+   prompt**. Si hay más de un modelo, genera una por modelo con el mismo texto
+   para que Paty compare limpio.
+2. Guárdala como `biblioteca/imagenes/[id].png`, con el id exacto de la receta.
+3. Formato vertical; la relación más cercana al A4 que acepte el modelo. **El
+   recorte al A4 se hace siempre por el borde inferior**, nunca por arriba: ese
+   tercio queda reservado a propósito.
+4. Si una llamada falla, no reintentes más de dos veces. Anótalo y sigue.
+
+Una imagen se genera **una sola vez en la vida de la receta**. La siguiente
+paciente que la use ya la tiene. Nunca regeneres una imagen existente salvo que
+Paty lo pida.
+
+Si no hay generador disponible, entrega los prompts y sigue: el recetario se
+maqueta igual, con la banda de color en vez de la foto.
+
 ### F4 · Validación
 
 ```bash
@@ -86,20 +116,27 @@ no el sistema.
 ### F6 · Render
 
 ```bash
-python motor/render.py [carpeta]
+python motor/render.py [carpeta]            # una hoja apaisada por semana
+python motor/render.py [carpeta] --caras    # dos hojas por semana, letra mayor
 ```
 
-Produce `Plan_[Paciente].pdf` y `Recetario_[Paciente].pdf` en la carpeta del
-paciente. Se niega a correr si el validador marcó BLOQUEADO.
+Produce `Plan_[Paciente].pdf` (horario apaisado) y `Recetario_[Paciente].pdf` en
+la carpeta del paciente. Se niega a correr si el validador marcó BLOQUEADO.
+
+Usa `--caras` cuando Paty lo pida o cuando la semana venga muy cargada: es lo
+que ella hace a mano cuando la letra no se lee impresa.
 
 ### F7 · Registro
 
 ```bash
-python motor/registrar.py [carpeta] --costo 189
+python motor/registrar.py [carpeta] --costo 189 --tipo primera_vez
+python motor/metricas.py                 # resumen del mes
 ```
 
-Añade una fila a `datos/consultas.csv`. Si Paty no dio el importe, pregúntale
-antes en vez de asumir cero.
+Añade una fila a `datos/consultas.csv` con paciente, edad, protocolo, semanas y
+diagnósticos: todo eso lo saca del plan. **Lo único que hay que preguntar es el
+importe.** Si Paty no lo dio, pregúntale en vez de asumir cero, y nunca lo
+deduzcas de un documento.
 
 ---
 
@@ -118,6 +155,16 @@ antes en vez de asumir cero.
   `/protocolos/` copiando uno existente. Nunca se parchea el ensamblador.
 
 ---
+
+## Diagnóstico
+
+```bash
+python motor/revisar.py
+```
+
+Comprueba dependencias, protocolos, alimentos base, biblioteca y fichas. Es lo
+primero que se ejecuta tras clonar el repositorio, tras editar un protocolo a
+mano, o cuando algo falla y no está claro por qué.
 
 ## Atajo
 

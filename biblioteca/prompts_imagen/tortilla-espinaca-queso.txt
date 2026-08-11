@@ -1,0 +1,23 @@
+Crea una fotografía gastronómica editorial para un recetario contemporáneo premium.
+
+SUJETO
+Una tortilla redonda de unos 14 cm de diámetro, cortada en cuatro porciones triangulares, con dos de ellas ligeramente separadas del conjunto para dejar ver el interior: masa de huevo cuajada de color amarillo pálido con hebras verdes de espinaca repartidas y motas blancas de queso fresco. Superficie superior levemente dorada y mate, bordes redondeados, sin brillo graso. Servido sobre un plato de cerámica mate color marfil.
+
+FORMATO
+A4 vertical, relación 210:297, full bleed.
+
+CÁMARA
+Ángulo de tres cuartos alto, aproximadamente 55-65° sobre la superficie.
+
+COMPOSICIÓN
+Sitúa el plato principal en la mitad inferior del encuadre, ligeramente desplazado hacia un lateral, nunca centrado con exactitud.
+Introduce un segundo plato con la misma preparación en el lado opuesto y más arriba, deliberadamente cortado por el borde del encuadre y visible solo en parte.
+Deja el tercio superior completamente limpio, sin comida ni objetos.
+
+FONDO
+Superficie continua, lisa y mate de mint grisáceo frío #D9E4E0, sin línea de horizonte visible ni cambio de tono entre suelo y pared. El color debe leerse con claridad, nunca lavado hacia el blanco.
+
+ILUMINACIÓN
+Luz difusa amplia desde arriba-izquierda. Sombras suaves y direccionales, colores limpios, textura del alimento bien definida.
+
+Genera exclusivamente la fotografía base. No incluyas texto, iconos, líneas, gráficos, logos ni elementos de maquetación.

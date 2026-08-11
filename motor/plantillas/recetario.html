@@ -34,8 +34,12 @@
 </section>
 
 {% for r in recetas %}
-<section class="receta">
+<section class="receta{{ ' con-foto' if r.imagen else '' }}">
+  {% if r.imagen %}
+  <div class="foto"><img src="{{ r.imagen }}" alt=""></div>
+  {% else %}
   <div class="acento" style="background: {{ r.meta.acento or '#D9A87E' }}"></div>
+  {% endif %}
   <h2>{{ r.meta.titulo }}</h2>
   {% if r.meta.subtitulo %}<div class="subtitulo">{{ r.meta.subtitulo }}</div>{% endif %}
   <div class="stats">{{ r.stats }}</div>

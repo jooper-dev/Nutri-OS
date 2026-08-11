@@ -20,6 +20,8 @@ conservacion:
   congelador_meses: 2
 origen: creada
 validada_en_cocina: false
+variante_foto: I
+props_foto:
 acento: "#F2C4A0"
 ---
 
@@ -55,6 +57,10 @@ Necesitas también: moldes para paletas.
 ## Conservación
 
 Dura: 2 congelador
+
+## Foto
+
+Cuatro paletas heladas de fruta, de color naranja intenso y opaco, de forma rectangular redondeada y unos 9 cm de largo, con palito de madera claro. Superficie mate con una fina capa de escarcha, sin cobertura ni trozos añadidos.
 
 --- NOTA PARA PATY ---
 

@@ -20,6 +20,8 @@ conservacion:
   congelador_meses: 2
 origen: creada
 validada_en_cocina: false
+variante_foto: F
+props_foto:
 acento: "#F2C4A0"
 ---
 
@@ -56,6 +58,10 @@ Suaves, ligeramente dulces por el plátano y con ese aroma a avena tostada que l
 ## Conservación
 
 Dura: 3 días refri · 2 congelador
+
+## Foto
+
+Cuatro panqueques redondos de unos 8 cm de diámetro y algo más de un centímetro de grosor, apilados en dos torres de dos. Color dorado cálido con motas más oscuras de avena, bordes irregulares y ligeramente esponjosos, superficie mate. Sin sirope ni cobertura.
 
 --- NOTA PARA PATY ---
 

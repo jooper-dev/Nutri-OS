@@ -20,6 +20,8 @@ conservacion:
   congelador_meses: 2
 origen: creada
 validada_en_cocina: false
+variante_foto: E
+props_foto:
 acento: "#D7D3E0"
 ---
 
@@ -54,6 +56,10 @@ Densas, achocolatadas y con textura de trufa de verdad. Nadie que las prueba adi
 ## Conservación
 
 Dura: 5 días refri · 2 congelador
+
+## Foto
+
+Seis bolitas de unos 3 cm de diámetro, de color marrón chocolate oscuro y superficie mate y ligeramente rugosa, alineadas en hilera. Una de ellas partida por la mitad, mostrando un interior denso y homogéneo del mismo tono. Sin envoltorio ni cobertura brillante.
 
 --- NOTA PARA PATY ---
 

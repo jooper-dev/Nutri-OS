@@ -1,0 +1,24 @@
+Crea una fotografía gastronómica editorial para un recetario contemporáneo premium, con un gesto en movimiento.
+
+SUJETO
+Mazamorra sedosa de color anaranjado suave, homogénea y sin grumos, con brillo mate y una consistencia que se sostiene en la cuchara. Servida en un cuenco pequeño de cerámica mate, superficie ligeramente ondulada, sin toppings ni espolvoreado. Presentado en un recipiente de cerámica de pared recta y acabado mate, acompañado de las piezas con las que se come.
+
+FORMATO
+A4 vertical, relación 210:297, full bleed.
+
+CÁMARA
+Ángulo de tres cuartos alto, aproximadamente 50-60° sobre la superficie.
+
+COMPOSICIÓN
+El recipiente principal ocupa el centro del encuadre, en la mitad inferior.
+Alrededor, repartidas de forma irregular sobre la superficie, varias de las piezas que acompañan la receta, algunas cortadas por los bordes.
+Desde arriba entra una sola mano adulta sosteniendo una de esas piezas, recién retirada del recipiente y con el contenido cayendo o adherido de forma natural. Se ven solo los dedos y parte de la mano.
+Evita llenar el tercio superior: la mano entra desde un borde y el resto queda despejado.
+
+FONDO
+Superficie clara y mate con textura fina, en gris muy claro o blanco cálido; opcionalmente un mantel de patrón discreto bajo la escena.
+
+ILUMINACIÓN
+Luz difusa amplia, sombras suaves, colores limpios y apetitosos. Foco nítido en la pieza sostenida.
+
+Genera exclusivamente la fotografía base. No incluyas texto, iconos, líneas, gráficos, logos ni elementos de maquetación.
