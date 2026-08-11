@@ -134,6 +134,14 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
             r.error(f"{donde}: «{item['nombre']}» no existe en la biblioteca ni en alimentos base.")
             continue
 
+        if opcion.nunca_recomendar:
+            r.error(
+                f"{donde}: «{item['nombre']}» está marcado 'nunca_recomendar' en el "
+                f"catálogo y no puede aparecer en ningún plan.\n"
+                f"    Es una decisión clínica de Paty, no un filtro por paciente: "
+                f"si está aquí, el motor tiene un fallo."
+            )
+
         choque = alergias & {normalizar(a) for a in opcion.alergenos}
         if choque:
             r.error(f"{donde}: «{item['nombre']}» contiene {', '.join(sorted(choque))} — ALERGIA declarada.")
@@ -191,6 +199,62 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
                 "—python motor/migrar_textura.py— o en datos/alimentos_base.yaml. "
                 "No se firma un plan cuya restricción de textura nadie ha podido "
                 "verificar."
+            )
+
+    # --- 2c. Carga de seco en un paciente con riesgo de disfagia -----------
+    # `texturas_excluidas` dice lo que el niño no se come; `riesgo_disfagia`
+    # dice lo que le puede hacer daño al tragar. En aversión textural los dos
+    # apuntan en direcciones opuestas: lo seco y lo crujiente es a la vez lo
+    # único que acepta y el perfil de bolo que se impacta en un esófago
+    # inflamado o estrecho.
+    #
+    # Esa tensión no la resuelve el motor, porque es criterio clínico. Pero sí
+    # puede medirla y ponerla delante de Paty, en vez de dejarla enterrada en la
+    # nota de una receta que quizá nadie abra. Por eso es AVISO y no ERROR: aquí
+    # no hay una regla que se viole, hay una decisión que alguien tiene que
+    # tomar mirando al paciente.
+    if ficha.get("riesgo_disfagia"):
+        SECAS = {"seca", "crujiente"}
+        total = secas = 0
+        solo_seco: list[str] = []
+        for s in plan["semanas"]:
+            for dia, comidas in s["dias"].items():
+                for cid, comida in comidas.items():
+                    txt = []
+                    for item in comida["items"]:
+                        op = catalogo.get(item.get("receta_id") or "") or next(
+                            (o for o in catalogo.values() if o.nombre == item["nombre"]),
+                            None,
+                        )
+                        # Las bebidas y los vehículos de grasa no forman bolo:
+                        # se excluyen del recuento igual que del filtro.
+                        if op is None or op.componente in COMPONENTES_SIN_FILTRO_TEXTURA:
+                            continue
+                        txt.append(normalizar(op.textura))
+                    if not txt:
+                        continue
+                    total += len(txt)
+                    secas += sum(1 for x in txt if x in SECAS)
+                    if all(x in SECAS for x in txt):
+                        solo_seco.append(f"S{s['semana']} · {dia} · {cid}")
+
+        if solo_seco:
+            extra = f" y {len(solo_seco) - 5} más" if len(solo_seco) > 5 else ""
+            r.aviso(
+                f"Riesgo de disfagia: {len(solo_seco)} comida(s) del plan no llevan "
+                f"ningún elemento blando que ayude a bajar el bolo — "
+                + "; ".join(solo_seco[:5])
+                + extra
+                + ". Conviene comprobar que cada una salga con bebida al lado y "
+                "bocados pequeños."
+            )
+        if total and secas * 2 > total:
+            r.aviso(
+                f"Riesgo de disfagia: {secas} de {total} raciones del plan "
+                f"({secas * 100 // total} %) son de textura seca o crujiente, que es "
+                f"el perfil de bolo que se impacta. Si la ficha además excluye las "
+                f"texturas húmedas, esta contradicción es clínica y no la resuelve "
+                f"el motor: decide Paty, y a veces la respuesta es derivar."
             )
 
     # --- 3. Frecuencias del protocolo, recontadas ---------------------------

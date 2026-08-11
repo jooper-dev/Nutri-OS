@@ -168,6 +168,7 @@ class Opcion:
     momento: list[str] = field(default_factory=list)
     aporta: list[str] = field(default_factory=list)
     textura: str = ""
+    nunca_recomendar: bool = False
     es_receta: bool = False
     validada_en_cocina: bool = False
     ruta: str = ""
@@ -193,6 +194,11 @@ class Opcion:
 
     def apta_para(self, ficha: dict) -> tuple[bool, str]:
         """¿Puede esta opción entrar en el plan de este paciente?"""
+        # Va primero, antes que la edad y antes que las alergias: no depende de
+        # este paciente ni admite excepción. Es una decisión clínica de Paty
+        # escrita en el catálogo para que no dependa de que alguien se acuerde.
+        if self.nunca_recomendar:
+            return False, "marcado 'nunca_recomendar' en el catálogo"
         if self.edad_min_meses > ficha["edad_meses"]:
             return False, f"edad mínima {self.edad_min_meses} m"
         alergias = {normalizar(a) for a in ficha.get("alergias") or []}
@@ -257,6 +263,7 @@ def cargar_alimentos_base() -> list[Opcion]:
                     familia=a.get("familia") or a["id"],
                     aporta=a.get("aporta") or [],
                     textura=str(a.get("textura") or ""),
+                    nunca_recomendar=bool(a.get("nunca_recomendar", False)),
                     es_receta=False,
                     ruta=str(ruta.relative_to(RAIZ)),
                 )
@@ -295,6 +302,7 @@ def cargar_biblioteca() -> tuple[list[Opcion], list[str]]:
                 momento=meta.get("momento") or [],
                 aporta=meta.get("aporta") or [],
                 textura=str(meta.get("textura") or ""),
+                nunca_recomendar=bool(meta.get("nunca_recomendar", False)),
                 es_receta=True,
                 validada_en_cocina=bool(meta.get("validada_en_cocina", False)),
                 ruta=str(ruta.relative_to(RAIZ)),
