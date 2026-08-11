@@ -27,6 +27,25 @@ DIR_REGLAS = RAIZ / "reglas_exclusion"
 
 DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
 
+# Componentes exentos del filtro de `texturas_excluidas`.
+#
+# `texturas_excluidas` describe cómo COME el niño, no cómo bebe ni de qué está
+# hecho por dentro un plato. Aplicarla a estos tres componentes es aplicarla
+# donde no corresponde, y el daño no era cosmético: a un paciente que no tolera
+# lo húmedo el filtro le quitaba el agua —que tiene textura `liquida`— y las
+# tres grasas, es decir, la bebida y toda la densidad calórica del plan, que en
+# un caso de bajo peso es justamente lo que hay que subir.
+#
+#   bebida          nadie con aversión textural deja de beber agua.
+#   grasa           el aceite y la palta no se comen solos: son ingrediente.
+#   ensalada_grasa  ídem. La textura que decide si el plato se come o termina
+#                   en arcada es la del plato terminado, no la del aceite.
+#
+# Va como lista explícita y no como excepción dentro del filtro para que se vea
+# al abrir el archivo: exonerar un componente del filtro de textura es una
+# decisión clínica, y tiene que poder discutirse leyendo esta línea.
+COMPONENTES_SIN_FILTRO_TEXTURA = {"bebida", "grasa", "ensalada_grasa"}
+
 
 class ErrorNutriOS(Exception):
     """Fallo controlado del motor. Se imprime limpio, sin traza."""
@@ -124,7 +143,11 @@ class Opcion:
         # igual que un rechazo, pero por su propio campo, porque el nombre del
         # alimento nunca la delata ("compota de pera" no dice "aguado").
         excluidas = {normalizar(t) for t in ficha.get("texturas_excluidas") or []}
-        if excluidas and normalizar(self.textura) in excluidas:
+        if (
+            excluidas
+            and self.componente not in COMPONENTES_SIN_FILTRO_TEXTURA
+            and normalizar(self.textura) in excluidas
+        ):
             return False, f"textura {self.textura}"
         return True, ""
 

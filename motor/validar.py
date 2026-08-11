@@ -25,6 +25,7 @@ from collections import Counter
 from pathlib import Path
 
 from comun import (
+    COMPONENTES_SIN_FILTRO_TEXTURA,
     DIR_PACIENTES,
     ErrorNutriOS,
     cargar_alimentos_base,
@@ -163,6 +164,11 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
                 (o for o in catalogo.values() if o.nombre == item["nombre"]), None
             )
             if op is None:
+                continue
+            # Misma lista de exentos que usa el ensamblador. Si el validador no
+            # la respetara, marcaría como error el agua y el aceite que el motor
+            # acaba de poner a propósito, y los dos no pueden contradecirse.
+            if op.componente in COMPONENTES_SIN_FILTRO_TEXTURA:
                 continue
             if normalizar(op.textura) in excluidas:
                 r.error(
