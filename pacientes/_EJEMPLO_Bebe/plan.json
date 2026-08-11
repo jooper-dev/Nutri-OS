@@ -34,7 +34,7 @@
               },
               {
                 "componente": "verdura",
-                "nombre": "Zanahoria",
+                "nombre": "Zapallo",
                 "cantidad": "1 cda",
                 "receta_id": null
               },
@@ -52,7 +52,7 @@
             "items": [
               {
                 "componente": "fruta",
-                "nombre": "Pera",
+                "nombre": "Manzana",
                 "cantidad": "2 cdas",
                 "receta_id": null
               }
@@ -66,19 +66,19 @@
             "items": [
               {
                 "componente": "base_energetica",
-                "nombre": "Papa aplastada",
+                "nombre": "Arroz bien cocido",
                 "cantidad": "2 cdas",
                 "receta_id": null
               },
               {
                 "componente": "proteina_hierro",
-                "nombre": "Sangrecita",
+                "nombre": "Pollo deshilachado",
                 "cantidad": "1 cda",
                 "receta_id": null
               },
               {
                 "componente": "verdura",
-                "nombre": "Zapallo",
+                "nombre": "Zanahoria",
                 "cantidad": "1 cda",
                 "receta_id": null
               },
@@ -110,7 +110,7 @@
             "items": [
               {
                 "componente": "base_energetica",
-                "nombre": "Arroz bien cocido",
+                "nombre": "Papa aplastada",
                 "cantidad": "2 cdas",
                 "receta_id": null
               },
@@ -128,7 +128,7 @@
               },
               {
                 "componente": "grasa",
-                "nombre": "Aceite de oliva",
+                "nombre": "Palta",
                 "cantidad": "½ cdta",
                 "receta_id": null
               }
@@ -140,7 +140,7 @@
             "items": [
               {
                 "componente": "fruta",
-                "nombre": "Manzana",
+                "nombre": "Pera",
                 "cantidad": "2 cdas",
                 "receta_id": null
               }
@@ -172,7 +172,7 @@
               },
               {
                 "componente": "grasa",
-                "nombre": "Palta",
+                "nombre": "Aceite de oliva",
                 "cantidad": "½ cdta",
                 "receta_id": null
               }
@@ -184,7 +184,7 @@
             "items": [
               {
                 "componente": "fruta",
-                "nombre": "Plátano",
+                "nombre": "Pera",
                 "cantidad": "2 cdas",
                 "receta_id": null
               }
@@ -216,7 +216,7 @@
               },
               {
                 "componente": "grasa",
-                "nombre": "Aceite de oliva",
+                "nombre": "Palta",
                 "cantidad": "½ cdta",
                 "receta_id": null
               }
@@ -260,7 +260,7 @@
               },
               {
                 "componente": "grasa",
-                "nombre": "Palta",
+                "nombre": "Aceite de oliva",
                 "cantidad": "½ cdta",
                 "receta_id": null
               }
@@ -272,7 +272,7 @@
             "items": [
               {
                 "componente": "fruta",
-                "nombre": "Pera",
+                "nombre": "Plátano",
                 "cantidad": "2 cdas",
                 "receta_id": null
               }
@@ -292,7 +292,7 @@
               },
               {
                 "componente": "proteina_hierro",
-                "nombre": "Pollo deshilachado",
+                "nombre": "Sangrecita",
                 "cantidad": "1 cda",
                 "receta_id": null
               },

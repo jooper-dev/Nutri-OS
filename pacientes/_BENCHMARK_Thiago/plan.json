@@ -44,9 +44,9 @@
               },
               {
                 "componente": "acompanante",
-                "nombre": "Tacacho de bellaco",
+                "nombre": "Bastones de yuca dorada",
                 "cantidad": "1 porción",
-                "receta_id": "tacacho-platano-bellaco"
+                "receta_id": "bastones-yuca-dorada"
               },
               {
                 "componente": "grasa",
@@ -56,7 +56,7 @@
               },
               {
                 "componente": "fruta",
-                "nombre": "Durazno",
+                "nombre": "Pera",
                 "cantidad": "1 unidad mediana",
                 "receta_id": null
               }
@@ -116,9 +116,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Mazamorra de kiwicha",
+                "nombre": "Compota de pera",
                 "cantidad": "1 porción",
-                "receta_id": "mazamorra-kiwicha"
+                "receta_id": "compota-pera-avena"
               }
             ]
           },
@@ -172,15 +172,15 @@
             "items": [
               {
                 "componente": "cereal",
-                "nombre": "Avena",
+                "nombre": "Hojuelas de kiwicha",
                 "cantidad": "5 cdas",
                 "receta_id": null
               },
               {
                 "componente": "acompanante",
-                "nombre": "Bastones de yuca dorada",
+                "nombre": "Tacacho de bellaco",
                 "cantidad": "1 porción",
-                "receta_id": "bastones-yuca-dorada"
+                "receta_id": "tacacho-platano-bellaco"
               },
               {
                 "componente": "grasa",
@@ -190,7 +190,7 @@
               },
               {
                 "componente": "fruta",
-                "nombre": "Uva cortada a lo largo",
+                "nombre": "Durazno",
                 "cantidad": "1 unidad mediana",
                 "receta_id": null
               }
@@ -202,9 +202,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Compota de pera",
+                "nombre": "Mazamorra de kiwicha",
                 "cantidad": "1 porción",
-                "receta_id": "compota-pera-avena"
+                "receta_id": "mazamorra-kiwicha"
               },
               {
                 "componente": "crujiente",
@@ -274,7 +274,7 @@
               },
               {
                 "componente": "menestra",
-                "nombre": "Arveja partida",
+                "nombre": "Garbanzo",
                 "cantidad": "4 cdas",
                 "receta_id": null
               },
@@ -286,7 +286,7 @@
               },
               {
                 "componente": "fruta_vitc",
-                "nombre": "Piña Golden",
+                "nombre": "Fresa",
                 "cantidad": "1 unidad mediana",
                 "receta_id": null
               },
@@ -306,7 +306,7 @@
             "items": [
               {
                 "componente": "cereal",
-                "nombre": "Hojuelas de kiwicha",
+                "nombre": "Hojuelas de quinua",
                 "cantidad": "5 cdas",
                 "receta_id": null
               },
@@ -315,6 +315,250 @@
                 "nombre": "Crema de quinua",
                 "cantidad": "1 porción",
                 "receta_id": "crema-quinua-manzana"
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Aceite de oliva",
+                "cantidad": "2 cdtas",
+                "receta_id": null
+              },
+              {
+                "componente": "fruta",
+                "nombre": "Manzana",
+                "cantidad": "1 unidad mediana",
+                "receta_id": null
+              }
+            ]
+          },
+          "media_manana": {
+            "nombre": "Media mañana",
+            "hora": "10:00 – 10:30",
+            "items": [
+              {
+                "componente": "base",
+                "nombre": "Fruta picada",
+                "cantidad": "1 porción",
+                "receta_id": null
+              },
+              {
+                "componente": "crujiente",
+                "nombre": "Quinua pop",
+                "cantidad": "3 cdas",
+                "receta_id": null
+              }
+            ]
+          },
+          "almuerzo": {
+            "nombre": "Almuerzo",
+            "hora": "12:30 – 1:30",
+            "items": [
+              {
+                "componente": "carbohidrato",
+                "nombre": "Camote sancochado",
+                "cantidad": "6 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "proteina",
+                "nombre": "Pollo",
+                "cantidad": "70 g en crudo",
+                "receta_id": null
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Palta",
+                "cantidad": "2 cdtas",
+                "receta_id": null
+              },
+              {
+                "componente": "bebida",
+                "nombre": "Agua",
+                "cantidad": "1 taza",
+                "receta_id": null
+              }
+            ]
+          },
+          "media_tarde": {
+            "nombre": "Media tarde",
+            "hora": "3:30 – 4:30",
+            "items": [
+              {
+                "componente": "base",
+                "nombre": "Paletas de mango",
+                "cantidad": "1 porción",
+                "receta_id": "paletas-mango-papaya"
+              }
+            ]
+          },
+          "cena": {
+            "nombre": "Cena",
+            "hora": "6:00 – 7:00",
+            "items": [
+              {
+                "componente": "carbohidrato",
+                "nombre": "Arroz",
+                "cantidad": "6 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "proteina",
+                "nombre": "Pavita",
+                "cantidad": "70 g en crudo",
+                "receta_id": null
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Aceite de oliva",
+                "cantidad": "2 cdtas",
+                "receta_id": null
+              },
+              {
+                "componente": "bebida",
+                "nombre": "Agua",
+                "cantidad": "1 taza",
+                "receta_id": null
+              }
+            ]
+          }
+        },
+        "Jueves": {
+          "desayuno": {
+            "nombre": "Desayuno",
+            "hora": "7:30 – 8:30",
+            "items": [
+              {
+                "componente": "cereal",
+                "nombre": "Hojuelas de kiwicha",
+                "cantidad": "5 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "acompanante",
+                "nombre": "Bastones de yuca dorada",
+                "cantidad": "1 porción",
+                "receta_id": "bastones-yuca-dorada"
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Aceite de oliva",
+                "cantidad": "2 cdtas",
+                "receta_id": null
+              },
+              {
+                "componente": "fruta",
+                "nombre": "Uva cortada a lo largo",
+                "cantidad": "1 unidad mediana",
+                "receta_id": null
+              }
+            ]
+          },
+          "media_manana": {
+            "nombre": "Media mañana",
+            "hora": "10:00 – 10:30",
+            "items": [
+              {
+                "componente": "base",
+                "nombre": "Mazamorra de kiwicha",
+                "cantidad": "1 porción",
+                "receta_id": "mazamorra-kiwicha"
+              },
+              {
+                "componente": "crujiente",
+                "nombre": "Kiwicha pop",
+                "cantidad": "3 cdas",
+                "receta_id": null
+              }
+            ]
+          },
+          "almuerzo": {
+            "nombre": "Almuerzo",
+            "hora": "12:30 – 1:30",
+            "items": [
+              {
+                "componente": "carbohidrato",
+                "nombre": "Arroz",
+                "cantidad": "6 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "proteina",
+                "nombre": "Pavita",
+                "cantidad": "70 g en crudo",
+                "receta_id": null
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Aceite de oliva",
+                "cantidad": "2 cdtas",
+                "receta_id": null
+              },
+              {
+                "componente": "bebida",
+                "nombre": "Agua",
+                "cantidad": "1 taza",
+                "receta_id": null
+              }
+            ]
+          },
+          "media_tarde": {
+            "nombre": "Media tarde",
+            "hora": "3:30 – 4:30",
+            "items": [
+              {
+                "componente": "base",
+                "nombre": "Compota de pera",
+                "cantidad": "1 porción",
+                "receta_id": "compota-pera-avena"
+              }
+            ]
+          },
+          "cena": {
+            "nombre": "Cena",
+            "hora": "6:00 – 7:00",
+            "items": [
+              {
+                "componente": "carbohidrato",
+                "nombre": "Camote sancochado",
+                "cantidad": "6 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "proteina",
+                "nombre": "Pollo",
+                "cantidad": "70 g en crudo",
+                "receta_id": null
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Palta",
+                "cantidad": "2 cdtas",
+                "receta_id": null
+              },
+              {
+                "componente": "bebida",
+                "nombre": "Agua",
+                "cantidad": "1 taza",
+                "receta_id": null
+              }
+            ]
+          }
+        },
+        "Viernes": {
+          "desayuno": {
+            "nombre": "Desayuno",
+            "hora": "7:30 – 8:30",
+            "items": [
+              {
+                "componente": "cereal",
+                "nombre": "Hojuelas de quinua",
+                "cantidad": "5 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "acompanante",
+                "nombre": "Tacacho de bellaco",
+                "cantidad": "1 porción",
+                "receta_id": "tacacho-platano-bellaco"
               },
               {
                 "componente": "grasa",
@@ -354,263 +598,19 @@
             "items": [
               {
                 "componente": "carbohidrato",
-                "nombre": "Camote sancochado",
+                "nombre": "Yuca sancochada",
                 "cantidad": "6 cdas",
                 "receta_id": null
               },
               {
                 "componente": "proteina",
                 "nombre": "Pavita",
-                "cantidad": "70 g en crudo",
-                "receta_id": null
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Palta",
-                "cantidad": "2 cdtas",
-                "receta_id": null
-              },
-              {
-                "componente": "bebida",
-                "nombre": "Agua",
-                "cantidad": "1 taza",
-                "receta_id": null
-              }
-            ]
-          },
-          "media_tarde": {
-            "nombre": "Media tarde",
-            "hora": "3:30 – 4:30",
-            "items": [
-              {
-                "componente": "base",
-                "nombre": "Compota de pera",
-                "cantidad": "1 porción",
-                "receta_id": "compota-pera-avena"
-              }
-            ]
-          },
-          "cena": {
-            "nombre": "Cena",
-            "hora": "6:00 – 7:00",
-            "items": [
-              {
-                "componente": "carbohidrato",
-                "nombre": "Arroz",
-                "cantidad": "6 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "proteina",
-                "nombre": "Pollo",
-                "cantidad": "70 g en crudo",
-                "receta_id": null
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Aceite de oliva",
-                "cantidad": "2 cdtas",
-                "receta_id": null
-              },
-              {
-                "componente": "bebida",
-                "nombre": "Agua",
-                "cantidad": "1 taza",
-                "receta_id": null
-              }
-            ]
-          }
-        },
-        "Jueves": {
-          "desayuno": {
-            "nombre": "Desayuno",
-            "hora": "7:30 – 8:30",
-            "items": [
-              {
-                "componente": "cereal",
-                "nombre": "Cañihua",
-                "cantidad": "5 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "acompanante",
-                "nombre": "Tacacho de bellaco",
-                "cantidad": "1 porción",
-                "receta_id": "tacacho-platano-bellaco"
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Aceite de oliva",
-                "cantidad": "2 cdtas",
-                "receta_id": null
-              },
-              {
-                "componente": "fruta",
-                "nombre": "Plátano",
-                "cantidad": "1 unidad mediana",
-                "receta_id": null
-              }
-            ]
-          },
-          "media_manana": {
-            "nombre": "Media mañana",
-            "hora": "10:00 – 10:30",
-            "items": [
-              {
-                "componente": "base",
-                "nombre": "Paletas de mango",
-                "cantidad": "1 porción",
-                "receta_id": "paletas-mango-papaya"
-              },
-              {
-                "componente": "crujiente",
-                "nombre": "Kiwicha pop",
-                "cantidad": "3 cdas",
-                "receta_id": null
-              }
-            ]
-          },
-          "almuerzo": {
-            "nombre": "Almuerzo",
-            "hora": "12:30 – 1:30",
-            "items": [
-              {
-                "componente": "carbohidrato",
-                "nombre": "Arroz",
-                "cantidad": "6 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "proteina",
-                "nombre": "Pollo",
-                "cantidad": "70 g en crudo",
-                "receta_id": null
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Aceite de oliva",
-                "cantidad": "2 cdtas",
-                "receta_id": null
-              },
-              {
-                "componente": "bebida",
-                "nombre": "Agua",
-                "cantidad": "1 taza",
-                "receta_id": null
-              }
-            ]
-          },
-          "media_tarde": {
-            "nombre": "Media tarde",
-            "hora": "3:30 – 4:30",
-            "items": [
-              {
-                "componente": "base",
-                "nombre": "Fruta picada",
-                "cantidad": "1 porción",
-                "receta_id": null
-              }
-            ]
-          },
-          "cena": {
-            "nombre": "Cena",
-            "hora": "6:00 – 7:00",
-            "items": [
-              {
-                "componente": "carbohidrato",
-                "nombre": "Camote sancochado",
-                "cantidad": "6 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "proteina",
-                "nombre": "Pavita",
-                "cantidad": "70 g en crudo",
-                "receta_id": null
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Palta",
-                "cantidad": "2 cdtas",
-                "receta_id": null
-              },
-              {
-                "componente": "bebida",
-                "nombre": "Agua",
-                "cantidad": "1 taza",
-                "receta_id": null
-              }
-            ]
-          }
-        },
-        "Viernes": {
-          "desayuno": {
-            "nombre": "Desayuno",
-            "hora": "7:30 – 8:30",
-            "items": [
-              {
-                "componente": "cereal",
-                "nombre": "Avena",
-                "cantidad": "5 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "acompanante",
-                "nombre": "Bastones de yuca dorada",
-                "cantidad": "1 porción",
-                "receta_id": "bastones-yuca-dorada"
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Aceite de oliva",
-                "cantidad": "2 cdtas",
-                "receta_id": null
-              },
-              {
-                "componente": "fruta",
-                "nombre": "Pera",
-                "cantidad": "1 unidad mediana",
-                "receta_id": null
-              }
-            ]
-          },
-          "media_manana": {
-            "nombre": "Media mañana",
-            "hora": "10:00 – 10:30",
-            "items": [
-              {
-                "componente": "base",
-                "nombre": "Mazamorra de kiwicha",
-                "cantidad": "1 porción",
-                "receta_id": "mazamorra-kiwicha"
-              },
-              {
-                "componente": "crujiente",
-                "nombre": "Quinua pop",
-                "cantidad": "3 cdas",
-                "receta_id": null
-              }
-            ]
-          },
-          "almuerzo": {
-            "nombre": "Almuerzo",
-            "hora": "12:30 – 1:30",
-            "items": [
-              {
-                "componente": "carbohidrato",
-                "nombre": "Quinua",
-                "cantidad": "6 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "proteina",
-                "nombre": "Pollo",
                 "cantidad": "70 g en crudo",
                 "receta_id": null
               },
               {
                 "componente": "menestra",
-                "nombre": "Frejol castilla",
+                "nombre": "Garbanzo",
                 "cantidad": "4 cdas",
                 "receta_id": null
               },
@@ -640,9 +640,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Fruta picada",
+                "nombre": "Paletas de mango",
                 "cantidad": "1 porción",
-                "receta_id": null
+                "receta_id": "paletas-mango-papaya"
               }
             ]
           },
@@ -658,7 +658,7 @@
               },
               {
                 "componente": "proteina",
-                "nombre": "Pavita",
+                "nombre": "Pollo",
                 "cantidad": "70 g en crudo",
                 "receta_id": null
               },
@@ -684,7 +684,7 @@
             "items": [
               {
                 "componente": "cereal",
-                "nombre": "Cañihua",
+                "nombre": "Hojuelas de kiwicha",
                 "cantidad": "5 cdas",
                 "receta_id": null
               },
@@ -702,7 +702,7 @@
               },
               {
                 "componente": "fruta",
-                "nombre": "Manzana",
+                "nombre": "Plátano",
                 "cantidad": "1 unidad mediana",
                 "receta_id": null
               }
@@ -714,9 +714,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Compota de pera",
+                "nombre": "Fruta picada",
                 "cantidad": "1 porción",
-                "receta_id": "compota-pera-avena"
+                "receta_id": null
               },
               {
                 "componente": "crujiente",
@@ -762,9 +762,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Paletas de mango",
+                "nombre": "Compota de pera",
                 "cantidad": "1 porción",
-                "receta_id": "paletas-mango-papaya"
+                "receta_id": "compota-pera-avena"
               }
             ]
           },
@@ -806,7 +806,7 @@
             "items": [
               {
                 "componente": "cereal",
-                "nombre": "Harina de maca",
+                "nombre": "Hojuelas de quinua",
                 "cantidad": "5 cdas",
                 "receta_id": null
               },
@@ -922,7 +922,12 @@
           }
         }
       },
-      "degradaciones": []
+      "degradaciones": [
+        "carbohidrato/quinua: sin opciones para este paciente; se sustituyó por otra familia",
+        "cereal/avena: sin opciones para este paciente; se sustituyó por otra familia",
+        "cereal/canihua: sin opciones para este paciente; se sustituyó por otra familia",
+        "cereal/harinas: sin opciones para este paciente; se sustituyó por otra familia"
+      ]
     },
     {
       "semana": 2,
@@ -934,7 +939,7 @@
             "items": [
               {
                 "componente": "cereal",
-                "nombre": "Harina de algarrobo",
+                "nombre": "Hojuelas de quinua",
                 "cantidad": "5 cdas",
                 "receta_id": null
               },
@@ -952,7 +957,7 @@
               },
               {
                 "componente": "fruta",
-                "nombre": "Plátano",
+                "nombre": "Pera",
                 "cantidad": "1 unidad mediana",
                 "receta_id": null
               }
@@ -964,9 +969,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Paletas de mango",
+                "nombre": "Fruta picada",
                 "cantidad": "1 porción",
-                "receta_id": "paletas-mango-papaya"
+                "receta_id": null
               },
               {
                 "componente": "crujiente",
@@ -982,32 +987,20 @@
             "items": [
               {
                 "componente": "carbohidrato",
-                "nombre": "Papa sancochada",
+                "nombre": "Arroz",
                 "cantidad": "6 cdas",
                 "receta_id": null
               },
               {
                 "componente": "proteina",
-                "nombre": "Pavita",
+                "nombre": "Pollo",
                 "cantidad": "70 g en crudo",
-                "receta_id": null
-              },
-              {
-                "componente": "menestra",
-                "nombre": "Garbanzo",
-                "cantidad": "4 cdas",
                 "receta_id": null
               },
               {
                 "componente": "grasa",
                 "nombre": "Aceite de oliva",
                 "cantidad": "2 cdtas",
-                "receta_id": null
-              },
-              {
-                "componente": "fruta_vitc",
-                "nombre": "Kiwi",
-                "cantidad": "1 unidad mediana",
                 "receta_id": null
               },
               {
@@ -1024,9 +1017,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Compota de pera",
+                "nombre": "Paletas de mango",
                 "cantidad": "1 porción",
-                "receta_id": "compota-pera-avena"
+                "receta_id": "paletas-mango-papaya"
               }
             ]
           },
@@ -1036,19 +1029,19 @@
             "items": [
               {
                 "componente": "carbohidrato",
-                "nombre": "Quinua",
+                "nombre": "Arroz",
                 "cantidad": "6 cdas",
                 "receta_id": null
               },
               {
                 "componente": "proteina",
-                "nombre": "Pescado",
+                "nombre": "Pavita",
                 "cantidad": "70 g en crudo",
                 "receta_id": null
               },
               {
                 "componente": "grasa",
-                "nombre": "Palta",
+                "nombre": "Aceite de oliva",
                 "cantidad": "2 cdtas",
                 "receta_id": null
               },
@@ -1068,7 +1061,7 @@
             "items": [
               {
                 "componente": "cereal",
-                "nombre": "Cañihua",
+                "nombre": "Hojuelas de kiwicha",
                 "cantidad": "5 cdas",
                 "receta_id": null
               },
@@ -1080,13 +1073,13 @@
               },
               {
                 "componente": "grasa",
-                "nombre": "Palta",
+                "nombre": "Aceite de oliva",
                 "cantidad": "2 cdtas",
                 "receta_id": null
               },
               {
                 "componente": "fruta",
-                "nombre": "Durazno",
+                "nombre": "Mango",
                 "cantidad": "1 unidad mediana",
                 "receta_id": null
               }
@@ -1122,13 +1115,13 @@
               },
               {
                 "componente": "proteina",
-                "nombre": "Pescado",
+                "nombre": "Pollo",
                 "cantidad": "70 g en crudo",
                 "receta_id": null
               },
               {
                 "componente": "grasa",
-                "nombre": "Palta",
+                "nombre": "Aceite de oliva",
                 "cantidad": "2 cdtas",
                 "receta_id": null
               },
@@ -1146,9 +1139,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Fruta picada",
+                "nombre": "Compota de pera",
                 "cantidad": "1 porción",
-                "receta_id": null
+                "receta_id": "compota-pera-avena"
               }
             ]
           },
@@ -1164,13 +1157,13 @@
               },
               {
                 "componente": "proteina",
-                "nombre": "Pollo",
+                "nombre": "Pavita",
                 "cantidad": "70 g en crudo",
                 "receta_id": null
               },
               {
                 "componente": "grasa",
-                "nombre": "Aceite de oliva",
+                "nombre": "Palta",
                 "cantidad": "2 cdtas",
                 "receta_id": null
               },
@@ -1202,519 +1195,7 @@
               },
               {
                 "componente": "grasa",
-                "nombre": "Palta",
-                "cantidad": "2 cdtas",
-                "receta_id": null
-              },
-              {
-                "componente": "fruta",
-                "nombre": "Pera",
-                "cantidad": "1 unidad mediana",
-                "receta_id": null
-              }
-            ]
-          },
-          "media_manana": {
-            "nombre": "Media mañana",
-            "hora": "10:00 – 10:30",
-            "items": [
-              {
-                "componente": "base",
-                "nombre": "Paletas de mango",
-                "cantidad": "1 porción",
-                "receta_id": "paletas-mango-papaya"
-              },
-              {
-                "componente": "crujiente",
-                "nombre": "Quinua pop",
-                "cantidad": "3 cdas",
-                "receta_id": null
-              }
-            ]
-          },
-          "almuerzo": {
-            "nombre": "Almuerzo",
-            "hora": "12:30 – 1:30",
-            "items": [
-              {
-                "componente": "carbohidrato",
-                "nombre": "Papa sancochada",
-                "cantidad": "6 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "proteina",
-                "nombre": "Pollo",
-                "cantidad": "70 g en crudo",
-                "receta_id": null
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Palta",
-                "cantidad": "2 cdtas",
-                "receta_id": null
-              },
-              {
-                "componente": "bebida",
-                "nombre": "Agua",
-                "cantidad": "1 taza",
-                "receta_id": null
-              }
-            ]
-          },
-          "media_tarde": {
-            "nombre": "Media tarde",
-            "hora": "3:30 – 4:30",
-            "items": [
-              {
-                "componente": "base",
-                "nombre": "Mazamorra de kiwicha",
-                "cantidad": "1 porción",
-                "receta_id": "mazamorra-kiwicha"
-              }
-            ]
-          },
-          "cena": {
-            "nombre": "Cena",
-            "hora": "6:00 – 7:00",
-            "items": [
-              {
-                "componente": "carbohidrato",
-                "nombre": "Papa sancochada",
-                "cantidad": "6 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "proteina",
-                "nombre": "Pavita",
-                "cantidad": "70 g en crudo",
-                "receta_id": null
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Palta",
-                "cantidad": "2 cdtas",
-                "receta_id": null
-              },
-              {
-                "componente": "bebida",
-                "nombre": "Agua",
-                "cantidad": "1 taza",
-                "receta_id": null
-              }
-            ]
-          }
-        },
-        "Jueves": {
-          "desayuno": {
-            "nombre": "Desayuno",
-            "hora": "7:30 – 8:30",
-            "items": [
-              {
-                "componente": "cereal",
-                "nombre": "Cañihua",
-                "cantidad": "5 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "acompanante",
-                "nombre": "Tacacho de bellaco",
-                "cantidad": "1 porción",
-                "receta_id": "tacacho-platano-bellaco"
-              },
-              {
-                "componente": "grasa",
                 "nombre": "Aceite de oliva",
-                "cantidad": "2 cdtas",
-                "receta_id": null
-              },
-              {
-                "componente": "fruta",
-                "nombre": "Manzana",
-                "cantidad": "1 unidad mediana",
-                "receta_id": null
-              }
-            ]
-          },
-          "media_manana": {
-            "nombre": "Media mañana",
-            "hora": "10:00 – 10:30",
-            "items": [
-              {
-                "componente": "base",
-                "nombre": "Fruta picada",
-                "cantidad": "1 porción",
-                "receta_id": null
-              },
-              {
-                "componente": "crujiente",
-                "nombre": "Kiwicha pop",
-                "cantidad": "3 cdas",
-                "receta_id": null
-              }
-            ]
-          },
-          "almuerzo": {
-            "nombre": "Almuerzo",
-            "hora": "12:30 – 1:30",
-            "items": [
-              {
-                "componente": "carbohidrato",
-                "nombre": "Arroz",
-                "cantidad": "6 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "proteina",
-                "nombre": "Pollo",
-                "cantidad": "70 g en crudo",
-                "receta_id": null
-              },
-              {
-                "componente": "menestra",
-                "nombre": "Lentejas",
-                "cantidad": "4 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Aceite de oliva",
-                "cantidad": "2 cdtas",
-                "receta_id": null
-              },
-              {
-                "componente": "fruta_vitc",
-                "nombre": "Papaya",
-                "cantidad": "1 unidad mediana",
-                "receta_id": null
-              },
-              {
-                "componente": "bebida",
-                "nombre": "Agua",
-                "cantidad": "1 taza",
-                "receta_id": null
-              }
-            ]
-          },
-          "media_tarde": {
-            "nombre": "Media tarde",
-            "hora": "3:30 – 4:30",
-            "items": [
-              {
-                "componente": "base",
-                "nombre": "Compota de pera",
-                "cantidad": "1 porción",
-                "receta_id": "compota-pera-avena"
-              }
-            ]
-          },
-          "cena": {
-            "nombre": "Cena",
-            "hora": "6:00 – 7:00",
-            "items": [
-              {
-                "componente": "carbohidrato",
-                "nombre": "Arroz",
-                "cantidad": "6 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "proteina",
-                "nombre": "Pavita",
-                "cantidad": "70 g en crudo",
-                "receta_id": null
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Aceite de oliva",
-                "cantidad": "2 cdtas",
-                "receta_id": null
-              },
-              {
-                "componente": "bebida",
-                "nombre": "Agua",
-                "cantidad": "1 taza",
-                "receta_id": null
-              }
-            ]
-          }
-        },
-        "Viernes": {
-          "desayuno": {
-            "nombre": "Desayuno",
-            "hora": "7:30 – 8:30",
-            "items": [
-              {
-                "componente": "cereal",
-                "nombre": "Avena",
-                "cantidad": "5 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "acompanante",
-                "nombre": "Bastones de yuca dorada",
-                "cantidad": "1 porción",
-                "receta_id": "bastones-yuca-dorada"
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Aceite de oliva",
-                "cantidad": "2 cdtas",
-                "receta_id": null
-              },
-              {
-                "componente": "fruta",
-                "nombre": "Uva cortada a lo largo",
-                "cantidad": "1 unidad mediana",
-                "receta_id": null
-              }
-            ]
-          },
-          "media_manana": {
-            "nombre": "Media mañana",
-            "hora": "10:00 – 10:30",
-            "items": [
-              {
-                "componente": "base",
-                "nombre": "Fruta picada",
-                "cantidad": "1 porción",
-                "receta_id": null
-              },
-              {
-                "componente": "crujiente",
-                "nombre": "Quinua pop",
-                "cantidad": "3 cdas",
-                "receta_id": null
-              }
-            ]
-          },
-          "almuerzo": {
-            "nombre": "Almuerzo",
-            "hora": "12:30 – 1:30",
-            "items": [
-              {
-                "componente": "carbohidrato",
-                "nombre": "Papa sancochada",
-                "cantidad": "6 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "proteina",
-                "nombre": "Pollo",
-                "cantidad": "70 g en crudo",
-                "receta_id": null
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Aceite de oliva",
-                "cantidad": "2 cdtas",
-                "receta_id": null
-              },
-              {
-                "componente": "bebida",
-                "nombre": "Agua",
-                "cantidad": "1 taza",
-                "receta_id": null
-              }
-            ]
-          },
-          "media_tarde": {
-            "nombre": "Media tarde",
-            "hora": "3:30 – 4:30",
-            "items": [
-              {
-                "componente": "base",
-                "nombre": "Paletas de mango",
-                "cantidad": "1 porción",
-                "receta_id": "paletas-mango-papaya"
-              }
-            ]
-          },
-          "cena": {
-            "nombre": "Cena",
-            "hora": "6:00 – 7:00",
-            "items": [
-              {
-                "componente": "carbohidrato",
-                "nombre": "Arroz",
-                "cantidad": "6 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "proteina",
-                "nombre": "Pavita",
-                "cantidad": "70 g en crudo",
-                "receta_id": null
-              },
-              {
-                "componente": "menestra",
-                "nombre": "Frejol panamito",
-                "cantidad": "4 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Aceite de oliva",
-                "cantidad": "2 cdtas",
-                "receta_id": null
-              },
-              {
-                "componente": "fruta_vitc",
-                "nombre": "Piña Golden",
-                "cantidad": "1 unidad mediana",
-                "receta_id": null
-              },
-              {
-                "componente": "bebida",
-                "nombre": "Agua",
-                "cantidad": "1 taza",
-                "receta_id": null
-              }
-            ]
-          }
-        },
-        "Sábado": {
-          "desayuno": {
-            "nombre": "Desayuno",
-            "hora": "7:30 – 8:30",
-            "items": [
-              {
-                "componente": "cereal",
-                "nombre": "Avena",
-                "cantidad": "5 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "acompanante",
-                "nombre": "Crema de quinua",
-                "cantidad": "1 porción",
-                "receta_id": "crema-quinua-manzana"
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Aceite de oliva",
-                "cantidad": "2 cdtas",
-                "receta_id": null
-              },
-              {
-                "componente": "fruta",
-                "nombre": "Mango",
-                "cantidad": "1 unidad mediana",
-                "receta_id": null
-              }
-            ]
-          },
-          "media_manana": {
-            "nombre": "Media mañana",
-            "hora": "10:00 – 10:30",
-            "items": [
-              {
-                "componente": "base",
-                "nombre": "Mazamorra de kiwicha",
-                "cantidad": "1 porción",
-                "receta_id": "mazamorra-kiwicha"
-              },
-              {
-                "componente": "crujiente",
-                "nombre": "Kiwicha pop",
-                "cantidad": "3 cdas",
-                "receta_id": null
-              }
-            ]
-          },
-          "almuerzo": {
-            "nombre": "Almuerzo",
-            "hora": "12:30 – 1:30",
-            "items": [
-              {
-                "componente": "carbohidrato",
-                "nombre": "Arroz",
-                "cantidad": "6 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "proteina",
-                "nombre": "Pavita",
-                "cantidad": "70 g en crudo",
-                "receta_id": null
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Aceite de oliva",
-                "cantidad": "2 cdtas",
-                "receta_id": null
-              },
-              {
-                "componente": "bebida",
-                "nombre": "Agua",
-                "cantidad": "1 taza",
-                "receta_id": null
-              }
-            ]
-          },
-          "media_tarde": {
-            "nombre": "Media tarde",
-            "hora": "3:30 – 4:30",
-            "items": [
-              {
-                "componente": "base",
-                "nombre": "Compota de pera",
-                "cantidad": "1 porción",
-                "receta_id": "compota-pera-avena"
-              }
-            ]
-          },
-          "cena": {
-            "nombre": "Cena",
-            "hora": "6:00 – 7:00",
-            "items": [
-              {
-                "componente": "carbohidrato",
-                "nombre": "Camote sancochado",
-                "cantidad": "6 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "proteina",
-                "nombre": "Pollo",
-                "cantidad": "70 g en crudo",
-                "receta_id": null
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Aceite de oliva",
-                "cantidad": "2 cdtas",
-                "receta_id": null
-              },
-              {
-                "componente": "bebida",
-                "nombre": "Agua",
-                "cantidad": "1 taza",
-                "receta_id": null
-              }
-            ]
-          }
-        },
-        "Domingo": {
-          "desayuno": {
-            "nombre": "Desayuno",
-            "hora": "7:30 – 8:30",
-            "items": [
-              {
-                "componente": "cereal",
-                "nombre": "Hojuelas de kiwicha",
-                "cantidad": "5 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "acompanante",
-                "nombre": "Tacacho de bellaco",
-                "cantidad": "1 porción",
-                "receta_id": "tacacho-platano-bellaco"
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Palta",
                 "cantidad": "2 cdtas",
                 "receta_id": null
               },
@@ -1750,7 +1231,531 @@
             "items": [
               {
                 "componente": "carbohidrato",
+                "nombre": "Yuca sancochada",
+                "cantidad": "6 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "proteina",
+                "nombre": "Pescado",
+                "cantidad": "70 g en crudo",
+                "receta_id": null
+              },
+              {
+                "componente": "menestra",
+                "nombre": "Garbanzo",
+                "cantidad": "4 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Aceite de oliva",
+                "cantidad": "2 cdtas",
+                "receta_id": null
+              },
+              {
+                "componente": "fruta_vitc",
+                "nombre": "Lima",
+                "cantidad": "1 unidad mediana",
+                "receta_id": null
+              },
+              {
+                "componente": "bebida",
+                "nombre": "Agua",
+                "cantidad": "1 taza",
+                "receta_id": null
+              }
+            ]
+          },
+          "media_tarde": {
+            "nombre": "Media tarde",
+            "hora": "3:30 – 4:30",
+            "items": [
+              {
+                "componente": "base",
+                "nombre": "Paletas de mango",
+                "cantidad": "1 porción",
+                "receta_id": "paletas-mango-papaya"
+              }
+            ]
+          },
+          "cena": {
+            "nombre": "Cena",
+            "hora": "6:00 – 7:00",
+            "items": [
+              {
+                "componente": "carbohidrato",
                 "nombre": "Arroz",
+                "cantidad": "6 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "proteina",
+                "nombre": "Pollo",
+                "cantidad": "70 g en crudo",
+                "receta_id": null
+              },
+              {
+                "componente": "menestra",
+                "nombre": "Garbanzo",
+                "cantidad": "4 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Aceite de oliva",
+                "cantidad": "2 cdtas",
+                "receta_id": null
+              },
+              {
+                "componente": "fruta_vitc",
+                "nombre": "Kiwi",
+                "cantidad": "1 unidad mediana",
+                "receta_id": null
+              },
+              {
+                "componente": "bebida",
+                "nombre": "Agua",
+                "cantidad": "1 taza",
+                "receta_id": null
+              }
+            ]
+          }
+        },
+        "Jueves": {
+          "desayuno": {
+            "nombre": "Desayuno",
+            "hora": "7:30 – 8:30",
+            "items": [
+              {
+                "componente": "cereal",
+                "nombre": "Hojuelas de kiwicha",
+                "cantidad": "5 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "acompanante",
+                "nombre": "Bastones de yuca dorada",
+                "cantidad": "1 porción",
+                "receta_id": "bastones-yuca-dorada"
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Palta",
+                "cantidad": "2 cdtas",
+                "receta_id": null
+              },
+              {
+                "componente": "fruta",
+                "nombre": "Durazno",
+                "cantidad": "1 unidad mediana",
+                "receta_id": null
+              }
+            ]
+          },
+          "media_manana": {
+            "nombre": "Media mañana",
+            "hora": "10:00 – 10:30",
+            "items": [
+              {
+                "componente": "base",
+                "nombre": "Compota de pera",
+                "cantidad": "1 porción",
+                "receta_id": "compota-pera-avena"
+              },
+              {
+                "componente": "crujiente",
+                "nombre": "Kiwicha pop",
+                "cantidad": "3 cdas",
+                "receta_id": null
+              }
+            ]
+          },
+          "almuerzo": {
+            "nombre": "Almuerzo",
+            "hora": "12:30 – 1:30",
+            "items": [
+              {
+                "componente": "carbohidrato",
+                "nombre": "Camote sancochado",
+                "cantidad": "6 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "proteina",
+                "nombre": "Pavita",
+                "cantidad": "70 g en crudo",
+                "receta_id": null
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Palta",
+                "cantidad": "2 cdtas",
+                "receta_id": null
+              },
+              {
+                "componente": "bebida",
+                "nombre": "Agua",
+                "cantidad": "1 taza",
+                "receta_id": null
+              }
+            ]
+          },
+          "media_tarde": {
+            "nombre": "Media tarde",
+            "hora": "3:30 – 4:30",
+            "items": [
+              {
+                "componente": "base",
+                "nombre": "Mazamorra de kiwicha",
+                "cantidad": "1 porción",
+                "receta_id": "mazamorra-kiwicha"
+              }
+            ]
+          },
+          "cena": {
+            "nombre": "Cena",
+            "hora": "6:00 – 7:00",
+            "items": [
+              {
+                "componente": "carbohidrato",
+                "nombre": "Papa sancochada",
+                "cantidad": "6 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "proteina",
+                "nombre": "Pavita",
+                "cantidad": "70 g en crudo",
+                "receta_id": null
+              },
+              {
+                "componente": "menestra",
+                "nombre": "Garbanzo",
+                "cantidad": "4 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Aceite de oliva",
+                "cantidad": "2 cdtas",
+                "receta_id": null
+              },
+              {
+                "componente": "fruta_vitc",
+                "nombre": "Piña Golden",
+                "cantidad": "1 unidad mediana",
+                "receta_id": null
+              },
+              {
+                "componente": "bebida",
+                "nombre": "Agua",
+                "cantidad": "1 taza",
+                "receta_id": null
+              }
+            ]
+          }
+        },
+        "Viernes": {
+          "desayuno": {
+            "nombre": "Desayuno",
+            "hora": "7:30 – 8:30",
+            "items": [
+              {
+                "componente": "cereal",
+                "nombre": "Hojuelas de quinua",
+                "cantidad": "5 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "acompanante",
+                "nombre": "Tacacho de bellaco",
+                "cantidad": "1 porción",
+                "receta_id": "tacacho-platano-bellaco"
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Aceite de oliva",
+                "cantidad": "2 cdtas",
+                "receta_id": null
+              },
+              {
+                "componente": "fruta",
+                "nombre": "Uva cortada a lo largo",
+                "cantidad": "1 unidad mediana",
+                "receta_id": null
+              }
+            ]
+          },
+          "media_manana": {
+            "nombre": "Media mañana",
+            "hora": "10:00 – 10:30",
+            "items": [
+              {
+                "componente": "base",
+                "nombre": "Compota de pera",
+                "cantidad": "1 porción",
+                "receta_id": "compota-pera-avena"
+              },
+              {
+                "componente": "crujiente",
+                "nombre": "Quinua pop",
+                "cantidad": "3 cdas",
+                "receta_id": null
+              }
+            ]
+          },
+          "almuerzo": {
+            "nombre": "Almuerzo",
+            "hora": "12:30 – 1:30",
+            "items": [
+              {
+                "componente": "carbohidrato",
+                "nombre": "Papa sancochada",
+                "cantidad": "6 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "proteina",
+                "nombre": "Pescado",
+                "cantidad": "70 g en crudo",
+                "receta_id": null
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Palta",
+                "cantidad": "2 cdtas",
+                "receta_id": null
+              },
+              {
+                "componente": "bebida",
+                "nombre": "Agua",
+                "cantidad": "1 taza",
+                "receta_id": null
+              }
+            ]
+          },
+          "media_tarde": {
+            "nombre": "Media tarde",
+            "hora": "3:30 – 4:30",
+            "items": [
+              {
+                "componente": "base",
+                "nombre": "Mazamorra de kiwicha",
+                "cantidad": "1 porción",
+                "receta_id": "mazamorra-kiwicha"
+              }
+            ]
+          },
+          "cena": {
+            "nombre": "Cena",
+            "hora": "6:00 – 7:00",
+            "items": [
+              {
+                "componente": "carbohidrato",
+                "nombre": "Arroz",
+                "cantidad": "6 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "proteina",
+                "nombre": "Pollo",
+                "cantidad": "70 g en crudo",
+                "receta_id": null
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Palta",
+                "cantidad": "2 cdtas",
+                "receta_id": null
+              },
+              {
+                "componente": "bebida",
+                "nombre": "Agua",
+                "cantidad": "1 taza",
+                "receta_id": null
+              }
+            ]
+          }
+        },
+        "Sábado": {
+          "desayuno": {
+            "nombre": "Desayuno",
+            "hora": "7:30 – 8:30",
+            "items": [
+              {
+                "componente": "cereal",
+                "nombre": "Hojuelas de kiwicha",
+                "cantidad": "5 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "acompanante",
+                "nombre": "Crema de quinua",
+                "cantidad": "1 porción",
+                "receta_id": "crema-quinua-manzana"
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Palta",
+                "cantidad": "2 cdtas",
+                "receta_id": null
+              },
+              {
+                "componente": "fruta",
+                "nombre": "Manzana",
+                "cantidad": "1 unidad mediana",
+                "receta_id": null
+              }
+            ]
+          },
+          "media_manana": {
+            "nombre": "Media mañana",
+            "hora": "10:00 – 10:30",
+            "items": [
+              {
+                "componente": "base",
+                "nombre": "Paletas de mango",
+                "cantidad": "1 porción",
+                "receta_id": "paletas-mango-papaya"
+              },
+              {
+                "componente": "crujiente",
+                "nombre": "Kiwicha pop",
+                "cantidad": "3 cdas",
+                "receta_id": null
+              }
+            ]
+          },
+          "almuerzo": {
+            "nombre": "Almuerzo",
+            "hora": "12:30 – 1:30",
+            "items": [
+              {
+                "componente": "carbohidrato",
+                "nombre": "Papa sancochada",
+                "cantidad": "6 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "proteina",
+                "nombre": "Pollo",
+                "cantidad": "70 g en crudo",
+                "receta_id": null
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Aceite de oliva",
+                "cantidad": "2 cdtas",
+                "receta_id": null
+              },
+              {
+                "componente": "bebida",
+                "nombre": "Agua",
+                "cantidad": "1 taza",
+                "receta_id": null
+              }
+            ]
+          },
+          "media_tarde": {
+            "nombre": "Media tarde",
+            "hora": "3:30 – 4:30",
+            "items": [
+              {
+                "componente": "base",
+                "nombre": "Fruta picada",
+                "cantidad": "1 porción",
+                "receta_id": null
+              }
+            ]
+          },
+          "cena": {
+            "nombre": "Cena",
+            "hora": "6:00 – 7:00",
+            "items": [
+              {
+                "componente": "carbohidrato",
+                "nombre": "Camote sancochado",
+                "cantidad": "6 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "proteina",
+                "nombre": "Pavita",
+                "cantidad": "70 g en crudo",
+                "receta_id": null
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Aceite de oliva",
+                "cantidad": "2 cdtas",
+                "receta_id": null
+              },
+              {
+                "componente": "bebida",
+                "nombre": "Agua",
+                "cantidad": "1 taza",
+                "receta_id": null
+              }
+            ]
+          }
+        },
+        "Domingo": {
+          "desayuno": {
+            "nombre": "Desayuno",
+            "hora": "7:30 – 8:30",
+            "items": [
+              {
+                "componente": "cereal",
+                "nombre": "Hojuelas de quinua",
+                "cantidad": "5 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "acompanante",
+                "nombre": "Tacacho de bellaco",
+                "cantidad": "1 porción",
+                "receta_id": "tacacho-platano-bellaco"
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Palta",
+                "cantidad": "2 cdtas",
+                "receta_id": null
+              },
+              {
+                "componente": "fruta",
+                "nombre": "Manzana",
+                "cantidad": "1 unidad mediana",
+                "receta_id": null
+              }
+            ]
+          },
+          "media_manana": {
+            "nombre": "Media mañana",
+            "hora": "10:00 – 10:30",
+            "items": [
+              {
+                "componente": "base",
+                "nombre": "Fruta picada",
+                "cantidad": "1 porción",
+                "receta_id": null
+              },
+              {
+                "componente": "crujiente",
+                "nombre": "Quinua pop",
+                "cantidad": "3 cdas",
+                "receta_id": null
+              }
+            ]
+          },
+          "almuerzo": {
+            "nombre": "Almuerzo",
+            "hora": "12:30 – 1:30",
+            "items": [
+              {
+                "componente": "carbohidrato",
+                "nombre": "Papa sancochada",
                 "cantidad": "6 cdas",
                 "receta_id": null
               },
@@ -1792,7 +1797,7 @@
             "items": [
               {
                 "componente": "carbohidrato",
-                "nombre": "Camote sancochado",
+                "nombre": "Arroz",
                 "cantidad": "6 cdas",
                 "receta_id": null
               },
@@ -1818,12 +1823,22 @@
           }
         }
       },
-      "degradaciones": []
+      "degradaciones": [
+        "carbohidrato/quinua: sin opciones para este paciente; se sustituyó por otra familia",
+        "cereal/avena: sin opciones para este paciente; se sustituyó por otra familia",
+        "cereal/canihua: sin opciones para este paciente; se sustituyó por otra familia",
+        "cereal/harinas: sin opciones para este paciente; se sustituyó por otra familia"
+      ]
     }
   ],
   "marco_diario": {},
   "avisos_biblioteca": [],
-  "degradaciones": [],
+  "degradaciones": [
+    "carbohidrato/quinua: sin opciones para este paciente; se sustituyó por otra familia",
+    "cereal/avena: sin opciones para este paciente; se sustituyó por otra familia",
+    "cereal/canihua: sin opciones para este paciente; se sustituyó por otra familia",
+    "cereal/harinas: sin opciones para este paciente; se sustituyó por otra familia"
+  ],
   "recetas_usadas": [
     "bastones-yuca-dorada",
     "compota-pera-avena",
