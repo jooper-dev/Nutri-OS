@@ -292,7 +292,7 @@
               },
               {
                 "componente": "proteina_hierro",
-                "nombre": "Sangrecita",
+                "nombre": "Hígado de pollo",
                 "cantidad": "1 cda",
                 "receta_id": null
               },
@@ -316,7 +316,7 @@
             "items": [
               {
                 "componente": "fruta",
-                "nombre": "Manzana",
+                "nombre": "Pera",
                 "cantidad": "2 cdas",
                 "receta_id": null
               }
