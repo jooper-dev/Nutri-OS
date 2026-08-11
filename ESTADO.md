@@ -2,7 +2,8 @@
 
 *Documento de traspaso. Léelo entero antes de tocar nada. Recoge decisiones ya tomadas y sus razones, para que no haya que rediscutirlas.*
 
-Última actualización: agosto 2026, tras el benchmark Thiago.
+Última actualización: 11 de agosto de 2026, tras la tanda de catálogo regional,
+familias funcionales y cierre del caso Thiago.
 
 ---
 
@@ -57,7 +58,7 @@ pacientes/         casos reales — FUERA de git
 salidas/           metricas.html
 ```
 
-**Fases:** F1 lectura clínica (modelo) → F2 ensamblaje (código) → F3 recetas nuevas (modelo, contexto limpio por receta) → F3b fotografía → F4 validación (código) → **F5 Puerta de Paty (humano)** → F6 render (código) → F7 registro.
+**Fases:** F1 lectura clínica (modelo) → F2 ensamblaje (código) → F3 recetas nuevas (modelo, contexto limpio por receta) → F3b fotografía → F4 validación (código) → F5 render (código) → **F6 Puerta de Paty (humano, sobre los PDF)** → F7 registro.
 
 ---
 
@@ -71,9 +72,22 @@ salidas/           metricas.html
 
 **El validador es independiente y determinista.** Relee protocolo y ficha por su cuenta y recuenta desde cero. Sustituye a la antigua "self-QA" donde un modelo se auditaba a sí mismo.
 
-**La Puerta de Paty no se salta.** El plan se detiene siempre antes de renderizar. `render.py` se niega a trabajar si el validador marcó BLOQUEADO, pero el visto bueno clínico lo da ella.
+**La Puerta de Paty no se salta, pero va DESPUÉS del render.** *(Cambiado el 11/08/2026; antes iba antes.)* Paty no lee markdown, así que pedirle que aprobara `reporte_qa.md` antes de generar los PDF era pedirle que revisara un documento que no puede leer: una puerta de mentira. El orden es validar → renderizar → ella revisa los PDF → si pide cambios, se corrige en el origen y se regenera. Lo que no cambió es el bloqueo automático: `render.py` se niega a trabajar si el validador marcó BLOQUEADO, y esa sí es una puerta que cierra sola. La firma clínica sigue siendo suya, ahora sobre el documento terminado.
 
 **Un tipo de plan nuevo es un archivo .yaml nuevo en `protocolos/`, nunca un parche al ensamblador.**
+
+**El protocolo nombra alimentos en dos niveles: el cajón (`familia`) o el alimento (`id`).** `{camote: 2, tuberculo: 2, grano: resto}` es una rotación válida. El cajón deja entrar a la región sin tocar el protocolo; el id conserva el criterio clínico fino donde lo hay. Fue la condición para poder ampliar el catálogo: antes las rotaciones nombraban los alimentos uno a uno y un alimento nuevo no podía aparecer en un plan por muchos que se añadieran.
+
+**Dos listas explícitas en `comun.py` gobiernan a qué componentes se les aplica cada regla.** Están escritas con su porqué encima porque son decisiones clínicas, no detalles de implementación:
+
+- `COMPONENTES_SIN_FILTRO_TEXTURA` — bebida, grasa, ensalada_grasa. `texturas_excluidas` describe cómo come el niño, no cómo bebe ni de qué está hecho un plato por dentro. Sin esto, a un paciente que no tolera lo húmedo el filtro le quitaba el agua y toda la grasa del plan.
+- `COMPONENTES_SIN_EXIGENCIA_DE_VARIEDAD` — carbohidrato, base_energetica, grasa, ensalada_grasa, crujiente, bebida. Que el arroz vaya a diario es normal; que el snack sea el mismo 28 veces no. El resto de componentes exige variedad aunque estén cubiertos por un alimento base.
+
+**Cuando el sistema no puede comprobar una restricción de seguridad, se detiene.** Ya valía para una alergia sin etiqueta en el catálogo; ahora vale también para un plan con `texturas_excluidas` donde algún alimento no declara su textura. Un veredicto APTO sobre una restricción no verificada es el peor modo de fallo posible.
+
+**`nunca_recomendar: true` en el catálogo es una exclusión absoluta**, para todos los pacientes, antes que la edad y las alergias, con bloqueo del validador si aparece igualmente. Hoy solo la lleva la sangrecita, por decisión clínica sostenida de Paty. No se borra el alimento del catálogo: se deja marcado para que la regla sea visible y nadie lo vuelva a añadir creyendo que faltaba.
+
+**`riesgo_disfagia` es un campo distinto de `texturas_excluidas`, y suelen contradecirse.** Uno dice lo que el niño no se come; el otro, lo que le puede hacer daño al tragar. En aversión textural lo seco es a la vez lo único que acepta y el perfil de bolo que se impacta. El sistema no resuelve esa tensión —es criterio clínico— pero la mide y la pone delante de Paty: PC_CLINICO la detecta, P1 ajusta humectación, tamaño de bocado, corte y líquido acompañante, y el validador avisa cuando el plan carga de seco.
 
 **Las fotos de receta se generan una sola vez en la vida de la receta.** Esto no reemplaza el flujo de Canva de los recetarios que Paty vende: son productos distintos con listón distinto. Aquí se trata del anexo personalizado de cada paciente.
 
@@ -99,21 +113,33 @@ salidas/           metricas.html
 
 **Reveló un agujero grande, ya tapado:** el sistema no tenía concepto de textura. Cuatro preparaciones húmedas ocupaban las 28 ranuras de media mañana y media tarde de un niño cuya madre dijo "nada aguado" como primera frase. El nombre de un plato nunca delata su textura: "compota de pera" no contiene la palabra "aguado". Se añadió el campo `textura` a alimentos y recetas y `texturas_excluidas` a la ficha. Al revalidar el plan viejo con el filtro nuevo salieron **86 errores**.
 
-**Reveló otro agujero, aún abierto:** ver punto 7.1.
+**Y reveló, en la tanda del 11/08, tres agujeros más — los tres ya tapados:**
+
+- **La migración de textura se había aplicado al catálogo y nunca a la biblioteca.** El filtro solo miraba alimentos base y toda receta le pasaba por debajo. El plan salía APTO con 22 raciones de textura excluida dentro —compota ×6, mazamorra ×6, paletas ×6, crema ×4— para un niño con impactación documentada, y lo único que lo delataba era un aviso entre nueve. Hoy las 13 recetas declaran su textura y la restricción no comprobada bloquea.
+- **El filtro de textura tumbaba el agua y las grasas.** `agua` es `liquida` y las tres grasas son `humeda` o `liquida`: el plan no se podía ensamblar, y el error no decía por qué. De ahí la lista de exentos.
+- **La comprobación de biblioteca insuficiente daba por resuelto cualquier componente con un alimento base.** El plan se llenaba con "Fruta picada" 10 de 28 veces y el motor lo daba por bueno. En selectividad severa eso no es aburrido: encoge el repertorio que el plan tendría que ampliar.
+
+**Estado actual del caso:** Thiago ensambla, valida sin errores y tiene sus dos PDF. Ver 7.2.
 
 ---
 
 ## 7. Pendientes, por prioridad
 
-### 7.1 Catálogo regional — el más importante
+### 7.1 Catálogo regional — el más importante, a medio camino
 
-`datos/alimentos_base.yaml` es costeño. Plátano bellaco, cocona, paiche, cecina, aguaje, tacacho, chonta, camu camu: nada existe. En el benchmark el plan salió con arroz y papa, comida que ese niño no come.
+`datos/alimentos_base.yaml` es costeño, y ni siquiera trujillano: faltan zarandaja, pallares, bonito, jurel y pota tanto como el plátano bellaco o la cocona. En el benchmark el plan salía con arroz y papa, comida que ese niño no come.
 
-Le va a pasar con cada familia de la sierra y la selva, que en Trujillo son muchas. Hay que ampliar el catálogo con alimentos amazónicos y andinos, con su `textura`, `edad_min_meses`, `alergenos` y `aporta`. Consultar con Paty antes: la disponibilidad y el precio real en Trujillo condicionan qué vale la pena incluir.
+**Hecho:** el mecanismo. Las rotaciones ya pueden pedir un cajón (`tuberculo`, `grano`, `hojuelas`, `aceite`, `fruto_graso`) en vez de nombrar los alimentos uno a uno, así que un alimento regional nuevo entra en los planes sin tocar ningún protocolo. `revisar.py` comprueba que las 47 claves de rotación y frecuencia de los tres protocolos correspondan a algún alimento.
 
-### 7.2 Terminar el caso Thiago
+**Falta:** los alimentos. Y antes de escribirlos, **la respuesta de Paty al Bloque 1** — tres preguntas de encuadre: cómo se reparten sus familias por región, si los niños andinos y amazónicos que viven en Trujillo siguen comiendo lo de su tierra o ya comen como la costa, y qué alimentos regionales no quiere recomendar nunca. Su respuesta decide el tamaño de la lista. Después hace falta, por alimento: disponibilidad real en Trujillo (siempre / por temporada / difícil / no se consigue), precio en tres cajones, edad mínima segura, textura y alérgeno.
 
-Re-ensamblar con `texturas_excluidas` activo, crear con P1 los snacks secos que pida el motor, pasar la Puerta de Paty, renderizar con `--caras` y registrar. No se ha llegado nunca al PDF de este caso.
+**Diseño ya acordado, no implementado:** tres campos por alimento —`region`, `mercado`, `costo`— y dos en la ficha —`origen_familiar`, `compras`—, todos opcionales y con valor por defecto que no toca ninguna línea existente. `mercado: no_hay` filtra duro; la coincidencia de región sube la prioridad en `puntaje()`; y un aviso nuevo del validador cuando la familia es de una región y el plan no tiene ni un alimento de ella.
+
+### 7.2 Caso Thiago — cerrado hasta el registro
+
+Ensambla, valida sin errores y tiene sus dos PDF (`--caras`). Se crearon con P1 cuatro recetas: `chifles-platano-bellaco` y `galletas-quinua-camote` (base, media mañana y tarde), `pollo-dorado-tiras` (acompanante, desayuno) y `granola-kiwicha-quinua` (cereal, desayuno).
+
+**Falta:** que Paty revise los PDF, y `registrar.py` con el importe. Y hay tres decisiones suyas encima de la mesa, todas en el reporte: el choque entre `riesgo_disfagia` y `texturas_excluidas` en este niño concreto; cuatro recetas nuevas de golpe en un paciente con selectividad severa cuando el protocolo topa la novedad en 3; y si autoriza el ajonjolí, que la ficha permite.
 
 ### 7.3 Reglas de protocolo declaradas pero no implementadas
 
@@ -130,12 +156,21 @@ El benchmark lo dejó claro: si el almuerzo lo cocina la abuela y no maneja la d
 
 `motor/generar_imagenes.py` nunca se ha ejecutado con una clave real. La ruta HTTP está verificada (llega a la API y devuelve error de clave inválida correctamente), pero no se ha generado ninguna imagen ni comprobado cómo queda embebida en el recetario.
 
-### 7.6 Higiene
+### 7.6 Etiquetas de alérgeno demasiado gruesas
+
+`frutos_secos` es un solo cajón para maní, almendra, anacardo y coco, que clínicamente no son la misma alergia. En el caso Thiago apareció tres veces estrechando el repertorio de un niño que tiene ocho alimentos: descarta sus dos únicos snacks secos previos —barritas de kiwicha y trufas de garbanzo— y bloqueó dos veces el aceite de coco, que era el mejor candidato por densidad calórica. Partir la etiqueta afecta a todo el catálogo y a las recetas ya escritas: decisión de Paty.
+
+### 7.7 Desfases entre los prompts y el motor
+
+`P1_RECETAS.md` describe `familia` como si sirviera solo para las reglas de frecuencia y dice que se deje vacío si no aplica. Desde las familias funcionales eso ya no es cierto: `familia` es también el cajón de las rotaciones, y una receta de `cereal` con el campo vacío solo puede entrar por degradación. Hay que actualizar esa regla del front-matter. Es el tipo de desfase que hay que buscar cada vez que cambie el motor: los prompts no se revalidan solos.
+
+### 7.8 Higiene
 
 - Fusionar la rama `codex/replace-with-zip` a `main`.
 - Rotar la clave de Gemini: pasó por un chat.
 - Confirmar que el cliente OAuth de Google del repositorio antiguo (`nutrios-492116`) fue eliminado. Borrar los archivos no bastaba, seguían en el historial de git.
 - `plan.json` y `reporte_qa.md` se regeneran en cada corrida y ensucian `git status`. Valorar ignorarlos; `ficha.md` sí conviene conservarla.
+- `motor/migrar_textura.py` ya cumplió su función (catálogo y biblioteca al día). Se puede borrar cuando se prefiera, pero documenta el vocabulario de texturas y de momento sirve de referencia.
 
 ---
 
@@ -159,14 +194,17 @@ python motor/revisar.py
 # Paty deja el material en pacientes/[Nombre]/fuente/
 # F1: con prompts/PC_CLINICO.md → ficha.md
 
-python motor/correr.py [Nombre]          # ensambla y valida, para en la Puerta
+python motor/correr.py [Nombre]          # ensambla y valida
 # si falla por biblioteca insuficiente → F3 con P1, contexto limpio por receta
 python motor/fotos.py [Nombre]           # prompts de imagen
 python motor/generar_imagenes.py [Nombre]
 
-# Paty revisa reporte_qa.md y aprueba
+python motor/render.py [Nombre] --caras  # no corre si el validador bloqueó
 
-python motor/render.py [Nombre] --caras
+# Paty revisa los DOS PDF y dice qué cambiar, si hay algo.
+# Se corrige en la ficha, el protocolo o la biblioteca — nunca en plan.json —
+# se vuelve a ensamblar, validar y renderizar, y se le entregan otra vez.
+
 python motor/registrar.py [Nombre] --costo 189 --tipo primera_vez
 python motor/metricas.py --html
 ```

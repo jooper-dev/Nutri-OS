@@ -1,8 +1,13 @@
 """
 Atajo — Nutri-OS
 
-Ensambla y valida en un solo paso, y se detiene en la puerta de Paty.
-No renderiza: eso requiere su visto bueno.
+Ensambla y valida en un solo paso. No renderiza, pero no porque haga falta un
+permiso: el render es un comando aparte y este atajo deja el plan listo para él.
+Si el validador marca BLOQUEADO, se detiene y no hay nada que renderizar.
+
+La revisión de Paty va DESPUÉS, sobre los PDF terminados: ella no lee markdown,
+y pedirle que apruebe un reporte que no puede leer no era una puerta, era un
+trámite.
 
 Uso:
     python motor/correr.py <nombre_carpeta_paciente> [--semilla N]
@@ -51,8 +56,9 @@ def main() -> int:
     print(f"✓ Plan válido, con {len(r.avisos)} aviso(s).")
     print(f"  → {destino}")
     print()
-    print("  ⛔ PUERTA DE PATY: revisa el reporte antes de renderizar.")
-    print(f"     Cuando dé el visto bueno:  python motor/render.py {args.paciente}")
+    print("  Siguiente paso — generar los PDF para que Paty los revise:")
+    print(f"     python motor/render.py {args.paciente}")
+    print(f"     python motor/render.py {args.paciente} --caras   (letra mayor)")
     return 0
 
 

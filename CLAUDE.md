@@ -108,20 +108,7 @@ python motor/validar.py [carpeta]
 Genera `reporte_qa.md`. Si sale **BLOQUEADO**, no continúes: los errores son
 aritméticos y siempre reales. Corrige la causa y vuelve a ensamblar.
 
-### F5 · Puerta de Paty ⛔
-
-**Aquí te detienes siempre.** Presenta a Paty:
-
-- El resumen del plan (paciente, semanas, protocolo, recetas nuevas).
-- Los avisos del reporte, en particular las **sustituciones forzadas**: cuando el
-  protocolo pedía algo que este paciente no puede comer, el motor lo sustituyó.
-  Paty tiene que enterarse de eso.
-- Las recetas sin probar en cocina.
-
-No renderices sin su visto bueno explícito. Un plan pediátrico lo firma ella,
-no el sistema.
-
-### F6 · Render
+### F5 · Render
 
 ```bash
 python motor/render.py [carpeta]            # una hoja apaisada por semana
@@ -129,10 +116,36 @@ python motor/render.py [carpeta] --caras    # dos hojas por semana, letra mayor
 ```
 
 Produce `Plan_[Paciente].pdf` (horario apaisado) y `Recetario_[Paciente].pdf` en
-la carpeta del paciente. Se niega a correr si el validador marcó BLOQUEADO.
+la carpeta del paciente. **Se niega a correr si el validador marcó BLOQUEADO**, y
+ese bloqueo es automático y no se salta: es la única puerta que cierra sola.
 
 Usa `--caras` cuando Paty lo pida o cuando la semana venga muy cargada: es lo
 que ella hace a mano cuando la letra no se lee impresa.
+
+### F6 · Puerta de Paty ⛔
+
+**Aquí te detienes siempre, y le entregas los PDF, no el reporte.** Paty no lee
+markdown: pedirle el visto bueno sobre `reporte_qa.md` era pedirle que aprobara
+un documento que no puede leer. Revisa sobre el plan terminado, que es el que va
+a entregar a la familia.
+
+Preséntale, en el chat y en lenguaje llano:
+
+- Dónde están los dos PDF y qué trae cada uno.
+- El resumen del plan (paciente, semanas, protocolo, recetas nuevas).
+- Los avisos del reporte traducidos, en particular las **sustituciones
+  forzadas**: cuando el protocolo pedía algo que este paciente no puede comer, el
+  motor lo sustituyó. Paty tiene que enterarse de eso.
+- Las recetas sin probar en cocina.
+- Cualquier alerta clínica que venga en la Nota para Paty de una receta nueva.
+
+Si pide correcciones, las dirá con sus palabras —"cámbiame las menestras del
+martes", "este niño no come camote"—. Se corrige donde toque (ficha, protocolo o
+biblioteca), se vuelve a ensamblar, validar y renderizar, y se le entregan los
+PDF nuevos. Nunca se edita `plan.json` ni el PDF a mano.
+
+La firma clínica sigue siendo suya. Lo que cambió es que ahora firma sobre el
+documento terminado, no sobre un informe técnico.
 
 ### F7 · Registro
 
@@ -181,5 +194,5 @@ mano, o cuando algo falla y no está claro por qué.
 ## Atajo
 
 ```bash
-python motor/correr.py [carpeta]     # ensambla y valida, y se detiene en la puerta de Paty
+python motor/correr.py [carpeta]     # ensambla y valida; después toca renderizar
 ```

@@ -53,14 +53,37 @@ Claude hace, en este orden:
 2. **Revisa si faltan recetas** para armar el plan.
 3. **Crea las que falten**, con la auditoría de seguridad pediátrica de siempre.
 4. **Arma el plan** y lo valida.
-5. **Se detiene y te pregunta.**
+5. **Genera los dos PDF** y se detiene para que los revises.
+
+Si la validación encuentra un error de verdad —una alergia en el plato, una
+cuenta que no cuadra—, **no genera nada** y te dice qué pasó. No hay PDF malo que
+se te pueda escapar.
 
 ---
 
-## Paso 3 · Tu revisión
+## Paso 3 · Los PDF
 
-Aquí es donde el sistema te entrega el `reporte_qa.md` y espera. Míralo con calma:
-es el momento en que decides tú, no la máquina.
+Salen dos archivos en la carpeta de la paciente:
+
+- **`Plan_Mateo.pdf`** — el horario semanal, apaisado, para imprimir y pegar en
+  la refrigeradora. Una hoja por semana.
+- **`Recetario_Mateo.pdf`** — solo las recetas que aparecen en ese plan, con
+  ingredientes, preparación y conservación.
+
+Si una semana te queda con la letra muy apretada, pídele:
+
+> Genera el plan en dos caras.
+
+Sale entonces a dos hojas por semana (lunes a jueves y viernes a domingo), con la
+letra más grande.
+
+---
+
+## Paso 4 · Tu revisión
+
+Aquí decides tú, sobre el documento terminado — el mismo que va a recibir la
+familia, no un informe técnico. Claude te resume en el chat lo que conviene
+mirar, y tú lo contrastas con el PDF delante.
 
 Presta atención sobre todo a dos cosas:
 
@@ -79,27 +102,12 @@ A partir de ahí el sistema la prefiere sobre las que no has probado.
 
 Si algo no te cuadra, dilo con tus palabras: *"cámbiame las menestras del martes"*,
 *"este niño no come camote"*, *"prefiero avena en vez de cañihua"*. Claude ajusta
-lo que corresponda y vuelve a armar el plan.
+lo que corresponda, vuelve a armar el plan y te genera los PDF otra vez. Las veces
+que haga falta: regenerarlos no cuesta nada.
 
----
-
-## Paso 4 · Los PDF
-
-Cuando das el visto bueno, salen dos archivos en la carpeta de la paciente:
-
-- **`Plan_Mateo.pdf`** — el horario semanal, apaisado, para imprimir y pegar en
-  la refrigeradora. Una hoja por semana.
-- **`Recetario_Mateo.pdf`** — solo las recetas que aparecen en ese plan, con
-  ingredientes, preparación y conservación.
-
-Si una semana te queda con la letra muy apretada, pídele:
-
-> Genera el plan en dos caras.
-
-Sale entonces a dos hojas por semana (lunes a jueves y viernes a domingo), con la
-letra más grande.
-
-Los PDF los subes tú a Drive y compartes el enlace, como haces siempre.
+Cuando estén como los quieres, **los PDF los subes tú a Drive y compartes el
+enlace**, como haces siempre. Ese es el momento en que el plan sale de tu mano, y
+por eso la última palabra es tuya: el sistema nunca entrega nada a nadie.
 
 ---
 
@@ -171,7 +179,8 @@ excluida del repositorio. Los PDF se generan en local, sin enviar nada a ningún
 servicio.
 
 **El sistema no firma nada.** Prepara y ordena; la revisión clínica y la decisión
-final son tuyas. Por eso se detiene siempre antes de generar los PDF.
+final son tuyas. Se detiene siempre después de generar los PDF y antes de que
+salgan de tu computadora: nada llega a una familia sin que tú lo hayas mirado.
 
 ---
 
