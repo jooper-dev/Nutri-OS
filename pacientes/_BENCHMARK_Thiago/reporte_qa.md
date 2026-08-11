@@ -4,11 +4,15 @@ Protocolo: Escolar 6–11 años · dieta de eliminación de 4 alimentos  ·  2 s
 
 ## Resultado
 
-**APTO PARA REVISIÓN** — sin errores bloqueantes.
+**BLOQUEADO** — 1 error(es). El plan no debe renderizarse.
+
+## Errores
+
+- La ficha excluye texturas (humeda, liquida, mixta) y estos alimentos del plan no declaran la suya, así que el filtro no los ha mirado y la restricción NO está comprobada: Bastones de yuca dorada, Compota de pera, Crema de quinua, Mazamorra de kiwicha, Paletas de mango, Tacacho de bellaco.
+    Declara `textura` en el front-matter de esas recetas —python motor/migrar_textura.py— o en datos/alimentos_base.yaml. No se firma un plan cuya restricción de textura nadie ha podido verificar.
 
 ## Avisos
 
-- La ficha excluye texturas (humeda, liquida, mixta) pero estos alimentos del plan no declaran la suya, así que el filtro no los ha mirado: Bastones de yuca dorada, Compota de pera, Crema de quinua, Mazamorra de kiwicha, Paletas de mango, Tacacho de bellaco
 - 6 receta(s) del plan no están marcadas como probadas en cocina: bastones-yuca-dorada, compota-pera-avena, crema-quinua-manzana, mazamorra-kiwicha, paletas-mango-papaya, tacacho-platano-bellaco
 - El protocolo declara «max_recetas_nuevas_semana» para selectividad, pero el motor todavía no lo aplica: queda a criterio de Paty.
 - Nota del protocolo (selectividad): priorizar recetas ya aceptadas por el paciente
