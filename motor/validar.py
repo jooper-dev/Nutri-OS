@@ -151,6 +151,35 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
         elif "[" in str(item["cantidad"]) or "]" in str(item["cantidad"]):
             r.error(f"{donde}: la cantidad de «{item['nombre']}» conserva corchetes.")
 
+    # --- 2b. Texturas -------------------------------------------------------
+    # Una textura excluida en la ficha solo filtra a los alimentos que la
+    # declaran. Los que no la declaran pasan sin que nadie los mire: hay que
+    # decirlo, o el plan parece respetar una restricción que no respetó.
+    excluidas = {normalizar(t) for t in ficha.get("texturas_excluidas") or []}
+    if excluidas:
+        sin_declarar: set[str] = set()
+        for sem, dia, cid, item in _items(plan):
+            op = catalogo.get(item.get("receta_id") or "") or next(
+                (o for o in catalogo.values() if o.nombre == item["nombre"]), None
+            )
+            if op is None:
+                continue
+            if normalizar(op.textura) in excluidas:
+                r.error(
+                    f"S{sem} · {dia} · {cid}: «{item['nombre']}» es de textura "
+                    f"{op.textura}, excluida para este paciente."
+                )
+            elif not op.textura:
+                sin_declarar.add(item["nombre"])
+        if sin_declarar:
+            r.aviso(
+                "La ficha excluye texturas ("
+                + ", ".join(sorted(excluidas))
+                + ") pero estos alimentos del plan no declaran la suya, así que el "
+                "filtro no los ha mirado: "
+                + ", ".join(sorted(sin_declarar))
+            )
+
     # --- 3. Frecuencias del protocolo, recontadas ---------------------------
     for s in plan["semanas"]:
         n = s["semana"]

@@ -60,6 +60,7 @@ diagnostico_texto: >
 alergias: [lacteos]            # lacteos | huevo | gluten | frutos_secos | pescado |
                                # soya | ajonjoli | mariscos
 rechazos: [pescado, brocoli]   # aversiones declaradas, no alergias
+texturas_excluidas: []         # seca | crujiente | blanda | humeda | liquida | mixta
 favoritos: [pollo, palta]
 
 porciones:                     # medidas caseras, derivadas del requerimiento
@@ -83,6 +84,8 @@ bloqueantes: []                # lista de datos vitales ausentes; si NO está va
 - **`diagnosticos`** solo admite los valores de la lista. Si el caso no encaja en ninguno, usa `[ninguno]` y describe el cuadro en `diagnostico_texto`. **No inventes categorías nuevas:** las llaves tienen que coincidir con `preferencias_clinicas` del protocolo o el ajuste no se aplica.
 - **`alergias`** admite valores fuera de la lista cuando el caso lo exige (por ejemplo `carne_mamifero` en un síndrome alfa-gal). Si escribes uno nuevo, **avísalo en la Nota para Paty**: el validador comprobará que esa etiqueta exista en el catálogo de alimentos, y si no existe detendrá el plan, porque una alergia que no coincide con nada no está excluyendo nada.
 - **`alergias`** es la lista más delicada del sistema. Ante cualquier mención ambigua ("le cae mal la leche"), **inclúyela** y anótalo en la Nota para Paty para que Paty decida. Un falso positivo quita una receta; un falso negativo es un evento adverso.
+- **`texturas_excluidas`** es el campo que más se olvida y el que más planes tira a la basura. Cuando la familia diga "nada aguado", "nada mezclado", "solo cosas secas" o "le da arcada la sopa", **tradúcelo aquí**, no a `rechazos`: un rechazo excluye un alimento concreto, esto excluye una forma de comer. Si no lo escribes, el motor no puede verlo — el nombre de un plato nunca dice qué textura tiene.
+  Traducción habitual: "nada aguado" → `humeda`, `liquida`; "nada mezclado" o "nada con salsa encima" → `mixta`; "solo seco" → `humeda`, `liquida`, `mixta`.
 - **`rechazos`** son aversiones, no riesgos. Van separados porque el ensamblador los trata distinto: un rechazo se puede ofrecer una vez en el plan como reintroducción; una alergia jamás.
 - **`porciones`** traduce el requerimiento calórico a medidas caseras ejecutables. Las llaves deben coincidir con los `componentes` del protocolo elegido. Sin corchetes, sin rangos: un valor concreto por componente.
 - **`protocolo_sugerido`** se elige por edad, salvo que el diagnóstico justifique otro. Si te apartas del protocolo por edad, explica por qué en la Nota para Paty — Paty tiene la última palabra.

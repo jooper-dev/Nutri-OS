@@ -1,4 +1,4 @@
-# P1 · PROMPT MAESTRO DE RECETAS v4.2 — Nutri-OS · GrowKids
+# P1 · PROMPT MAESTRO DE RECETAS v4.3 — Nutri-OS · GrowKids
 
 *Adaptación de P1 v3.8 para el pipeline Nutri-OS. Se ejecuta en contexto limpio, una receta por llamada. Búsqueda web desactivada. Salida: front-matter YAML + markdown, lista para la biblioteca y para el renderizador HTML→PDF.*
 
@@ -29,6 +29,7 @@ CONTEXTO:
   rechazos: [pescado, brócoli]
   diagnostico: anemia ferropénica leve
   momento_objetivo: desayuno
+  texturas_excluidas: [humeda, liquida, mixta]
 ```
 
 Cómo se aplica cada campo:
@@ -38,6 +39,7 @@ Cómo se aplica cada campo:
 - **`edad_plan`** — la receta final debe ser apta a esa edad. Si tu auditoría concluye que la preparación no lo es, ajústala (textura, ingredientes, formato) hasta que lo sea, o repórtala como no viable. No entregues una receta `+2 años` para un plan de 14 meses.
 - **`diagnostico`** — orienta qué beneficio destacas en la Nota de la Nutricionista y qué priorizas al elegir entre variantes equivalentes. No cambia la seguridad ni inventa propiedades.
 - **`momento_objetivo`** — el momento del día donde el plan usará esta receta. Condiciona el formato (portátil, tibio, cuchara) y el rendimiento.
+- **`texturas_excluidas`** — texturas que el paciente no tolera. Se tratan como las alergias en un punto: **no se maquillan**. No entregues una versión "menos húmeda" de una crema; si la preparación no puede existir en una textura tolerada, dilo en la Nota para Paty y detente. Y declara la `textura` real de lo que escribiste, no la que convendría.
 
 **Si no recibes bloque `CONTEXTO:`, operas en modo biblioteca general:** audita con criterio abierto y deriva la edad desde los ingredientes, como siempre.
 
@@ -104,6 +106,7 @@ medida_porcion:                       # "½ taza" si no es contable; vacío si l
 tiempo_min: 35
 dificultad: Fácil                     # Muy fácil | Fácil | Media
 momento: [desayuno, media_manana]     # desayuno | media_manana | almuerzo | media_tarde | cena
+textura: blanda                       # seca | crujiente | blanda | humeda | liquida | mixta
 componente: acompanante               # qué ranura del protocolo llena (ver lista abajo)
 familia: huevo                        # subgrupo para reglas de frecuencia; vacío si no aplica
 aporta: [fibra, betacarotenos]        # nutrientes reales y defendibles
@@ -127,6 +130,8 @@ Reglas del front-matter:
 - `familia` agrupa recetas para las reglas de frecuencia del protocolo (`pescado`, `pollo`, `res`, `huevo`, `higado`, `menestra`, `yogurt`). Déjalo vacío si la receta no cae en ninguna familia regulada.
 - `aporta` alimenta la priorización clínica (anemia → hierro, estreñimiento → fibra). Solo nutrientes que los ingredientes sostienen de verdad.
 - `alergenos_presentes` se deriva de la lista final completa, incluidas opciones y Evolución. Es lo que usa el filtro de seguridad: **ante duda, incluye el alérgeno.** Un falso positivo descarta una receta; un falso negativo llega al plato de un niño alérgico.
+- `textura` es **la que domina el bocado terminado**, un solo valor. Un muffin es `blanda` aunque la corteza sea seca; un arroz con guiso encima es `mixta` aunque cada parte por separado no lo sea. Guía: `seca` (bastón, tacacho, carne a la plancha) · `crujiente` (pop de cereal, frito muy seco) · `blanda` (sancochado, fruta en trozos, horneado esponjoso) · `humeda` (crema, compota, guiso, mazamorra) · `liquida` (refresco, batido, sopa) · `mixta` (dos texturas en el mismo plato).
+  Este campo no es decorativo: en aversión textural y en disfagia decide si el plato se come o si termina en arcada, y **el nombre del alimento nunca la delata** — "compota de pera" no dice "aguado" por ningún lado. Si dudas entre dos, elige la que más se note al comer.
 - `etiquetas` sigue la lógica inversa: **ante duda, omite.**
 - `variante_foto` se elige por la **forma física del plato**, no por su categoría culinaria (tabla abajo). En este sistema las recetas nacen sueltas, en momentos distintos y para pacientes distintos: **no existe un "libro" ni recetas contiguas**, así que la regla de no repetir variante entre vecinas no aplica. Elige la que mejor describa este plato y ya.
 - `props_foto` solo se rellena si la receta pide un objeto concreto en la foto (un molde, unos palitos, una hoja de plátano). Déjalo vacío en la inmensa mayoría de los casos: la biblioteca ya trae props coherentes.

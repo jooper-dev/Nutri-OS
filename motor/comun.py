@@ -80,6 +80,7 @@ class Opcion:
     familia: str = ""
     momento: list[str] = field(default_factory=list)
     aporta: list[str] = field(default_factory=list)
+    textura: str = ""
     es_receta: bool = False
     validada_en_cocina: bool = False
     ruta: str = ""
@@ -98,6 +99,14 @@ class Opcion:
         for r in rechazos:
             if r and r in normalizar(self.nombre):
                 return False, "rechazo declarado"
+
+        # La aversión a una textura no es una manía: en selectividad severa y en
+        # disfagia decide si el plato se come o si termina en arcada. Se filtra
+        # igual que un rechazo, pero por su propio campo, porque el nombre del
+        # alimento nunca la delata ("compota de pera" no dice "aguado").
+        excluidas = {normalizar(t) for t in ficha.get("texturas_excluidas") or []}
+        if excluidas and normalizar(self.textura) in excluidas:
+            return False, f"textura {self.textura}"
         return True, ""
 
 
@@ -137,6 +146,7 @@ def cargar_alimentos_base() -> list[Opcion]:
                     alergenos=a.get("alergenos") or [],
                     familia=a.get("familia") or a["id"],
                     aporta=a.get("aporta") or [],
+                    textura=str(a.get("textura") or ""),
                     es_receta=False,
                     ruta=str(ruta.relative_to(RAIZ)),
                 )
@@ -174,6 +184,7 @@ def cargar_biblioteca() -> tuple[list[Opcion], list[str]]:
                 familia=str(meta.get("familia") or ""),
                 momento=meta.get("momento") or [],
                 aporta=meta.get("aporta") or [],
+                textura=str(meta.get("textura") or ""),
                 es_receta=True,
                 validada_en_cocina=bool(meta.get("validada_en_cocina", False)),
                 ruta=str(ruta.relative_to(RAIZ)),

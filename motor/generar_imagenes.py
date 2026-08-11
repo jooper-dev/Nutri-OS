@@ -55,14 +55,30 @@ MAX_INTENTOS = 2
 
 
 def clave() -> str:
+    """Variable de entorno primero; si no, el archivo .env de la raíz."""
     k = os.environ.get("GEMINI_API_KEY", "").strip()
-    if not k:
-        raise ErrorNutriOS(
-            "No hay clave de API.\n"
-            "    Define GEMINI_API_KEY como variable de entorno antes de ejecutar.\n"
-            "    NO la escribas en ningún archivo del proyecto ni la pegues en el chat."
-        )
-    return k
+    if k:
+        return k
+
+    # .env está en .gitignore desde la primera línea del proyecto: es el único
+    # sitio del repositorio donde una clave puede vivir sin acabar en GitHub.
+    env = Path(__file__).resolve().parent.parent / ".env"
+    if env.exists():
+        for linea in env.read_text(encoding="utf-8").splitlines():
+            linea = linea.strip()
+            if linea.startswith("GEMINI_API_KEY"):
+                valor = linea.split("=", 1)[-1].strip().strip("\"'")
+                if valor:
+                    return valor
+
+    raise ErrorNutriOS(
+        "No hay clave de API.\n"
+        "    Opción A — crea un archivo .env en la raíz del proyecto con esta línea:\n"
+        "        GEMINI_API_KEY=tu_clave_aqui\n"
+        "    Opción B — defínela como variable de entorno antes de ejecutar.\n"
+        "    .env ya está en .gitignore, así que no se sube a GitHub.\n"
+        "    NO la pegues en el chat ni en ningún otro archivo del proyecto."
+    )
 
 
 def llamar(prompt: str, modelo: str, api_key: str) -> bytes:
