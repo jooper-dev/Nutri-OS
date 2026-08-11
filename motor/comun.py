@@ -86,17 +86,20 @@ COMPONENTES_SIN_FILTRO_TEXTURA = {"bebida", "grasa", "ensalada_grasa"}
 # y en selectividad severa no es solo aburrido, es contraproducente: la
 # monotonía impuesta encoge el repertorio que el plan tendría que ampliar.
 #
-#   fondo de plato, guarnición y bebida
-#       carbohidrato · base_energetica · grasa · ensalada_grasa · bebida
+#   fondo de plato, guarnición, topping y bebida
+#       carbohidrato · base_energetica · grasa · ensalada_grasa · crujiente ·
+#       bebida
 #   el plato en sí
-#       base · acompanante · crujiente · cereal · proteina · proteina_hierro ·
-#       menestra · fruta · fruta_vitc · verdura
+#       base · acompanante · cereal · proteina · proteina_hierro · menestra ·
+#       fruta · fruta_vitc · verdura
 #
-# `ensalada_grasa` está en la primera lista por su papel, no por su nombre:
-# cumple exactamente el de `grasa` —vehículo de grasa que acompaña al plato—,
-# hasta el punto de que escolar_eliminacion_4 sustituye una por la otra. Pedir
-# que "ensalada con palta" no se repita más de dos veces por semana no protege
-# a nadie; solo hace imposible un protocolo que la pide a diario.
+# `ensalada_grasa` y `crujiente` están en la primera lista por su papel, no por
+# su nombre. La primera cumple el de `grasa` —vehículo de grasa que acompaña—,
+# hasta el punto de que escolar_eliminacion_4 sustituye una por la otra. El
+# `crujiente` son dos o tres cucharadas de grano inflado por encima de otra
+# cosa: la variedad de esa comida la aporta la `base` que va debajo. Exigirles
+# variedad no protege a nadie y hace imposibles protocolos que las piden a
+# diario, que es rigor puesto donde no toca.
 #
 # Solo la primera lista vive aquí, porque es la excepción. Todo lo demás exige
 # variedad, incluido lo que no aparezca en ninguna de las dos: si mañana se
@@ -107,6 +110,7 @@ COMPONENTES_SIN_EXIGENCIA_DE_VARIEDAD = {
     "base_energetica",
     "grasa",
     "ensalada_grasa",
+    "crujiente",
     "bebida",
 }
 
