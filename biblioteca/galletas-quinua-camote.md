@@ -82,7 +82,7 @@ ALERTA DE ALÉRGENO — la harina de quinua y la maicena. La quinua no tiene glu
 TEXTURA — el punto crítico de este encargo. Declaro `crujiente`, y quiero dejar claro que no es una etiqueta de conveniencia: la ficha excluye húmeda, líquida y mixta, así que `seca` y `crujiente` pasan las dos el filtro y no gano nada eligiendo una. Elijo `crujiente` porque a 5 mm de grosor, sin gluten que dé elasticidad y con 30 minutos de horno más 10 de horno apagado, la galleta pierde toda el agua libre del camote y suena al partirse. Es una sola textura de principio a fin: no hay corteza seca sobre interior tierno.
 
 RIESGOS DE LA TEXTURA, los dos que veo:
-1. Si la masa sale de más de 5 mm, el centro se queda tierno y eso ya es `blanda` — es decir, una textura excluida para este paciente. Es el único punto donde la mamá puede romper la indicación clínica sin darse cuenta. Vale la pena insistir en el grosor y en el paso del horno apagado.
+1. Si la masa sale de más de 5 mm, el borde queda quebradizo y el centro tierno: eso son dos texturas en la misma galleta, es decir `mixta`, y `mixta` sí está excluida para este paciente. Es el único punto donde la mamá puede romper la indicación clínica sin darse cuenta. Vale la pena insistir en el grosor y en el paso del horno apagado. (Una galleta uniformemente tierna sería `blanda`, que para este paciente no está excluida: el problema es la mezcla, no la ternura.)
 2. Una galleta sin gluten y con esta proporción de grasa se desmenuza al morder. Cumple con la textura única (miga seca, nunca húmeda), pero deja bastantes migas en boca. En un niño que come lento y con impactación documentada, yo la ofrecería con un vaso de agua al lado. El agua está exenta del filtro de textura del motor, así que no rompe nada del plan.
 
 DECISIONES QUE DESCARTÉ, para que consten:
@@ -108,3 +108,18 @@ Datos asumidos: rendimiento (8 porciones de 4 galletas, sobre unos 420 g de masa
 Variante de foto: E — unidades repetidas iguales, es una galleta en hilera.
 
 Acento de color: durazno `#F2C4A0`, por el dorado anaranjado del camote asado en la miga y en el borde.
+
+---
+
+CORRECCIÓN POSTERIOR A LA GENERACIÓN (2026-08-11, orquestador)
+
+En "RIESGOS DE LA TEXTURA", punto 1, la salida original decía que un centro tierno
+sería `blanda` y que `blanda` era "una textura excluida para este paciente". Es
+falso: la ficha de este paciente excluye `humeda`, `liquida` y `mixta`, y de hecho
+56 raciones de su plan son de textura blanda. Lo que sí quedaría excluido es la
+combinación de borde quebradizo con centro tierno, que es `mixta`. Se corrigió la
+frase y se conservó la advertencia sobre el grosor, que sigue siendo válida.
+
+La regla del proyecto de guardar la salida de P1 íntegra existe para no maquillar
+criterio clínico, no para conservar errores de hecho. El criterio de la receta no
+se tocó: solo el enunciado equivocado.
