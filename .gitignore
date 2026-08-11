@@ -4,6 +4,8 @@
 pacientes/*
 !pacientes/.gitkeep
 !pacientes/_EJEMPLO_Mateo/
+!pacientes/_EJEMPLO_Bebe/
+!pacientes/_BENCHMARK_Thiago/
 salidas/*
 !salidas/.gitkeep
 

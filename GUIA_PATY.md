@@ -115,6 +115,11 @@ corresponde y prepara el texto para el generador de imágenes. Tú solo dices:
 La imagen queda guardada junto a la receta **para siempre**. La siguiente
 paciente que lleve esa misma receta la recibe con foto sin volver a generar nada.
 
+Para que las fotos se generen solas hace falta una clave de la API de Google.
+Danny la configura una vez en la computadora y ya no se vuelve a tocar.
+**Nunca la escribas en un archivo ni la pegues en el chat**: si eso pasa, hay que
+cambiarla.
+
 Si una foto no te convence, dilo y se rehace solo esa. Y si prefieres no usar
 fotos en un plan concreto, el recetario sale igual de bien: en lugar de la
 fotografía va una banda del color de la receta.
@@ -138,9 +143,16 @@ Y cuando quieras ver cómo va el mes:
 
 > Muéstrame las métricas del mes.
 
-Te da consultas, facturado, ticket promedio, desglose por tipo de consulta y los
-motivos de consulta más frecuentes. Si regeneras el plan de una paciente, no se
-duplica el ingreso: la fila se reemplaza.
+Se genera **`salidas/metricas.html`**: lo abres con doble clic y se ve en el
+navegador como una página normal. Trae consultas del mes, facturado, ticket
+promedio, la evolución mes a mes, el desglose por tipo de consulta, los motivos
+más frecuentes y el detalle de cada paciente.
+
+No hay que instalar nada ni entrar a ningún sitio: es un archivo en tu
+computadora. Puedes guardarlo o imprimirlo si te sirve.
+
+Si regeneras el plan de una paciente, no se duplica el ingreso: la fila se
+reemplaza sola.
 
 ---
 

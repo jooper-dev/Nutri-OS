@@ -65,11 +65,13 @@ python motor/render.py Mateo             # horario apaisado, una hoja por semana
 python motor/render.py Mateo --caras     # dos hojas por semana, letra más grande
 
 # 6. Fotos de las recetas nuevas (opcional)
-python motor/fotos.py Mateo              # escribe los prompts listos para pegar
+python motor/fotos.py Mateo              # escribe los prompts
+export GEMINI_API_KEY="..."              # nunca dentro del repositorio
+python motor/generar_imagenes.py Mateo   # genera y recorta las imágenes
 
 # 7. Registro y métricas
 python motor/registrar.py Mateo --costo 189 --tipo primera_vez
-python motor/metricas.py
+python motor/metricas.py --html          # panel en salidas/metricas.html
 ```
 
 Hay un caso completo de ejemplo en `pacientes/_EJEMPLO_Mateo/` con datos
@@ -87,7 +89,8 @@ biblioteca/        una receta por archivo, crece con el uso
   prompts_imagen/  prompt de foto de cada receta (generado)
   imagenes/        la foto de cada receta (una vez y para siempre)
 datos/             alimentos base · biblioteca de fotografía · registro de consultas
-motor/             revisar · ensamblar · validar · fotos · render · registrar · metricas
+motor/             revisar · ensamblar · validar · fotos · generar_imagenes
+                   render · registrar · metricas
 pacientes/         casos reales (fuera de Git)
 ```
 
@@ -117,8 +120,25 @@ deja el prompt listo para pegar en el generador; la imagen se guarda como
 receta**. A partir de ahí, cualquier paciente que la use la recibe con foto sin
 coste adicional.
 
+`motor/generar_imagenes.py` las genera con la API de Gemini (Nano Banana 2,
+`gemini-3.1-flash-image` por defecto; cambiable con `--modelo`), recorta a A4
+**por el borde inferior** —el tercio superior lo reservan los prompts— y
+reintenta dos veces antes de anotar el fallo y seguir. **La clave se lee solo de
+`GEMINI_API_KEY`**: nunca se escribe en el proyecto.
+
 Esto no reemplaza el flujo de Canva de los recetarios que se venden: son
 productos distintos. Aquí se trata del anexo personalizado de cada paciente.
+
+---
+
+## Caso de prueba
+
+`pacientes/_BENCHMARK_Thiago/` es un caso sintético difícil a propósito:
+esofagitis eosinofílica con dieta de eliminación de cuatro alimentos,
+selectividad alimentaria severa, aversión a texturas mixtas, una alergia rara
+fuera del vocabulario del sistema, familia amazónica recién mudada a la costa y
+datos contradictorios entre documentos. Sirve para comprobar que el sistema se
+detiene donde debe en lugar de producir un plan bonito y equivocado.
 
 ---
 

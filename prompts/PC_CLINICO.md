@@ -81,6 +81,7 @@ bloqueantes: []                # lista de datos vitales ausentes; si NO está va
 
 - **`edad_meses`** es el campo más crítico: selecciona protocolo y filtra toda la biblioteca. Calcúlalo desde la fecha de nacimiento y la fecha del plan. Si solo tienes la edad declarada ("2 añitos"), conviértela al valor más conservador (24 meses, no 35) y repórtalo.
 - **`diagnosticos`** solo admite los valores de la lista. Si el caso no encaja en ninguno, usa `[ninguno]` y describe el cuadro en `diagnostico_texto`. **No inventes categorías nuevas:** las llaves tienen que coincidir con `preferencias_clinicas` del protocolo o el ajuste no se aplica.
+- **`alergias`** admite valores fuera de la lista cuando el caso lo exige (por ejemplo `carne_mamifero` en un síndrome alfa-gal). Si escribes uno nuevo, **avísalo en la Nota para Paty**: el validador comprobará que esa etiqueta exista en el catálogo de alimentos, y si no existe detendrá el plan, porque una alergia que no coincide con nada no está excluyendo nada.
 - **`alergias`** es la lista más delicada del sistema. Ante cualquier mención ambigua ("le cae mal la leche"), **inclúyela** y anótalo en la Nota para Paty para que Paty decida. Un falso positivo quita una receta; un falso negativo es un evento adverso.
 - **`rechazos`** son aversiones, no riesgos. Van separados porque el ensamblador los trata distinto: un rechazo se puede ofrecer una vez en el plan como reintroducción; una alergia jamás.
 - **`porciones`** traduce el requerimiento calórico a medidas caseras ejecutables. Las llaves deben coincidir con los `componentes` del protocolo elegido. Sin corchetes, sin rangos: un valor concreto por componente.
@@ -102,7 +103,22 @@ Qué hay que priorizar para resolver los diagnósticos, en términos que el ensa
 
 No propongas menús ni recetas concretas. No es tu fase.
 
-### 3) Cómo se derivaron las porciones
+### 3) Señales de derivación
+
+Si el caso muestra alguna de estas señales, **dilo aquí de forma explícita y sin suavizarlo**. Un plan alimentario no las resuelve solo, y omitirlas es el error más caro que puedes cometer:
+
+- pérdida de peso o estancamiento del crecimiento entre controles;
+- repertorio muy reducido de alimentos aceptados (orientativamente, menos de 20);
+- arcadas, atragantamientos, vómitos o miedo a comer;
+- rechazo por textura, temperatura o color que se sostiene en el tiempo;
+- comidas que duran más de 30–40 minutos o que terminan en llanto de forma habitual;
+- sospecha de causa médica no estudiada (digestiva, respiratoria, motora, sensorial).
+
+Escribe qué señales viste y de dónde las sacaste, y sugiere a qué profesional correspondería derivar (terapeuta de alimentación, fonoaudiología, gastroenterología, salud mental infantil). **La decisión es de Paty**; tu trabajo es que no se le pase.
+
+Si no hay ninguna señal, escribe `Sin señales de derivación`.
+
+### 4) Cómo se derivaron las porciones
 
 El cálculo, en 2 o 3 líneas: requerimiento total, reparto por tiempo de comida, y cómo se tradujo a medida casera. Paty tiene que poder auditar esto en diez segundos.
 

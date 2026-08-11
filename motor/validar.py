@@ -91,6 +91,37 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
     alergias = {normalizar(a) for a in ficha.get("alergias") or []}
     rechazos = {normalizar(x) for x in ficha.get("rechazos") or []}
 
+    # Una alergia que no coincide con ninguna etiqueta del catálogo no está
+    # filtrando nada: el plan parece seguro y no lo es. Es el fallo más
+    # peligroso posible del sistema, así que se detecta explícitamente.
+    etiquetas_catalogo = {normalizar(a) for o in catalogo.values() for a in o.alergenos}
+    for a in sorted(alergias):
+        if a not in etiquetas_catalogo:
+            r.error(
+                f"La alergia «{a}» no corresponde a ninguna etiqueta de alérgeno del "
+                f"catálogo, así que NO está excluyendo nada.\n"
+                f"    Etiquetas reconocidas: {', '.join(sorted(etiquetas_catalogo)) or '(ninguna)'}.\n"
+                f"    Añade esa etiqueta a los alimentos que la contengan en "
+                f"datos/alimentos_base.yaml y al front-matter de las recetas afectadas, "
+                f"o corrige el nombre en la ficha."
+            )
+
+    # Igual para los rechazos, pero como aviso: un rechazo mal escrito molesta,
+    # no hace daño.
+    ids_catalogo = {normalizar(o.id) for o in catalogo.values()}
+    familias_catalogo = {normalizar(o.familia) for o in catalogo.values() if o.familia}
+    nombres_catalogo = {normalizar(o.nombre) for o in catalogo.values()}
+    for x in sorted(rechazos):
+        if x and not (
+            x in ids_catalogo
+            or x in familias_catalogo
+            or any(x in n for n in nombres_catalogo)
+        ):
+            r.aviso(
+                f"El rechazo «{x}» no coincide con ningún alimento del catálogo: "
+                f"no está excluyendo nada. Revisa cómo se escribe."
+            )
+
     for sem, dia, cid, item in _items(plan):
         ident = item.get("receta_id") or normalizar(item["nombre"])
         opcion = catalogo.get(ident) or next(
@@ -233,6 +264,27 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
             f"{len(sin_probar)} receta(s) del plan no están marcadas como probadas en cocina: "
             + ", ".join(sin_probar)
         )
+
+    # --- 6b. Reglas del protocolo que el motor todavía no aplica ------------
+    # Mejor decirlo que dejar creer que se cumplieron.
+    IMPLEMENTADAS = {"priorizar_aporta", "subir_frecuencia", "exclusiones_extra"}
+    for dx in ficha.get("diagnosticos") or []:
+        ajuste = (protocolo.get("preferencias_clinicas") or {}).get(dx) or {}
+        for clave in ajuste:
+            if clave not in IMPLEMENTADAS and clave != "nota_qa":
+                r.aviso(
+                    f"El protocolo declara «{clave}» para {dx}, pero el motor todavía "
+                    f"no lo aplica: queda a criterio de Paty."
+                )
+        if ajuste.get("nota_qa"):
+            r.aviso(f"Nota del protocolo ({dx}): {ajuste['nota_qa']}")
+
+    for clave in ("introduccion_progresiva", "progresion_textura", "exclusiones_duras"):
+        if protocolo.get(clave):
+            r.aviso(
+                f"El protocolo declara «{clave}», que el motor aún no hace cumplir. "
+                f"Revísalo a mano."
+            )
 
     # --- 7. Degradaciones del ensamblador -----------------------------------
     for d in plan.get("degradaciones", []):

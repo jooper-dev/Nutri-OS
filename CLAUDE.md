@@ -73,16 +73,24 @@ El script no decide nada: la variante A–K y el color los fijó P1 en el
 front-matter, y aquí solo se rellena la plantilla de la biblioteca. Escribe los
 prompts en `biblioteca/prompts_imagen/[id].txt`.
 
-Después, por cada prompt sin imagen:
+Después, genera las imágenes:
 
-1. Genera la imagen con el generador disponible, **sin modificar el texto del
-   prompt**. Si hay más de un modelo, genera una por modelo con el mismo texto
-   para que Paty compare limpio.
-2. Guárdala como `biblioteca/imagenes/[id].png`, con el id exacto de la receta.
-3. Formato vertical; la relación más cercana al A4 que acepte el modelo. **El
-   recorte al A4 se hace siempre por el borde inferior**, nunca por arriba: ese
-   tercio queda reservado a propósito.
-4. Si una llamada falla, no reintentes más de dos veces. Anótalo y sigue.
+```bash
+python motor/generar_imagenes.py [carpeta]     # solo las de este plan
+python motor/generar_imagenes.py --todas
+```
+
+El script se encarga de todo: llama a Nano Banana, recorta al A4 por el borde
+inferior, guarda en `biblioteca/imagenes/[id].png` y reintenta como máximo dos
+veces antes de anotar el fallo y seguir.
+
+**La clave de API se lee solo de la variable de entorno `GEMINI_API_KEY`.**
+Si Paty te la escribe en el chat, no la guardes en ningún archivo, no la repitas
+en tus mensajes y dile que la ponga como variable de entorno. Si ya la pegó en
+algún sitio del proyecto, avísale de que hay que rotarla.
+
+Si no hay clave configurada, el script se detiene con un mensaje claro: entrega
+los prompts y sigue. El recetario se maqueta igual, con la banda de color.
 
 Una imagen se genera **una sola vez en la vida de la receta**. La siguiente
 paciente que la use ya la tiene. Nunca regeneres una imagen existente salvo que
@@ -130,8 +138,12 @@ que ella hace a mano cuando la letra no se lee impresa.
 
 ```bash
 python motor/registrar.py [carpeta] --costo 189 --tipo primera_vez
-python motor/metricas.py                 # resumen del mes
+python motor/metricas.py                 # resumen del mes en la terminal
+python motor/metricas.py --html          # panel para abrir en el navegador
 ```
+
+Cuando Paty pida ver cómo va el mes, usa `--html` y dile que abra
+`salidas/metricas.html`: es una página que se lee de un vistazo, no una tabla.
 
 Añade una fila a `datos/consultas.csv` con paciente, edad, protocolo, semanas y
 diagnósticos: todo eso lo saca del plan. **Lo único que hay que preguntar es el
