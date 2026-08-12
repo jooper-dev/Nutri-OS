@@ -150,6 +150,98 @@ def recortar_a4(bruto: bytes) -> bytes:
     return salida.getvalue()
 
 
+def generar(
+    rutas: list[Path],
+    api_key: str,
+    modelo: str = MODELO_POR_DEFECTO,
+    pausa: float = 1.5,
+    rehacer: bool = False,
+) -> tuple[list[str], list[str], list[tuple[str, str]]]:
+    """Genera las imágenes de esos prompts. Devuelve (hechas, saltadas, fallidas).
+
+    Nunca lanza: un fallo de una imagen se anota y se sigue con la siguiente.
+    """
+    DIR_IMAGENES.mkdir(parents=True, exist_ok=True)
+    hechas: list[str] = []
+    saltadas: list[str] = []
+    fallidas: list[tuple[str, str]] = []
+
+    for ruta in rutas:
+        rid = ruta.stem
+        destino = DIR_IMAGENES / f"{rid}.png"
+        if destino.exists() and not rehacer:
+            saltadas.append(rid)
+            continue
+
+        prompt = ruta.read_text(encoding="utf-8")
+        ultimo = ""
+        for intento in range(1, MAX_INTENTOS + 1):
+            try:
+                bruto = llamar(prompt, modelo, api_key)
+                destino.write_bytes(recortar_a4(bruto))
+                hechas.append(rid)
+                print(f"  ✓ {rid}")
+                break
+            except ErrorNutriOS as e:
+                ultimo = str(e)
+                if intento < MAX_INTENTOS:
+                    time.sleep(3)
+        else:
+            # Nunca se deja el proceso colgado por una imagen: se anota y sigue.
+            fallidas.append((rid, ultimo))
+            print(f"  ✗ {rid} — {ultimo}")
+
+        time.sleep(pausa)
+
+    return hechas, saltadas, fallidas
+
+
+def asegurar_imagenes(
+    ids: list[str], modelo: str = MODELO_POR_DEFECTO, pausa: float = 1.5
+) -> dict:
+    """Consigue la foto de cada receta de la lista que aún no la tenga.
+
+    Es la puerta que usa `render.py` antes de maquetar el recetario. **No lanza
+    nunca**, ni siquiera sin clave de API: devuelve el resumen y quien llama
+    decide qué contar. El recetario se maqueta igual sin foto, con la banda de
+    color, y perder una fotografía nunca puede costar un plan.
+
+    Resumen: {hechas, saltadas, fallidas: [(id, error)], sin_prompt, motivo}
+    donde `motivo` explica por qué no se intentó nada (falta de clave).
+    """
+    resumen: dict = {
+        "hechas": [],
+        "saltadas": [],
+        "fallidas": [],
+        "sin_prompt": [],
+        "motivo": None,
+    }
+
+    pendientes: list[Path] = []
+    for rid in ids:
+        prompt = DIR_PROMPTS / f"{rid}.txt"
+        if not prompt.exists():
+            resumen["sin_prompt"].append(rid)
+        elif (DIR_IMAGENES / f"{rid}.png").exists():
+            resumen["saltadas"].append(rid)
+        else:
+            pendientes.append(prompt)
+
+    if not pendientes:
+        return resumen
+
+    try:
+        api_key = clave()
+    except ErrorNutriOS as e:
+        resumen["motivo"] = str(e)
+        return resumen
+
+    hechas, _, fallidas = generar(pendientes, api_key, modelo=modelo, pausa=pausa)
+    resumen["hechas"] = hechas
+    resumen["fallidas"] = fallidas
+    return resumen
+
+
 def objetivos(args) -> list[Path]:
     if args.solo:
         rutas = [DIR_PROMPTS / f"{i}.txt" for i in args.solo]
@@ -196,37 +288,11 @@ def main() -> int:
         print("\nNo hay prompts que procesar. Ejecuta antes:  python motor/fotos.py --todas\n")
         return 0
 
-    DIR_IMAGENES.mkdir(parents=True, exist_ok=True)
-    hechas, saltadas, fallidas = [], [], []
-
     print(f"\nModelo: {args.modelo} · proporción {PROPORCION} · recorte A4 por el borde inferior\n")
 
-    for ruta in rutas:
-        rid = ruta.stem
-        destino = DIR_IMAGENES / f"{rid}.png"
-        if destino.exists() and not args.rehacer:
-            saltadas.append(rid)
-            continue
-
-        prompt = ruta.read_text(encoding="utf-8")
-        ultimo = ""
-        for intento in range(1, MAX_INTENTOS + 1):
-            try:
-                bruto = llamar(prompt, args.modelo, api_key)
-                destino.write_bytes(recortar_a4(bruto))
-                hechas.append(rid)
-                print(f"  ✓ {rid}")
-                break
-            except ErrorNutriOS as e:
-                ultimo = str(e)
-                if intento < MAX_INTENTOS:
-                    time.sleep(3)
-        else:
-            # Nunca se deja el proceso colgado por una imagen: se anota y sigue.
-            fallidas.append((rid, ultimo))
-            print(f"  ✗ {rid} — {ultimo}")
-
-        time.sleep(args.pausa)
+    hechas, saltadas, fallidas = generar(
+        rutas, api_key, modelo=args.modelo, pausa=args.pausa, rehacer=args.rehacer
+    )
 
     print()
     print(f"✓ {len(hechas)} imagen(es) nueva(s) · {len(saltadas)} ya existían · {len(fallidas)} fallo(s)")

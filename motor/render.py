@@ -10,8 +10,16 @@ Sin Canva, sin Google Slides, sin etiquetas {{ }} que reemplazar una por una.
 La "Leyenda de énfasis" de P1 la aplica la hoja de estilo: las cantidades y
 los verbos salen en negrita solos.
 
+Antes de maquetar el recetario, las recetas de este plan que no tengan foto la
+consiguen solas: prompt de imagen si falta y llamada al generador. No es un paso
+aparte que haya que recordar. Si no hay clave o la API falla, se avisa en una
+línea y esas recetas salen con su banda de color; el render no se detiene nunca
+por una fotografía.
+
 Uso:
     python motor/render.py <nombre_carpeta_paciente>
+    python motor/render.py <carpeta> --caras       dos hojas por semana
+    python motor/render.py <carpeta> --sin-fotos   no genera imágenes
 """
 
 from __future__ import annotations
@@ -104,6 +112,59 @@ def leer_receta(rid: str) -> dict | None:
 
 
 # ---------------------------------------------------------------------------
+# Fotografía: parte del render, no un paso aparte
+# ---------------------------------------------------------------------------
+
+
+def asegurar_fotos(plan: dict) -> None:
+    """Consigue la foto de las recetas de este plan que todavía no la tengan.
+
+    Vive aquí dentro y no en un comando suelto por una razón medida: un paso
+    opcional que hay que acordarse de ejecutar es un paso que no se ejecuta.
+    `generar_imagenes.py` existía, funcionaba y estaba documentado como
+    opcional — y en todo el MVP no se generó ni una sola imagen. Ahora el
+    recetario pide sus fotos solo, justo antes de maquetarse.
+
+    Blindado de punta a punta: sin clave, sin red, con la API caída o con una
+    receta sin sección «Foto», se avisa en una línea y esa receta sale con su
+    banda de color. **Ninguna fotografía detiene un plan.** Por eso el `except`
+    es tan ancho: aquí un fallo inesperado tiene que costar una foto, nunca los
+    dos PDF que Paty está esperando.
+    """
+    ids = list(plan.get("recetas_usadas") or [])
+    if not ids:
+        return
+
+    try:
+        from fotos import asegurar_prompts
+        from generar_imagenes import asegurar_imagenes
+
+        listos, avisos = asegurar_prompts(ids)
+        for a in avisos:
+            print(f"  ⚠ foto: {a}")
+        r = asegurar_imagenes(listos)
+    except Exception as e:  # noqa: BLE001 — ver el docstring
+        print(f"  ⚠ fotos: no se pudieron generar ({e}). El recetario sale con la banda de color.")
+        return
+
+    pendientes = len(ids) - len(r["saltadas"]) - len(r["hechas"])
+
+    if r["motivo"]:
+        print(
+            f"  ⚠ fotos: no hay clave de API — {pendientes} receta(s) salen con la banda de "
+            "color. Pon GEMINI_API_KEY en .env y vuelve a renderizar."
+        )
+        return
+
+    if r["hechas"]:
+        print(f"  ✓ fotos: {len(r['hechas'])} nueva(s) · {len(r['saltadas'])} ya existían")
+    if r["fallidas"]:
+        print(f"  ⚠ fotos: {len(r['fallidas'])} fallaron y salen con la banda de color (error arriba)")
+    if r["sin_prompt"]:
+        print(f"  ⚠ fotos: sin prompt de imagen — {', '.join(r['sin_prompt'])}")
+
+
+# ---------------------------------------------------------------------------
 
 
 def construir_hojas(plan: dict, caras: bool) -> list[dict]:
@@ -165,7 +226,25 @@ def _slug(nombre: str) -> str:
     return re.sub(r"[\s]+", "_", s)
 
 
-def renderizar(nombre_carpeta: str, caras: bool = False) -> list[Path]:
+def _escribir_pdf(doc: str, destino: Path, hojas: list[CSS], base: str) -> None:
+    """Escribe el PDF, o explica en castellano por qué no pudo.
+
+    Windows bloquea un archivo abierto en un visor, y ese es justo el estado
+    normal en la Puerta de Paty: ella tiene el PDF delante, pide un cambio, y el
+    render moría con una traza de Python de doce líneas sobre PermissionError.
+    El plan estaba bien y el motor también; solo había una pestaña abierta.
+    """
+    try:
+        HTML(string=doc, base_url=base).write_pdf(destino, stylesheets=hojas)
+    except PermissionError as e:
+        raise ErrorNutriOS(
+            f"No se pudo escribir {destino.name}: está abierto en otro programa.\n"
+            "    Ciérralo (visor de PDF, navegador o vista previa) y vuelve a renderizar.\n"
+            "    El plan no tiene nada malo: es el archivo, que está en uso."
+        ) from e
+
+
+def renderizar(nombre_carpeta: str, caras: bool = False, fotos: bool = True) -> list[Path]:
     carpeta = DIR_PACIENTES / nombre_carpeta
     ruta_plan = carpeta / "plan.json"
     if not ruta_plan.exists():
@@ -195,10 +274,15 @@ def renderizar(nombre_carpeta: str, caras: bool = False) -> list[Path]:
     hojas = construir_hojas(plan, caras)
     doc = env.get_template("plan.html").render(p=plan, hojas=hojas)
     destino = carpeta / f"Plan_{slug}.pdf"
-    HTML(string=doc, base_url=base).write_pdf(destino, stylesheets=[css_base, css_plan])
+    _escribir_pdf(doc, destino, [css_base, css_plan], base)
     salidas.append(destino)
 
     # --- Recetario ----------------------------------------------------------
+    # Las fotos, antes de leer las recetas: `leer_receta` mira si el PNG existe,
+    # así que una imagen generada después no entraría en el PDF de esta corrida.
+    if fotos:
+        asegurar_fotos(plan)
+
     recetas, faltantes = [], []
     for rid in plan.get("recetas_usadas", []):
         r = leer_receta(rid)
@@ -210,7 +294,7 @@ def renderizar(nombre_carpeta: str, caras: bool = False) -> list[Path]:
         recetas.sort(key=lambda r: r["meta"].get("titulo", ""))
         doc = env.get_template("recetario.html").render(p=plan, recetas=recetas)
         destino = carpeta / f"Recetario_{slug}.pdf"
-        HTML(string=doc, base_url=base).write_pdf(destino, stylesheets=[css_base])
+        _escribir_pdf(doc, destino, [css_base], base)
         salidas.append(destino)
 
     return salidas
@@ -224,10 +308,15 @@ def main() -> int:
         action="store_true",
         help="parte cada semana en dos hojas (Cara A: lun–jue · Cara B: vie–dom), con letra más grande",
     )
+    ap.add_argument(
+        "--sin-fotos",
+        action="store_true",
+        help="no genera las fotos que falten; las recetas sin imagen salen con su banda de color",
+    )
     args = ap.parse_args()
 
     try:
-        salidas = renderizar(args.paciente, caras=args.caras)
+        salidas = renderizar(args.paciente, caras=args.caras, fotos=not args.sin_fotos)
     except ErrorNutriOS as e:
         print(f"\n✗ {e}\n", file=sys.stderr)
         return 1

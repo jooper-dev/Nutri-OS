@@ -22,13 +22,101 @@
             "items": [
               {
                 "componente": "base_energetica",
-                "nombre": "Arroz bien cocido",
+                "nombre": "Camote aplastado",
                 "cantidad": "2 cdas",
                 "receta_id": null
               },
               {
                 "componente": "proteina_hierro",
                 "nombre": "Pollo deshilachado",
+                "cantidad": "1 cda",
+                "receta_id": null
+              },
+              {
+                "componente": "verdura",
+                "nombre": "Zapallo",
+                "cantidad": "1 cda",
+                "receta_id": null
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Aceite de oliva",
+                "cantidad": "½ cdta",
+                "receta_id": null
+              }
+            ]
+          },
+          "media_tarde": {
+            "nombre": "Media tarde",
+            "hora": "3:30 – 4:00",
+            "items": [
+              {
+                "componente": "fruta",
+                "nombre": "Plátano",
+                "cantidad": "2 cdas",
+                "receta_id": null
+              }
+            ]
+          }
+        },
+        "Martes": {
+          "almuerzo": {
+            "nombre": "Almuerzo",
+            "hora": "12:00 – 1:00",
+            "items": [
+              {
+                "componente": "base_energetica",
+                "nombre": "Camote aplastado",
+                "cantidad": "2 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "proteina_hierro",
+                "nombre": "Pollo deshilachado",
+                "cantidad": "1 cda",
+                "receta_id": null
+              },
+              {
+                "componente": "verdura",
+                "nombre": "Zanahoria",
+                "cantidad": "1 cda",
+                "receta_id": null
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Palta",
+                "cantidad": "½ cdta",
+                "receta_id": null
+              }
+            ]
+          },
+          "media_tarde": {
+            "nombre": "Media tarde",
+            "hora": "3:30 – 4:00",
+            "items": [
+              {
+                "componente": "fruta",
+                "nombre": "Pera",
+                "cantidad": "2 cdas",
+                "receta_id": null
+              }
+            ]
+          }
+        },
+        "Miércoles": {
+          "almuerzo": {
+            "nombre": "Almuerzo",
+            "hora": "12:00 – 1:00",
+            "items": [
+              {
+                "componente": "base_energetica",
+                "nombre": "Papa aplastada",
+                "cantidad": "2 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "proteina_hierro",
+                "nombre": "Hígado de pollo",
                 "cantidad": "1 cda",
                 "receta_id": null
               },
@@ -59,58 +147,14 @@
             ]
           }
         },
-        "Martes": {
+        "Jueves": {
           "almuerzo": {
             "nombre": "Almuerzo",
             "hora": "12:00 – 1:00",
             "items": [
               {
                 "componente": "base_energetica",
-                "nombre": "Arroz bien cocido",
-                "cantidad": "2 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "proteina_hierro",
-                "nombre": "Pollo deshilachado",
-                "cantidad": "1 cda",
-                "receta_id": null
-              },
-              {
-                "componente": "verdura",
-                "nombre": "Zanahoria",
-                "cantidad": "1 cda",
-                "receta_id": null
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Aceite de oliva",
-                "cantidad": "½ cdta",
-                "receta_id": null
-              }
-            ]
-          },
-          "media_tarde": {
-            "nombre": "Media tarde",
-            "hora": "3:30 – 4:00",
-            "items": [
-              {
-                "componente": "fruta",
-                "nombre": "Plátano",
-                "cantidad": "2 cdas",
-                "receta_id": null
-              }
-            ]
-          }
-        },
-        "Miércoles": {
-          "almuerzo": {
-            "nombre": "Almuerzo",
-            "hora": "12:00 – 1:00",
-            "items": [
-              {
-                "componente": "base_energetica",
-                "nombre": "Papa aplastada",
+                "nombre": "Zapallo aplastado",
                 "cantidad": "2 cdas",
                 "receta_id": null
               },
@@ -123,50 +167,6 @@
               {
                 "componente": "verdura",
                 "nombre": "Zapallo",
-                "cantidad": "1 cda",
-                "receta_id": null
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Palta",
-                "cantidad": "½ cdta",
-                "receta_id": null
-              }
-            ]
-          },
-          "media_tarde": {
-            "nombre": "Media tarde",
-            "hora": "3:30 – 4:00",
-            "items": [
-              {
-                "componente": "fruta",
-                "nombre": "Pera",
-                "cantidad": "2 cdas",
-                "receta_id": null
-              }
-            ]
-          }
-        },
-        "Jueves": {
-          "almuerzo": {
-            "nombre": "Almuerzo",
-            "hora": "12:00 – 1:00",
-            "items": [
-              {
-                "componente": "base_energetica",
-                "nombre": "Camote aplastado",
-                "cantidad": "2 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "proteina_hierro",
-                "nombre": "Pollo deshilachado",
-                "cantidad": "1 cda",
-                "receta_id": null
-              },
-              {
-                "componente": "verdura",
-                "nombre": "Zanahoria",
                 "cantidad": "1 cda",
                 "receta_id": null
               },
@@ -198,7 +198,7 @@
             "items": [
               {
                 "componente": "base_energetica",
-                "nombre": "Zapallo aplastado",
+                "nombre": "Arroz bien cocido",
                 "cantidad": "2 cdas",
                 "receta_id": null
               },
@@ -210,7 +210,7 @@
               },
               {
                 "componente": "verdura",
-                "nombre": "Zapallo",
+                "nombre": "Zanahoria",
                 "cantidad": "1 cda",
                 "receta_id": null
               },
@@ -242,7 +242,7 @@
             "items": [
               {
                 "componente": "base_energetica",
-                "nombre": "Camote aplastado",
+                "nombre": "Papa aplastada",
                 "cantidad": "2 cdas",
                 "receta_id": null
               },
@@ -286,13 +286,13 @@
             "items": [
               {
                 "componente": "base_energetica",
-                "nombre": "Papa aplastada",
+                "nombre": "Arroz bien cocido",
                 "cantidad": "2 cdas",
                 "receta_id": null
               },
               {
                 "componente": "proteina_hierro",
-                "nombre": "Hígado de pollo",
+                "nombre": "Pollo deshilachado",
                 "cantidad": "1 cda",
                 "receta_id": null
               },

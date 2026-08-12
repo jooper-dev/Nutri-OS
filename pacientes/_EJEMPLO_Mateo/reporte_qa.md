@@ -12,7 +12,8 @@ Protocolo: Escolar 6–11 años  ·  2 semana(s)  ·  fecha 2026-08-10
 - Semana 1: base/yogurt aparece 0 vez/veces; el protocolo exige exactamente 3. (degradado por restricción del paciente)
 - Semana 2: proteina/pescado aparece 0 vez/veces; el protocolo exige exactamente 2. (degradado por restricción del paciente)
 - Semana 2: base/yogurt aparece 0 vez/veces; el protocolo exige exactamente 3. (degradado por restricción del paciente)
-- 15 receta(s) del plan no están marcadas como probadas en cocina: barritas-kiwicha-datil, baston-relleno-pollo, bastones-yuca-dorada, chifles-platano-bellaco, compota-pera-avena, crema-quinua-manzana, galletas-quinua-camote, granola-kiwicha-quinua, huevo-revuelto-palta, mazamorra-kiwicha, muffins-zanahoria-avena, paletas-mango-papaya, panqueques-avena-huevo, pollo-dorado-tiras, trufas-garbanzo-cacao
+- 16 receta(s) del plan no están marcadas como probadas en cocina: barritas-kiwicha-datil, baston-relleno-pollo, bastones-yuca-dorada, chifles-platano-bellaco, compota-pera-avena, crema-quinua-manzana, galletas-quinua-camote, granola-kiwicha-quinua, huevo-revuelto-palta, mazamorra-kiwicha, muffins-zanahoria-avena, paletas-mango-papaya, panqueques-avena-huevo, pollo-dorado-tiras, tacacho-platano-bellaco, trufas-garbanzo-cacao
+- El protocolo declara «subir_frecuencia» para anemia, pero el motor todavía no lo aplica: queda a criterio de Paty.
 - Sustitución forzada: base/yogurt: sin opciones para este paciente; se sustituyó por otra familia
 - Sustitución forzada: proteina/pescado: sin opciones para este paciente; se sustituyó por otra familia
 

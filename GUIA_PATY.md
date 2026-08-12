@@ -6,25 +6,26 @@ Esta guía es lo único que necesitas leer. No hace falta entender el código.
 
 ## Cómo se abre
 
-En **Claude Cowork**, abre la carpeta `Nutri-OS`. Con eso basta: Claude lee solo
-el archivo `CLAUDE.md` y ya sabe cómo funciona todo el sistema.
+En **Claude Cowork**, abre el proyecto `Nutri-OS`. Con eso basta: Claude ya sabe
+cómo funciona todo el sistema.
 
-No hay que escribir comandos ni pegar prompts. Le hablas normal.
+No hay que escribir comandos, ni pegar prompts, ni crear carpetas, ni tocar
+archivos. Le hablas normal y le arrastras lo que tengas.
 
 ---
 
-## Paso 1 · Prepara la carpeta de la paciente
+## Paso 1 · Arrastra y pide
 
-Dentro de `pacientes/`, crea una carpeta con el nombre del niño, y dentro otra
-llamada `fuente`:
+Abre el chat, **arrastra los archivos de la consulta** y escribe lo que quieres.
+Así de literal:
 
-```
-pacientes/
-  Mateo/
-    fuente/
-```
+> Hazme un plan de dos semanas para este paciente.
 
-En `fuente/` metes **todo lo que tengas de la consulta, tal como esté**:
+No tienes que crear ninguna carpeta, ni ordenar nada, ni ponerle nombre a los
+archivos. De eso se encarga el sistema solo: guarda el material donde
+corresponde y empieza a leer el caso.
+
+Arrastra **todo lo que tengas, tal como esté**:
 
 - fotos o PDF del laboratorio
 - la historia clínica o tus notas
@@ -32,28 +33,34 @@ En `fuente/` metes **todo lo que tengas de la consulta, tal como esté**:
 - capturas de WhatsApp con lo que la mamá contó
 - audios de la consulta, si los grabas
 
-No hace falta ordenarlo ni transcribirlo. El sistema lo lee y lo organiza.
+**Y cuenta en el mensaje lo que sepas de la consulta.** Lo que escribes se guarda
+con el caso igual que un documento: *"la mamá dice que no come nada verde"*,
+*"son dos semanas"*, *"la familia acaba de mudarse de la selva"*. Eso es
+información clínica y cuenta como tal.
 
-**Lo único que sí es obligatorio:** fecha de nacimiento (o edad exacta), peso,
-talla y las alergias. Si falta algo de eso, el sistema se detiene y te lo dice
-en vez de inventarlo.
+Lo único que puede preguntarte al principio es **cómo se llama el niño**, y solo
+si no lo encuentra en lo que le pasaste. Nada más.
+
+**Lo que sí es obligatorio que esté en algún sitio:** fecha de nacimiento (o edad
+exacta), peso, talla y las alergias. Si falta algo de eso, el sistema se detiene
+y te lo dice en vez de inventarlo.
+
+Si es un control de un niño que ya pasó por aquí, arrastra lo nuevo y dilo: se
+añade a su caso, no se empieza otro.
 
 ---
 
-## Paso 2 · Pídelo
+## Paso 2 · Lo que hace solo
 
-En el chat de Cowork escribes algo así:
-
-> Prepara el plan de Mateo. Son 2 semanas.
-
-Claude hace, en este orden:
+Después de tu mensaje, y sin preguntarte nada más:
 
 1. **Lee el caso** y escribe una ficha con edad, diagnóstico, alergias,
    requerimiento calórico y porciones. Te la muestra.
 2. **Revisa si faltan recetas** para armar el plan.
 3. **Crea las que falten**, con la auditoría de seguridad pediátrica de siempre.
 4. **Arma el plan** y lo valida.
-5. **Genera los dos PDF** y se detiene para que los revises.
+5. **Genera las fotos** de las recetas que aún no tengan.
+6. **Genera los dos PDF** y se detiene para que los revises.
 
 Si la validación encuentra un error de verdad —una alergia en el plato, una
 cuenta que no cuadra—, **no genera nada** y te dice qué pasó. No hay PDF malo que
@@ -63,7 +70,8 @@ se te pueda escapar.
 
 ## Paso 3 · Los PDF
 
-Salen dos archivos en la carpeta de la paciente:
+Salen dos PDF, y Claude te dice en el chat dónde quedaron. No tienes que ir a
+buscarlos: si no los encuentras, pídeselos y te los pone delante.
 
 - **`Plan_Mateo.pdf`** — el horario semanal, apaisado, para imprimir y pegar en
   la refrigeradora. Una hoja por semana.
@@ -113,24 +121,24 @@ por eso la última palabra es tuya: el sistema nunca entrega nada a nadie.
 
 ## Las fotos de las recetas
 
-Las recetas del recetario pueden llevar fotografía. Funciona así:
-
-Cuando se crea una receta nueva, el sistema decide qué tipo de encuadre le
-corresponde y prepara el texto para el generador de imágenes. Tú solo dices:
-
-> Genera las fotos que falten para el plan de Mateo.
+Las recetas del recetario llevan fotografía, y **no tienes que pedirla**. Al
+generar los PDF, el sistema mira qué recetas del plan no tienen foto todavía y
+las consigue en ese momento. Es parte de hacer el recetario, no un paso aparte.
 
 La imagen queda guardada junto a la receta **para siempre**. La siguiente
-paciente que lleve esa misma receta la recibe con foto sin volver a generar nada.
+paciente que lleve esa misma receta la recibe con foto sin volver a generar nada,
+así que cada plan tarda menos que el anterior.
 
-Para que las fotos se generen solas hace falta una clave de la API de Google.
-Danny la configura una vez en la computadora y ya no se vuelve a tocar.
-**Nunca la escribas en un archivo ni la pegues en el chat**: si eso pasa, hay que
-cambiarla.
+Si por lo que sea una foto no se puede generar —se cayó el servicio, se acabó la
+cuota—, **el recetario sale igual**: esa receta lleva una banda del color que le
+toca en vez de la fotografía, y te lo dice en una línea. Nunca vas a quedarte sin
+plan por una foto.
 
-Si una foto no te convence, dilo y se rehace solo esa. Y si prefieres no usar
-fotos en un plan concreto, el recetario sale igual de bien: en lugar de la
-fotografía va una banda del color de la receta.
+Si una foto no te convence, dilo y se rehace solo esa.
+
+Para que se generen hace falta una clave de la API de Google. Danny la configura
+una vez en la computadora y ya no se vuelve a tocar. **Nunca la escribas en un
+archivo ni la pegues en el chat**: si eso pasa, hay que cambiarla.
 
 Esto es aparte de los recetarios que vendes. Aquellos siguen pasando por tu
 plantilla de Canva como siempre; esto es solo el anexo de cada paciente.

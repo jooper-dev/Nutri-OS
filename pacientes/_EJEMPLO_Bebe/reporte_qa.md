@@ -4,7 +4,11 @@ Protocolo: Inicio de alimentación complementaria — 6 meses  ·  1 semana(s)  
 
 ## Resultado
 
-**APTO PARA REVISIÓN** — sin errores bloqueantes.
+**BLOQUEADO** — 1 error(es). El plan no debe renderizarse.
+
+## Errores
+
+- Regla acoplada «proteina_hierro.menestra -> fruta_vitc» no resoluble: el objetivo «fruta_vitc» no es un componente de ninguna comida del protocolo «ablactancia_6_meses».
 
 ## Avisos
 

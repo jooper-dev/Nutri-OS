@@ -140,6 +140,44 @@ def construir_prompt(ruta_receta: Path, variantes: dict[str, dict]) -> tuple[str
     return prompt, info
 
 
+def asegurar_prompts(ids: list[str]) -> tuple[list[str], list[str]]:
+    """Escribe el prompt de fotografía de cada receta de la lista que no lo tenga.
+
+    Es la puerta que usa `render.py`: antes de maquetar el recetario, toda receta
+    del plan necesita prompt para poder tener foto. Devuelve (ids con prompt
+    listo, avisos) y **no lanza nunca**: una receta sin sección «Foto» o con una
+    variante inválida se queda sin prompt, se dice, y el recetario sale igual con
+    su banda de color. Una foto no detiene un plan.
+    """
+    try:
+        variantes = cargar_variantes()
+    except ErrorNutriOS as e:
+        return [], [str(e)]
+
+    DIR_PROMPTS.mkdir(parents=True, exist_ok=True)
+    listos: list[str] = []
+    avisos: list[str] = []
+
+    for rid in ids:
+        destino = DIR_PROMPTS / f"{rid}.txt"
+        if destino.exists():
+            listos.append(rid)
+            continue
+        receta = DIR_BIBLIOTECA / f"{rid}.md"
+        if not receta.exists():
+            avisos.append(f"{rid}: no está en la biblioteca")
+            continue
+        try:
+            prompt, _ = construir_prompt(receta, variantes)
+        except ErrorNutriOS as e:
+            avisos.append(str(e))
+            continue
+        destino.write_text(prompt + "\n", encoding="utf-8")
+        listos.append(rid)
+
+    return listos, avisos
+
+
 def recetas_objetivo(args) -> list[Path]:
     if args.paciente:
         ruta_plan = DIR_PACIENTES / args.paciente / "plan.json"

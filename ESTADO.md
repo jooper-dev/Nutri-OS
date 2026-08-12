@@ -2,8 +2,8 @@
 
 *Documento de traspaso. Léelo entero antes de tocar nada. Recoge decisiones ya tomadas y sus razones, para que no haya que rediscutirlas.*
 
-Última actualización: 11 de agosto de 2026, tras la tanda de catálogo regional,
-familias funcionales y cierre del caso Thiago.
+Última actualización: 11 de agosto de 2026, tras integrar la fotografía en el
+render, mover la entrada del sistema al chat y cerrar el caso Thiago.
 
 ---
 
@@ -58,7 +58,7 @@ pacientes/         casos reales — FUERA de git
 salidas/           metricas.html
 ```
 
-**Fases:** F1 lectura clínica (modelo) → F2 ensamblaje (código) → F3 recetas nuevas (modelo, contexto limpio por receta) → F3b fotografía → F4 validación (código) → F5 render (código) → **F6 Puerta de Paty (humano, sobre los PDF)** → F7 registro.
+**Fases:** F0 entrada por chat (el sistema crea la carpeta y guarda el material) → F1 lectura clínica (modelo) → F2 ensamblaje (código) → F3 recetas nuevas (modelo, contexto limpio por receta) → F4 validación (código) → F5 render, **fotografía incluida** (código) → **F6 Puerta de Paty (humano, sobre los PDF)** → F7 registro.
 
 ---
 
@@ -91,7 +91,33 @@ salidas/           metricas.html
 
 **Las fotos de receta se generan una sola vez en la vida de la receta.** Esto no reemplaza el flujo de Canva de los recetarios que Paty vende: son productos distintos con listón distinto. Aquí se trata del anexo personalizado de cada paciente.
 
+**La fotografía es parte del render, no un paso propio.** *(Cambiado el 11/08/2026.)* `generar_imagenes.py` existía, funcionaba y estaba documentado como F3b opcional — y en todo el MVP no se generó ni una sola imagen. Un paso opcional que hay que acordarse de ejecutar es un paso que no se ejecuta: el fallo estaba en el diseño del flujo, no en el script. Hoy `render.py` mira, antes de maquetar el recetario, qué recetas del plan no tienen foto, escribe el prompt que falte y llama al generador. Los dos comandos sueltos siguen existiendo para trabajar la biblioteca entera. **Ninguna foto detiene un plan:** sin clave, sin red o con la API caída se avisa en una línea y esas recetas salen con su banda de color.
+
+**El sistema entra por el chat, no por una carpeta.** *(Cambiado el 11/08/2026.)* Paty no va a crear `pacientes/[Nombre]/fuente/`; va a arrastrar los archivos al chat y escribir *"hazme un plan de dos semanas para este paciente"*. La carpeta la crea el sistema, y ahí dentro guarda también **lo que ella escribió en el mensaje**: *"son dos semanas"*, *"no come nada verde"*, *"la familia viene de la selva"* es información clínica, y si vive solo en el chat desaparece del caso en la siguiente sesión. La única pregunta permitida al arrancar es el nombre del niño, y solo si no está en el material.
+
 **Las claves de API viven solo en `.env`** (ignorado por git) o en variables de entorno. Nunca en un archivo del proyecto, nunca en un chat. El repositorio ya se filtró una vez por esto.
+
+---
+
+## 4b. Dónde se toca cada cosa
+
+Esto es un MVP y va a cambiar en cuanto Paty lo use de verdad. Casi todos sus pedidos van a llegar en lenguaje de consulta —*"a este niño dale más en el desayuno"*, *"quiero menos menestras"*, *"añádeme la zarandaja"*— y **casi ninguno se arregla en el motor**. El motor es la parte que menos debería moverse: si un cambio de este tipo termina en un `if` dentro de `ensamblar.py`, se ha parcheado el sitio equivocado y el sistema pierde la garantía de que el plan cumple el protocolo.
+
+| Lo que pide | Dónde se toca |
+|---|---|
+| Porciones y reparto calórico por comida | la ficha del paciente y `prompts/PC_CLINICO.md` |
+| Estructura del día, frecuencias, rotaciones | el `.yaml` del protocolo |
+| Alimentos nuevos | `datos/alimentos_base.yaml` |
+| Recetas nuevas | P1, y aterrizan en `biblioteca/` |
+| Un entregable nuevo (p. ej. una guía de implementación para la familia) | plantilla HTML + CSS nuevos en `motor/plantillas/`, llamados desde `render.py` |
+| Estilo visual de los PDF | `motor/plantillas/*.css` |
+
+Dos matices que se pierden si solo se lee la tabla:
+
+- **Ficha o PC_CLINICO** no son lo mismo. La ficha es este paciente; PC_CLINICO es cómo se leen todos. Si Paty dice *"a Thiago dale más en el desayuno"*, es la ficha. Si dice *"yo siempre reparto 25/30/35/10"*, es PC_CLINICO, y entonces cambia para todos los que vengan.
+- **Un tipo de plan nuevo es un `.yaml` nuevo**, copiado de uno existente. Nunca una rama nueva en el ensamblador. Lo mismo vale para un entregable nuevo: plantilla propia, no un modo especial dentro de las que ya hay.
+
+Un cambio toca el motor solo cuando lo que falla es una cuenta, un filtro o una garantía: el validador no ve algo que debería ver, el filtro de alergias deja pasar un alimento, una frecuencia no se cumple. Eso sí es un bug y ahí sí se entra al código.
 
 ---
 
@@ -137,7 +163,7 @@ salidas/           metricas.html
 
 ### 7.2 Caso Thiago — cerrado hasta el registro
 
-Ensambla, valida sin errores y tiene sus dos PDF (`--caras`). Se crearon con P1 cuatro recetas: `chifles-platano-bellaco` y `galletas-quinua-camote` (base, media mañana y tarde), `pollo-dorado-tiras` (acompanante, desayuno) y `granola-kiwicha-quinua` (cereal, desayuno).
+Ensambla, valida sin errores y tiene sus dos PDF (`--caras`), ya **con las seis recetas fotografiadas**. Se crearon con P1 cuatro recetas: `chifles-platano-bellaco` y `galletas-quinua-camote` (base, media mañana y tarde), `pollo-dorado-tiras` (acompanante, desayuno) y `granola-kiwicha-quinua` (cereal, desayuno).
 
 **Falta:** que Paty revise los PDF, y `registrar.py` con el importe. Y hay tres decisiones suyas encima de la mesa, todas en el reporte: el choque entre `riesgo_disfagia` y `texturas_excluidas` en este niño concreto; cuatro recetas nuevas de golpe en un paciente con selectividad severa cuando el protocolo topa la novedad en 3; y si autoriza el ajonjolí, que la ficha permite.
 
@@ -152,9 +178,11 @@ El motor las ignora y el validador solo avisa:
 
 El benchmark lo dejó claro: si el almuerzo lo cocina la abuela y no maneja la dieta, el 30 % de las calorías depende de alguien que no leyó el plan. Haría falta un tercer entregable corto, en lenguaje directo, con lo que esa persona necesita saber.
 
-### 7.5 Probar la generación de imágenes de verdad
+### 7.5 Generación de imágenes — hecha y verificada
 
-`motor/generar_imagenes.py` nunca se ha ejecutado con una clave real. La ruta HTTP está verificada (llega a la API y devuelve error de clave inválida correctamente), pero no se ha generado ninguna imagen ni comprobado cómo queda embebida en el recetario.
+*(Cerrado el 11/08/2026.)* Ejecutada con clave real contra `gemini-3.1-flash-image`: las seis recetas del plan de Thiago tienen foto, el recorte sale exacto a proporción A4 (0.707) por el borde inferior, y el recetario las embebe sangrando a los cuatro bordes. La banda de color del acento y el fondo de la fotografía combinan como preveía la tabla de `fotos.py`.
+
+Quedan 11 recetas de la biblioteca sin imagen (las que ningún plan ha usado todavía). Se generarán solas la primera vez que un plan las lleve; para adelantarlo, `python motor/generar_imagenes.py --todas`.
 
 ### 7.6 Etiquetas de alérgeno demasiado gruesas
 
@@ -191,15 +219,16 @@ python motor/revisar.py
 ## 9. Cómo se ve un ciclo completo
 
 ```bash
-# Paty deja el material en pacientes/[Nombre]/fuente/
+# F0: Paty arrastra los archivos al chat y pide el plan.
+#     El sistema crea pacientes/[Nombre]/fuente/ y guarda ahí los adjuntos
+#     Y su mensaje. Ella no toca el sistema de archivos.
 # F1: con prompts/PC_CLINICO.md → ficha.md
 
 python motor/correr.py [Nombre]          # ensambla y valida
 # si falla por biblioteca insuficiente → F3 con P1, contexto limpio por receta
-python motor/fotos.py [Nombre]           # prompts de imagen
-python motor/generar_imagenes.py [Nombre]
 
-python motor/render.py [Nombre] --caras  # no corre si el validador bloqueó
+python motor/render.py [Nombre] --caras  # genera las fotos que falten y maqueta;
+                                         # no corre si el validador bloqueó
 
 # Paty revisa los DOS PDF y dice qué cambiar, si hay algo.
 # Se corrige en la ficha, el protocolo o la biblioteca — nunca en plan.json —

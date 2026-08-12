@@ -1,0 +1,23 @@
+Crea una fotografía gastronómica editorial para un recetario contemporáneo premium.
+
+SUJETO
+Granola suelta de grano andino, en trozos irregulares y quebradizos del tamaño de un garbanzo, ninguno mayor, extendida en un montón parejo sobre un plato claro y visto desde arriba, con unos veinte trozos sueltos que se distinguen uno a uno y grano fino disperso alrededor. Color dorado ámbar, algo más tostado en los cantos de cada trozo, con las hojuelas de quinua reconocibles como láminas planas y los puntos diminutos de kiwicha inflada adheridos a la superficie. Acabado mate y completamente seco, sin brillo de aceite ni gotas. Un par de trozos partidos dejan ver un interior compacto del mismo tono. Sin leche, sin líquido, sin frutas ni trozos oscuros por encima, sin polvos espolvoreados y sin nada verde en el encuadre. Servido sobre un plato de cerámica mate en tono claro.
+
+FORMATO
+A4 vertical, relación 210:297, full bleed.
+
+CÁMARA
+Plano cenital de aproximadamente 80-90°, prácticamente perpendicular a la mesa.
+
+COMPOSICIÓN
+Coloca el plato principal en la mitad inferior, ocupando buena parte del ancho.
+Añade un segundo plato en la esquina superior de un lateral, cortado por el borde y visible solo parcialmente, para dar profundidad sin llenar el encuadre.
+El tercio superior central queda limpio.
+
+FONDO
+Superficie lisa y mate de beige durazno cálido #EBD3C0, uniforme en todo el encuadre. El tono debe percibirse con nitidez, nunca casi blanco.
+
+ILUMINACIÓN
+Luz cenital-lateral suave desde arriba-izquierda, sombras cortas y blandas, buena definición del relieve del alimento.
+
+Genera exclusivamente la fotografía base. No incluyas texto, iconos, líneas, gráficos, logos ni elementos de maquetación.
