@@ -44,9 +44,9 @@ Cremoso, suave y de sabor amable: suele ser de los primeros platos que un bebé 
 
 ## Preparación
 
-01  **Bate**. el huevo hasta integrar bien la yema.
-02  **Cocina**. a fuego muy bajo removiendo, hasta que cuaje sin dorarse.
-03  **Aplasta**. la palta e intégrala fuera del fuego.
+01  **Bate** el huevo hasta integrar bien la yema.
+02  **Cocina** a fuego muy bajo removiendo, hasta que cuaje sin dorarse.
+03  **Aplasta** la palta e intégrala fuera del fuego.
 
 ## Ideas
 

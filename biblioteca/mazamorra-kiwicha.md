@@ -45,9 +45,9 @@ Sedosa, de color cálido y con el punto justo de dulzor de la fruta. La kiwicha 
 
 ## Preparación
 
-01  **Cocina**. la kiwicha en el agua 15 minutos, removiendo.
-02  **Licúa**. la papaya hasta obtener un puré liso.
-03  **Integra**. ambas preparaciones fuera del fuego.
+01  **Cocina** la kiwicha en el agua 15 minutos, removiendo.
+02  **Licúa** la papaya hasta obtener un puré liso.
+03  **Integra** ambas preparaciones fuera del fuego.
 
 ## Ideas
 

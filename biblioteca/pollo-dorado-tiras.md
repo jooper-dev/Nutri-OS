@@ -45,12 +45,12 @@ Se doran hasta que la superficie queda firme y mate, y se comen con la mano, tir
 
 ## Preparación
 
-01  **Retira**. la piel y la grasa suelta de los muslos, y seca la carne con papel de cocina.
-02  **Corta**. tiras del grosor de un dedo, siempre a través de la fibra y nunca a lo largo.
-03  **Mezcla**. las tiras con el ajo en polvo y la sal, hasta que queden parejas.
-04  **Calienta**. el aceite a fuego medio y acomoda las tiras separadas, sin amontonarlas.
-05  **Dora**. 6 minutos por lado, hasta que el centro quede blanco y sin ningún punto rosado.
-06  **Escurre**. sobre papel absorbente y sirve las tiras sueltas, sin nada encima.
+01  **Retira** la piel y la grasa suelta de los muslos, y seca la carne con papel de cocina.
+02  **Corta** tiras del grosor de un dedo, siempre a través de la fibra y nunca a lo largo.
+03  **Mezcla** las tiras con el ajo en polvo y la sal, hasta que queden parejas.
+04  **Calienta** el aceite a fuego medio y acomoda las tiras separadas, sin amontonarlas.
+05  **Dora** 6 minutos por lado, hasta que el centro quede blanco y sin ningún punto rosado.
+06  **Escurre** sobre papel absorbente y sirve las tiras sueltas, sin nada encima.
 
 ## Ideas
 

@@ -45,10 +45,10 @@ Espesa, tibia y con el dulzor discreto de la manzana cocida. Es de esas cucharad
 
 ## Preparación
 
-01  **Lava**. la quinua frotándola bajo el agua hasta que no salga espuma.
-02  **Cocina**. con la manzana en el agua, 20 minutos a fuego bajo.
-03  **Aplasta**. hasta la textura que corresponda a la edad.
-04  **Integra**. el aceite fuera del fuego.
+01  **Lava** la quinua frotándola bajo el agua hasta que no salga espuma.
+02  **Cocina** con la manzana en el agua, 20 minutos a fuego bajo.
+03  **Aplasta** hasta la textura que corresponda a la edad.
+04  **Integra** el aceite fuera del fuego.
 
 ## Ideas
 

@@ -37,6 +37,7 @@ from comun import (
     coincide_rechazo,
     comidas_activas,
     comprobar_rango_edad,
+    huella_plan,
     normalizar,
     resolver_regla_acoplada,
 )
@@ -538,6 +539,11 @@ def escribir_reporte(carpeta: Path, r: Reporte, plan: dict) -> Path:
         "",
         "Este reporte lo genera código, no un modelo de lenguaje: los conteos son "
         "aritmética sobre el plan ya construido. Un error aquí siempre es real.",
+        "",
+        # La huella ata este reporte AL plan que se validó. El renderizador la
+        # comprueba y se niega a maquetar si no coincide: un reporte que dice
+        # APTO sobre un plan que ya no existe no es una puerta, es un adorno.
+        f"Huella del plan validado: `sha256:{huella_plan(carpeta / 'plan.json')}`",
         "",
         "Revisión final y firma clínica: Nut. Patricia López.",
     ]

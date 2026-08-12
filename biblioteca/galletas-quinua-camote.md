@@ -50,12 +50,12 @@ Necesitas también: rodillo, papel manteca.
 
 ## Preparación
 
-01  **Asa**. el camote entero con cáscara a 200 °C por 35 minutos. Pélalo y aplástalo con tenedor.
-02  **Tuesta**. la harina de quinua en sartén seca, 3 minutos, moviendo sin parar. Deja enfriar.
-03  **Mezcla**. en un bol la harina tostada, la maicena, el azúcar y la sal.
-04  **Integra**. el puré de camote y el aceite hasta formar una masa firme que se despegue de las manos.
-05  **Estira**. entre dos papeles manteca hasta 5 mm de grosor y corta rectángulos de 6 por 4 cm.
-06  **Hornea**. a 170 °C por 30 minutos, hasta que doren. Apaga el horno y déjalas dentro 10 minutos.
+01  **Asa** el camote entero con cáscara a 200 °C por 35 minutos. Pélalo y aplástalo con tenedor.
+02  **Tuesta** la harina de quinua en sartén seca, 3 minutos, moviendo sin parar. Deja enfriar.
+03  **Mezcla** en un bol la harina tostada, la maicena, el azúcar y la sal.
+04  **Integra** el puré de camote y el aceite hasta formar una masa firme que se despegue de las manos.
+05  **Estira** entre dos papeles manteca hasta 5 mm de grosor y corta rectángulos de 6 por 4 cm.
+06  **Hornea** a 170 °C por 30 minutos, hasta que doren. Apaga el horno y déjalas dentro 10 minutos.
 
 ## Ideas
 

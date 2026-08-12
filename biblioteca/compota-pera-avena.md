@@ -45,10 +45,10 @@ Tibia, sedosa y con el dulzor limpio de la pera cocida. La avena la espesa lo ju
 
 ## Preparación
 
-01  **Pela**. y pica las peras en cubos.
-02  **Cocina**. con el agua 12 minutos a fuego bajo.
-03  **Integra**. la avena y cocina 3 minutos más.
-04  **Aplasta**. hasta la textura que corresponda a la edad.
+01  **Pela** y pica las peras en cubos.
+02  **Cocina** con el agua 12 minutos a fuego bajo.
+03  **Integra** la avena y cocina 3 minutos más.
+04  **Aplasta** hasta la textura que corresponda a la edad.
 
 ## Ideas
 

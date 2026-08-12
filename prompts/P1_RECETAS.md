@@ -206,7 +206,8 @@ Evita únicamente:
 - Numeración en dos dígitos: `01`, `02`, `03`…
 - **Entre 3 y 7 pasos**, calibrados a la complejidad real: 3–4 para preparaciones simples (bebidas, acompañamientos, sin cocción); 5–6 para horneados y armados; 6–7 para recetas con dos preparaciones que luego se unen. Si necesita más de 7, avisa en la Nota para Paty: probablemente requiera spread doble.
 - **La regla real es la longitud del paso, no su número.** Un paso = una acción que la mamá ejecuta de una vez. Prohibido fundir acciones separadas para acortar la lista: seis pasos de una línea se escanean mejor que cuatro compuestos. Prohibido también atomizar lo que es una sola acción.
-- Cada paso ≤ 140 caracteres. Formato: `01  **[Verbo]**. [Instrucción]. [Solo si aplica: dato de seguridad ultracorto].`
+- Cada paso ≤ 140 caracteres. Formato: `01  **[Verbo]** [resto de la instrucción]. [Solo si aplica: dato de seguridad ultracorto].`
+- **El verbo en negrita es la primera palabra de la frase, no un rótulo.** No lleva punto detrás ni mayúscula después: se lee `01  **Deshilacha** el pollo cocido en hebras finas.`, nunca `01  **Deshilacha**. el pollo cocido en hebras finas.` La negrita la aplica la hoja de estilo del recetario; la puntuación es la de una frase normal.
 - Prohibido el "porqué" culinario (texturas, esponjosidad, técnica). Se conserva únicamente el dato de seguridad directa (atragantamiento, temperatura, botulismo) o beneficio inmediato para el niño.
 
 ### 4) Ideas

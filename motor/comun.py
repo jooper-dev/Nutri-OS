@@ -7,6 +7,7 @@ un solo sitio donde cambiar formatos.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import sys
@@ -623,6 +624,18 @@ def cargar_ficha(carpeta_paciente: Path) -> dict:
 
     meta["_cuerpo"] = cuerpo
     return meta
+
+
+def huella_plan(ruta: Path) -> str:
+    """SHA-256 del plan.json tal cual está en disco.
+
+    El validador la escribe en el reporte y el renderizador la comprueba antes
+    de maquetar. Sin esto, "el renderizador se niega a trabajar si el validador
+    marcó BLOQUEADO" era una garantía que se saltaba con dos comandos: validar
+    un plan bueno y volver a ensamblar otro sin validarlo dejaba en la carpeta
+    un reporte APTO junto a un plan que nadie había mirado.
+    """
+    return hashlib.sha256(ruta.read_bytes()).hexdigest()
 
 
 def guardar_json(ruta: Path, datos: Any) -> None:

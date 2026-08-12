@@ -47,10 +47,10 @@ Necesitas también: molde rectangular, papel manteca.
 
 ## Preparación
 
-01  **Derrite**. la pasta de dátiles con la mantequilla a fuego muy bajo.
-02  **Mezcla**. con la kiwicha pop hasta cubrirla toda.
-03  **Presiona**. la mezcla en un molde forrado.
-04  **Enfría**. 2 horas y corta en barras.
+01  **Derrite** la pasta de dátiles con la mantequilla a fuego muy bajo.
+02  **Mezcla** con la kiwicha pop hasta cubrirla toda.
+03  **Presiona** la mezcla en un molde forrado.
+04  **Enfría** 2 horas y corta en barras.
 
 ## Ideas
 

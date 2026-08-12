@@ -45,12 +45,12 @@ Dorados por fuera, harinosos por dentro, y cada bastón se agarra con la mano si
 
 ## Preparación
 
-01  **Pela**. la yuca, córtala en trozos de un palmo y retira la fibra dura del centro.
-02  **Sancocha**. en el agua con la sal, 20 a 25 minutos, hasta que se pinche sin esfuerzo. La yuca nunca se come cruda.
-03  **Escurre**. y deja entibiar los trozos sobre un paño seco, unos 10 minutos.
-04  **Corta**. cada trozo en bastones del grosor de un dedo.
-05  **Dora**. en el aceite caliente, volteándolos, hasta que la superficie quede seca y firme.
-06  **Retira**. sobre papel absorbente y sírvelos separados, sin nada encima.
+01  **Pela** la yuca, córtala en trozos de un palmo y retira la fibra dura del centro.
+02  **Sancocha** en el agua con la sal, 20 a 25 minutos, hasta que se pinche sin esfuerzo. La yuca nunca se come cruda.
+03  **Escurre** y deja entibiar los trozos sobre un paño seco, unos 10 minutos.
+04  **Corta** cada trozo en bastones del grosor de un dedo.
+05  **Dora** en el aceite caliente, volteándolos, hasta que la superficie quede seca y firme.
+06  **Retira** sobre papel absorbente y sírvelos separados, sin nada encima.
 
 ## Ideas
 

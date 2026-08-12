@@ -19,4 +19,6 @@ Protocolo: Inicio de alimentación complementaria — 6 meses  ·  1 semana(s)  
 
 Este reporte lo genera código, no un modelo de lenguaje: los conteos son aritmética sobre el plan ya construido. Un error aquí siempre es real.
 
+Huella del plan validado: `sha256:9da8c8fb87f43c8c40dffc4887348d7f299dd5424e15fed4828b1e9ab7594826`
+
 Revisión final y firma clínica: Nut. Patricia López.

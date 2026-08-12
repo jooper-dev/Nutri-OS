@@ -46,12 +46,12 @@ Necesitas también: mandolina o pelador de verduras.
 
 ## Preparación
 
-01  **Pela**. los plátanos con cuchillo: la cáscara verde no cede al pelador. Córtalos en trozos de un palmo.
-02  **Corta**. rodajas muy finas, más delgadas que una moneda, con la mandolina o el pelador.
-03  **Calienta**. el aceite a fuego medio-alto hasta que una rodaja burbujee al entrar. Nunca dejes la sartén sola.
-04  **Fríe**. por tandas pequeñas, 2 a 3 minutos, hasta que dejen de burbujear y queden doradas.
-05  **Escurre**. sobre papel absorbente en una sola capa y sala en caliente.
-06  **Enfría**. por completo antes de guardar, destapados.
+01  **Pela** los plátanos con cuchillo: la cáscara verde no cede al pelador. Córtalos en trozos de un palmo.
+02  **Corta** rodajas muy finas, más delgadas que una moneda, con la mandolina o el pelador.
+03  **Calienta** el aceite a fuego medio-alto hasta que una rodaja burbujee al entrar. Nunca dejes la sartén sola.
+04  **Fríe** por tandas pequeñas, 2 a 3 minutos, hasta que dejen de burbujear y queden doradas.
+05  **Escurre** sobre papel absorbente en una sola capa y sala en caliente.
+06  **Enfría** por completo antes de guardar, destapados.
 
 ## Ideas
 

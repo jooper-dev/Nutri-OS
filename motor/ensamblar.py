@@ -450,11 +450,62 @@ def firma_dia(dia: dict) -> str:
     )
 
 
+def _familias_protegidas(protocolo: dict, frecuencias: list[dict]) -> set[tuple[str, str]]:
+    """Las (componente, clave) que otra regla ya reservó y nadie puede pisar.
+
+    Una regla de frecuencia con familia y una rotación con cupo fijo no son
+    sugerencias: son las ranuras que el ensamblador reservó primero para poder
+    garantizar el protocolo por construcción. Quien venga después escribe en lo
+    que quede libre, que es el relleno.
+    """
+    protegidas: set[tuple[str, str]] = set()
+    for regla in frecuencias:
+        if regla.get("cada_dias") or regla.get("modo") == "relleno":
+            continue
+        if regla.get("familia"):
+            protegidas.add((regla["componente"], normalizar(regla["familia"])))
+    for rot in protocolo.get("rotaciones") or []:
+        for fam, cupo in (rot.get("reparto") or {}).items():
+            if str(cupo).strip() != "resto":
+                protegidas.add((rot["componente"], normalizar(fam)))
+    return protegidas
+
+
 def aplicar_reglas_periodicas(
-    plan: dict, frecuencias: list[dict], rep: Repertorio, rng: random.Random
+    plan: dict,
+    protocolo: dict,
+    frecuencias: list[dict],
+    rep: Repertorio,
+    rng: random.Random,
 ):
-    """Reglas del tipo '1 vez cada 15 días', que exceden la semana."""
+    """Reglas del tipo '1 vez cada 15 días', que exceden la semana.
+
+    Estas reglas llegan al final, cuando las semanas ya están construidas, y
+    sustituyen el contenido de una ranura. El problema es a quién se lo quitan:
+    antes elegían una ranura al azar entre todas las del componente y pisaban lo
+    que hubiera, incluido el pescado que la regla de frecuencia acababa de
+    reservar. Uno de cada cinco planes salía BLOQUEADO por eso, con un mensaje
+    aritméticamente correcto y clínicamente incomprensible ("pescado aparece 1
+    vez; el protocolo exige 2"), y como esto corre FUERA del bucle de reintentos,
+    los 60 intentos no lo arreglaban nunca.
+
+    Ahora la res solo puede ocupar una ranura de relleno: lo que ninguna otra
+    regla había reservado.
+    """
     dias_totales = len(plan["semanas"]) * 7
+    protegidas = _familias_protegidas(protocolo, frecuencias)
+    catalogo = {
+        o.nombre: o for lista in rep.por_componente.values() for o in lista
+    }
+
+    def reservada(item: dict, comp: str) -> bool:
+        opcion = catalogo.get(item["nombre"])
+        if opcion is None:
+            # Si no se puede identificar, se trata como reservada: quitarle la
+            # ranura a algo que no sabemos qué es rompe más de lo que arregla.
+            return True
+        return any(c == comp and opcion.responde_a(clave) for c, clave in protegidas)
+
     for regla in frecuencias:
         if not regla.get("cada_dias"):
             continue
@@ -470,7 +521,10 @@ def aplicar_reglas_periodicas(
             for s in plan["semanas"]
             for d, dia in s["dias"].items()
             for c, cm in dia.items()
-            if c in (regla.get("en") or []) and any(i["componente"] == comp for i in cm["items"])
+            if c in (regla.get("en") or [])
+            and any(
+                i["componente"] == comp and not reservada(i, comp) for i in cm["items"]
+            )
         ]
         if not ranuras:
             continue
@@ -478,7 +532,7 @@ def aplicar_reglas_periodicas(
             elegida = rng.choice(candidatas)
             bloque = next(s for s in plan["semanas"] if s["semana"] == sem)
             for item in bloque["dias"][d][c]["items"]:
-                if item["componente"] == comp:
+                if item["componente"] == comp and not reservada(item, comp):
                     item["nombre"] = elegida.nombre
                     item["receta_id"] = elegida.id if elegida.es_receta else None
 
@@ -551,7 +605,7 @@ def ensamblar(nombre_carpeta: str, semilla: int | None = None) -> dict:
         "avisos_biblioteca": avisos,
         "degradaciones": sorted({d for s_ in semanas for d in s_["degradaciones"]}),
     }
-    aplicar_reglas_periodicas(plan, frecuencias, rep, random.Random(base))
+    aplicar_reglas_periodicas(plan, protocolo, frecuencias, rep, random.Random(base))
 
     plan["recetas_usadas"] = sorted(
         {

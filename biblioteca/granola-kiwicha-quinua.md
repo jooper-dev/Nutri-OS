@@ -51,13 +51,13 @@ Necesitas también: papel manteca.
 
 ## Preparación
 
-01  **Calienta**. el horno a 150 °C y forra una bandeja plana con papel manteca.
-02  **Derrite**. la pasta de dátiles con la miel y el aceite a fuego bajo, hasta obtener un jarabe fluido.
-03  **Mezcla**. en un bol las hojuelas de quinua, la kiwicha pop, la canela y la sal.
-04  **Vierte**. el jarabe caliente encima y remueve hasta que no quede nada seco.
-05  **Extiende**. en la bandeja, en capa pareja, y presiona con el dorso de una cuchara.
-06  **Hornea**. 25 minutos, removiendo una sola vez a los 12, hasta que quede dorada.
-07  **Enfría**. por completo en la bandeja, 20 minutos, y rompe en trozos no mayores que un garbanzo.
+01  **Calienta** el horno a 150 °C y forra una bandeja plana con papel manteca.
+02  **Derrite** la pasta de dátiles con la miel y el aceite a fuego bajo, hasta obtener un jarabe fluido.
+03  **Mezcla** en un bol las hojuelas de quinua, la kiwicha pop, la canela y la sal.
+04  **Vierte** el jarabe caliente encima y remueve hasta que no quede nada seco.
+05  **Extiende** en la bandeja, en capa pareja, y presiona con el dorso de una cuchara.
+06  **Hornea** 25 minutos, removiendo una sola vez a los 12, hasta que quede dorada.
+07  **Enfría** por completo en la bandeja, 20 minutos, y rompe en trozos no mayores que un garbanzo.
 
 ## Ideas
 

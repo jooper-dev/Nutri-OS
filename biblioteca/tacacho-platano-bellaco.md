@@ -46,11 +46,11 @@ Necesitas también: machacador de papas o mortero.
 
 ## Preparación
 
-01  **Pela**. los plátanos y córtalos en rodajas de dos dedos de grosor.
-02  **Dora**. las rodajas con 2 cdas de aceite a fuego medio, tapadas y volteando a media cocción, 15 minutos.
-03  **Machaca**. en caliente con la sal y el aceite restante, hasta una masa pareja y sin grumos.
-04  **Forma**. 6 bolas apretando con las manos húmedas. Para los más chicos, dales forma de tira alargada.
-05  **Sella**. las bolas en el sartén caliente, 2 minutos por lado, hasta que la superficie quede seca y dorada.
+01  **Pela** los plátanos y córtalos en rodajas de dos dedos de grosor.
+02  **Dora** las rodajas con 2 cdas de aceite a fuego medio, tapadas y volteando a media cocción, 15 minutos.
+03  **Machaca** en caliente con la sal y el aceite restante, hasta una masa pareja y sin grumos.
+04  **Forma** 6 bolas apretando con las manos húmedas. Para los más chicos, dales forma de tira alargada.
+05  **Sella** las bolas en el sartén caliente, 2 minutos por lado, hasta que la superficie quede seca y dorada.
 
 ## Ideas
 

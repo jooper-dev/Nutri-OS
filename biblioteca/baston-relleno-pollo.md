@@ -45,9 +45,9 @@ Se agarra con una mano y se come caminando, que es como desayunan de verdad los 
 
 ## Preparación
 
-01  **Deshilacha**. el pollo cocido en hebras finas.
-02  **Aplasta**. la palta con el aceite.
-03  **Rellena**. el pan y ciérralo presionando suave.
+01  **Deshilacha** el pollo cocido en hebras finas.
+02  **Aplasta** la palta con el aceite.
+03  **Rellena** el pan y ciérralo presionando suave.
 
 ## Ideas
 

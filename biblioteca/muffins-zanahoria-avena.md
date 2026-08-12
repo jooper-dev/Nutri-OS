@@ -49,11 +49,11 @@ Necesitas también: molde para muffins, rallador fino.
 
 ## Preparación
 
-01  **Ralla**. la zanahoria lo más fino posible.
-02  **Mezcla**. los ingredientes secos en un recipiente.
-03  **Integra**. los húmedos sin batir de más.
-04  **Reparte**. en moldes hasta tres cuartos de su capacidad.
-05  **Hornea**. 25 minutos a 180 °C.
+01  **Ralla** la zanahoria lo más fino posible.
+02  **Mezcla** los ingredientes secos en un recipiente.
+03  **Integra** los húmedos sin batir de más.
+04  **Reparte** en moldes hasta tres cuartos de su capacidad.
+05  **Hornea** 25 minutos a 180 °C.
 
 ## Ideas
 

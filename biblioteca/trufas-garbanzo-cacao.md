@@ -45,9 +45,9 @@ Densas, achocolatadas y con textura de trufa de verdad. Nadie que las prueba adi
 
 ## Preparación
 
-01  **Escurre**. los garbanzos y sécalos con papel.
-02  **Procesa**. todo hasta obtener una masa homogénea.
-03  **Forma**. bolitas del tamaño de una cereza.
+01  **Escurre** los garbanzos y sécalos con papel.
+02  **Procesa** todo hasta obtener una masa homogénea.
+03  **Forma** bolitas del tamaño de una cereza.
 
 ## Ideas
 

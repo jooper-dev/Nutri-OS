@@ -45,10 +45,10 @@ Dorada por fuera, tierna por dentro, y lista antes de que termine de calentar el
 
 ## Preparación
 
-01  **Saltea**. la espinaca en el aceite hasta que reduzca.
-02  **Bate**. los huevos y mézclalos con la espinaca y el queso.
-03  **Cocina**. a fuego bajo 3 minutos por lado, tapada.
-04  **Corta**. en porciones del tamaño de un bocado.
+01  **Saltea** la espinaca en el aceite hasta que reduzca.
+02  **Bate** los huevos y mézclalos con la espinaca y el queso.
+03  **Cocina** a fuego bajo 3 minutos por lado, tapada.
+04  **Corta** en porciones del tamaño de un bocado.
 
 ## Ideas
 

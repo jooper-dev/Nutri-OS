@@ -46,10 +46,10 @@ Suaves, ligeramente dulces por el plátano y con ese aroma a avena tostada que l
 
 ## Preparación
 
-01  **Aplasta**. el plátano hasta que quede sin grumos.
-02  **Mezcla**. con los huevos, la harina de avena y el agua.
-03  **Reposa**. la masa 5 minutos.
-04  **Cocina**. porciones pequeñas a fuego bajo, 2 minutos por lado.
+01  **Aplasta** el plátano hasta que quede sin grumos.
+02  **Mezcla** con los huevos, la harina de avena y el agua.
+03  **Reposa** la masa 5 minutos.
+04  **Cocina** porciones pequeñas a fuego bajo, 2 minutos por lado.
 
 ## Ideas
 

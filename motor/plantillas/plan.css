@@ -7,6 +7,10 @@
 @page {
   size: A4 landscape;
   margin: 11mm 12mm 12mm 12mm;
+  /* estilo.css pone el folio abajo al centro y esta hoja lo quiere abajo a la
+     derecha. Las dos se aplican al plan, así que hay que apagar el de estilo.css
+     explícitamente: si no, el número sale dos veces en cada página. */
+  @bottom-center { content: none; }
   @bottom-right {
     content: counter(page);
     font-family: "Inter", "Carlito", sans-serif;

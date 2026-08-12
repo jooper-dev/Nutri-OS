@@ -46,9 +46,9 @@ Necesitas también: moldes para paletas.
 
 ## Preparación
 
-01  **Pela**. y pica la fruta en trozos parejos.
-02  **Licúa**. hasta obtener un puré sin hilos.
-03  **Reparte**. en los moldes y congela 4 horas.
+01  **Pela** y pica la fruta en trozos parejos.
+02  **Licúa** hasta obtener un puré sin hilos.
+03  **Reparte** en los moldes y congela 4 horas.
 
 ## Ideas
 

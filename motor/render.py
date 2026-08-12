@@ -34,7 +34,14 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from weasyprint import CSS, HTML
 
-from comun import DIAS, DIR_BIBLIOTECA, DIR_PACIENTES, ErrorNutriOS, leer_front_matter
+from comun import (
+    DIAS,
+    DIR_BIBLIOTECA,
+    DIR_PACIENTES,
+    ErrorNutriOS,
+    huella_plan,
+    leer_front_matter,
+)
 
 PLANTILLAS = Path(__file__).resolve().parent / "plantillas"
 
@@ -256,10 +263,30 @@ def renderizar(nombre_carpeta: str, caras: bool = False, fotos: bool = True) -> 
             "Falta reporte_qa.md: este plan no ha pasado por el validador.\n"
             "    Ejecuta motor/validar.py antes de renderizar."
         )
-    if "**BLOQUEADO**" in reporte.read_text(encoding="utf-8"):
+    texto_reporte = reporte.read_text(encoding="utf-8")
+    if "**BLOQUEADO**" in texto_reporte:
         raise ErrorNutriOS(
             "El validador marcó este plan como BLOQUEADO. No se renderiza.\n"
             "    Revisa los errores en reporte_qa.md, corrige y vuelve a ensamblar."
+        )
+
+    # Que exista un reporte APTO no basta: tiene que ser el reporte DE ESTE plan.
+    # Validar una versión y volver a ensamblar otra sin validarla dejaba en la
+    # carpeta un visto bueno que no correspondía a nada, y los PDF salían igual.
+    marca = re.search(r"sha256:([0-9a-f]{64})", texto_reporte)
+    if not marca:
+        raise ErrorNutriOS(
+            "reporte_qa.md no lleva la huella del plan que validó: se generó con una "
+            "versión anterior del validador.\n"
+            "    Ejecuta motor/validar.py " + nombre_carpeta + " y vuelve a renderizar."
+        )
+    if marca.group(1) != huella_plan(ruta_plan):
+        raise ErrorNutriOS(
+            "plan.json ha cambiado desde que se validó: el visto bueno de reporte_qa.md "
+            "no corresponde a este plan y no se renderiza.\n"
+            "    Suele pasar tras volver a ensamblar sin validar después.\n"
+            "    Ejecuta motor/validar.py " + nombre_carpeta + " —o motor/correr.py "
+            + nombre_carpeta + ", que hace las dos cosas— y vuelve a renderizar."
         )
 
     plan = json.loads(ruta_plan.read_text(encoding="utf-8"))
