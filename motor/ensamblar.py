@@ -27,10 +27,12 @@ from comun import (
     DIR_PACIENTES,
     ErrorNutriOS,
     Opcion,
+    ajustes_clinicos,
     cargar_alimentos_base,
     cargar_biblioteca,
     cargar_ficha,
     cargar_protocolo,
+    comidas_activas,
     comprobar_rango_edad,
     guardar_json,
     normalizar,
@@ -48,13 +50,20 @@ MAX_INTENTOS = 60
 class Repertorio:
     """Todas las opciones disponibles, ya filtradas para este paciente."""
 
-    def __init__(self, opciones: list[Opcion], ficha: dict, protocolo: dict):
+    def __init__(
+        self,
+        opciones: list[Opcion],
+        ficha: dict,
+        protocolo: dict,
+        frecuencias: list[dict],
+        exclusiones_extra: set[str] | None = None,
+    ):
         self.ficha = ficha
         self.descartes: list[tuple[str, str]] = []
         self.por_componente: dict[str, list[Opcion]] = defaultdict(list)
 
         for o in opciones:
-            apta, motivo = o.apta_para(ficha)
+            apta, motivo = o.apta_para(ficha, exclusiones_extra)
             if apta:
                 self.por_componente[o.componente].append(o)
             else:
@@ -64,7 +73,7 @@ class Repertorio:
         # relleno improvisado, o se desbordaría su frecuencia.
         self.reguladas = {
             normalizar(r["familia"])
-            for r in (protocolo.get("frecuencias_semanales") or [])
+            for r in frecuencias
             if r.get("familia") and r.get("modo") != "relleno"
         }
         prefs = (protocolo.get("preferencias_clinicas") or {})
@@ -122,10 +131,17 @@ class Repertorio:
 # ---------------------------------------------------------------------------
 
 
-def _ranuras(protocolo: dict, componente: str, comidas_validas: list[str]) -> list[tuple[int, str]]:
-    """Todas las (dia, comida) donde este componente puede existir."""
+def _ranuras(
+    protocolo: dict, componente: str, comidas_validas: list[str], n_semana: int
+) -> list[tuple[int, str]]:
+    """Todas las (dia, comida) donde este componente puede existir esta semana.
+
+    `n_semana` no sobra: una comida con `activo_desde_semana` todavía no existe
+    en las semanas anteriores, y contar sus ranuras como disponibles hacía que
+    una frecuencia se repartiera sobre días que nunca se imprimen.
+    """
     out = []
-    for comida in protocolo["comidas"]:
+    for comida in comidas_activas(protocolo, n_semana):
         if comida["id"] not in comidas_validas:
             continue
         if componente not in comida["componentes"]:
@@ -158,14 +174,21 @@ def _reparto(reparto: dict, total: int) -> list[str]:
 
 
 def construir_semana(
-    protocolo: dict, ficha: dict, rep: Repertorio, rng: random.Random, n_semana: int
+    protocolo: dict,
+    frecuencias: list[dict],
+    ficha: dict,
+    rep: Repertorio,
+    rng: random.Random,
+    n_semana: int,
 ) -> dict:
     porciones = ficha.get("porciones") or {}
     tope = int((protocolo.get("variedad") or {}).get("max_veces_misma_receta_semana", 99))
     usos: dict[str, int] = defaultdict(int)
+    activas = comidas_activas(protocolo, n_semana)
+    ids_activas = [c["id"] for c in activas]
 
     # semana[dia][comida][componente] = Opcion
-    semana: dict = {d: {c["id"]: {} for c in protocolo["comidas"]} for d in range(7)}
+    semana: dict = {d: {c["id"]: {} for c in activas} for d in range(7)}
 
     # --- componentes que NO se llenan siempre -------------------------------
     acopladas = protocolo.get("reglas_acopladas") or []
@@ -182,10 +205,10 @@ def construir_semana(
     familia_forzada: dict[tuple[int, str, str], str] = {}
     limitados: dict[str, int] = {}
 
-    for regla in protocolo.get("frecuencias_semanales") or []:
+    for regla in frecuencias:
         comp = regla["componente"]
-        comidas_validas = regla.get("en") or [c["id"] for c in protocolo["comidas"]]
-        ranuras = _ranuras(protocolo, comp, comidas_validas)
+        comidas_validas = regla.get("en") or ids_activas
+        ranuras = _ranuras(protocolo, comp, comidas_validas, n_semana)
         modo = regla.get("modo", "exacto")
 
         if regla.get("familia"):
@@ -208,8 +231,8 @@ def construir_semana(
     # --- 2. Rotaciones ------------------------------------------------------
     for rot in protocolo.get("rotaciones") or []:
         comp = rot["componente"]
-        comidas_validas = rot.get("en") or [c["id"] for c in protocolo["comidas"]]
-        ranuras = _ranuras(protocolo, comp, comidas_validas)
+        comidas_validas = rot.get("en") or ids_activas
+        ranuras = _ranuras(protocolo, comp, comidas_validas, n_semana)
         ranuras = [r for r in ranuras if (r[0], r[1], comp) not in familia_forzada]
         familias = _reparto(rot["reparto"], len(ranuras))
         rng.shuffle(familias)
@@ -225,11 +248,11 @@ def construir_semana(
     cubiertos: set[tuple[str, str]] = set()
 
     for comp, (veces, comidas_validas) in limitados.items():
-        ranuras = _ranuras(protocolo, comp, comidas_validas)
+        ranuras = _ranuras(protocolo, comp, comidas_validas, n_semana)
         a_llenar += [(d, c, comp) for d, c in rng.sample(ranuras, veces)]
         cubiertos |= {(comp, c) for c in comidas_validas}
 
-    for comida in protocolo["comidas"]:
+    for comida in activas:
         for comp in comida["componentes"]:
             if (comp, comida["id"]) in cubiertos or comp in dependientes:
                 continue
@@ -256,20 +279,34 @@ def construir_semana(
                 else resuelta["comidas_objetivo"]
             )
             for cm in candidatas_comida:
-                estructura = next((m for m in protocolo["comidas"] if m["id"] == cm), None)
+                # Solo entre las comidas ACTIVAS esta semana: colocar el objetivo
+                # en una comida que todavía no existe deja la regla sin cumplir y
+                # el validador la marca sin que se entienda por qué.
+                estructura = next((m for m in activas if m["id"] == cm), None)
                 if estructura and objetivo in estructura["componentes"]:
                     if (d, cm, objetivo) not in a_llenar:
                         nuevas.append((d, cm, objetivo))
                     break
+            else:
+                raise ErrorNutriOS(
+                    f"La regla acoplada «{regla.get('si')} -> {regla.get('entonces')}» del "
+                    f"protocolo «{protocolo.get('id')}» se dispara en la semana {n_semana} "
+                    f"({DIAS[d]} · {c}) y no tiene dónde colocar «{objetivo}»: ninguna de las "
+                    f"comidas que lo declaran ({', '.join(resuelta['comidas_objetivo'])}) está "
+                    f"activa todavía esa semana.\n"
+                    f"    Solución: añade «{objetivo}» a los componentes de una comida activa "
+                    f"desde la semana 1, o adelanta el «activo_desde_semana» de la comida "
+                    f"objetivo en protocolos/{protocolo.get('id')}.yaml."
+                )
         a_llenar += nuevas
 
     # --- 5. Relleno de familias sobrantes -----------------------------------
-    for regla in protocolo.get("frecuencias_semanales") or []:
+    for regla in frecuencias:
         if regla.get("modo") != "relleno" or not regla.get("familia"):
             continue
         comp = regla["componente"]
-        comidas_validas = regla.get("en") or [c["id"] for c in protocolo["comidas"]]
-        for d, c in _ranuras(protocolo, comp, comidas_validas):
+        comidas_validas = regla.get("en") or ids_activas
+        for d, c in _ranuras(protocolo, comp, comidas_validas, n_semana):
             familia_forzada.setdefault((d, c, comp), regla["familia"])
 
     # --- 5b. Comprobación de viabilidad -------------------------------------
@@ -297,6 +334,52 @@ def construir_semana(
                 f"{math.ceil(n / tope) - len(opciones)} receta(s) más de "
                 f"componente '{comp}' con momento '{c}', o sube "
                 f"'max_veces_misma_receta_semana' en el protocolo."
+            )
+
+    # --- 5c. Suficiencia de RECETAS, que es distinto de suficiencia de ranuras
+    # El chequeo de arriba pregunta "¿puedo llenar las ranuras?". Casi siempre la
+    # respuesta es sí, porque hay un alimento base detrás de casi todo. La
+    # pregunta que quedaba sin hacer es la otra: "¿puedo llenarlas con las N
+    # recetas distintas que el protocolo pide?". Un plan lleno de arroz, papa y
+    # pollo cumple todas las frecuencias y no lleva recetario, y eso se
+    # despachaba con un aviso al final que no accionaba nada.
+    #
+    # Aquí sí acciona: es el mensaje que arranca el ciclo F2 → F3 y hace crecer
+    # la biblioteca, que es el único mecanismo que tiene para crecer.
+    minimo_recetas = int(
+        (protocolo.get("variedad") or {}).get("min_recetas_distintas_semana") or 0
+    )
+    if minimo_recetas:
+        recetas_posibles: set[str] = set()
+        ranuras_con_receta = 0
+        huecos: list[tuple[int, str]] = []
+        for (comp, c), n in sorted(demanda.items()):
+            if comp in COMPONENTES_SIN_EXIGENCIA_DE_VARIEDAD:
+                continue
+            disponibles = {o.id for o in rep.candidatas(comp, c) if o.es_receta}
+            recetas_posibles |= disponibles
+            ranuras_con_receta += n if disponibles else 0
+            if len(disponibles) < n:
+                huecos.append(
+                    (n - len(disponibles), f"{comp} en {c}: {len(disponibles)} receta(s) "
+                                           f"disponible(s) para {n} ranura(s)")
+                )
+        # Más recetas distintas que ranuras donde ponerlas no sirve de nada: el
+        # techo real es el menor de los dos.
+        techo_recetas = min(len(recetas_posibles), ranuras_con_receta)
+        if techo_recetas < minimo_recetas:
+            huecos.sort(key=lambda h: -h[0])
+            listado = "\n      - ".join(h[1] for h in huecos[:8])
+            raise ErrorNutriOS(
+                f"Biblioteca insuficiente: el protocolo «{protocolo.get('id')}» pide al menos "
+                f"{minimo_recetas} receta(s) distinta(s) del recetario por semana y, con los "
+                f"filtros de este paciente, como mucho pueden entrar {techo_recetas}.\n"
+                f"    Faltan {minimo_recetas - techo_recetas} receta(s).\n"
+                f"    Dónde hacen falta:\n      - {listado}\n"
+                f"    Solución: escribe esas recetas con prompts/P1_RECETAS.md (Fase 3), una "
+                f"por conversación limpia, con el 'componente' y el 'momento' de la línea que "
+                f"corresponda en su front-matter, y guárdalas en biblioteca/. Después vuelve "
+                f"a ensamblar."
             )
 
     # --- 6. Elección concreta ----------------------------------------------
@@ -332,7 +415,7 @@ def construir_semana(
     salida = {"semana": n_semana, "dias": {}, "degradaciones": sorted(degradaciones)}
     for d in range(7):
         dia = {}
-        for comida in protocolo["comidas"]:
+        for comida in activas:
             items = []
             for comp in comida["componentes"]:
                 o = semana[d][comida["id"]].get(comp)
@@ -367,10 +450,12 @@ def firma_dia(dia: dict) -> str:
     )
 
 
-def aplicar_reglas_periodicas(plan: dict, protocolo: dict, rep: Repertorio, rng: random.Random):
+def aplicar_reglas_periodicas(
+    plan: dict, frecuencias: list[dict], rep: Repertorio, rng: random.Random
+):
     """Reglas del tipo '1 vez cada 15 días', que exceden la semana."""
     dias_totales = len(plan["semanas"]) * 7
-    for regla in protocolo.get("frecuencias_semanales") or []:
+    for regla in frecuencias:
         if not regla.get("cada_dias"):
             continue
         comp, fam = regla["componente"], regla.get("familia", "")
@@ -408,8 +493,20 @@ def ensamblar(nombre_carpeta: str, semilla: int | None = None) -> dict:
     estado_rango, mensaje_rango = comprobar_rango_edad(protocolo, ficha)
     if estado_rango == "fuera_sin_justificar":
         raise ErrorNutriOS(mensaje_rango)
+
+    # Los ajustes por diagnóstico se resuelven ANTES de tocar nada: suben las
+    # frecuencias que el protocolo pide subir y añaden las exclusiones que el
+    # diagnóstico impone. Un ajuste declarado que no se puede aplicar detiene el
+    # ensamblaje: seguir sería construir un plan al que le falta un ajuste
+    # clínico y no decirlo.
+    frecuencias, exclusiones_extra, problemas = ajustes_clinicos(protocolo, ficha)
+    if problemas:
+        raise ErrorNutriOS("\n  - ".join(["Ajustes clínicos que no se pueden aplicar:"] + problemas))
+
     recetas, avisos = cargar_biblioteca()
-    rep = Repertorio(recetas + cargar_alimentos_base(), ficha, protocolo)
+    rep = Repertorio(
+        recetas + cargar_alimentos_base(), ficha, protocolo, frecuencias, exclusiones_extra
+    )
 
     variedad = protocolo.get("variedad") or {}
     n_semanas = int(ficha["semanas_plan"])
@@ -419,7 +516,8 @@ def ensamblar(nombre_carpeta: str, semilla: int | None = None) -> dict:
         rng = random.Random(base + intento)
         try:
             semanas = [
-                construir_semana(protocolo, ficha, rep, rng, i + 1) for i in range(n_semanas)
+                construir_semana(protocolo, frecuencias, ficha, rep, rng, i + 1)
+                for i in range(n_semanas)
             ]
         except ErrorNutriOS as e:
             if "Biblioteca insuficiente" in str(e) or intento >= 3:
@@ -453,7 +551,7 @@ def ensamblar(nombre_carpeta: str, semilla: int | None = None) -> dict:
         "avisos_biblioteca": avisos,
         "degradaciones": sorted({d for s_ in semanas for d in s_["degradaciones"]}),
     }
-    aplicar_reglas_periodicas(plan, protocolo, rep, random.Random(base))
+    aplicar_reglas_periodicas(plan, frecuencias, rep, random.Random(base))
 
     plan["recetas_usadas"] = sorted(
         {

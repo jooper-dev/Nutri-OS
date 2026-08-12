@@ -53,9 +53,45 @@ DIR_BIBLIOTECA = RAIZ / "biblioteca"
 DIR_DATOS = RAIZ / "datos"
 DIR_PACIENTES = RAIZ / "pacientes"
 DIR_SALIDAS = RAIZ / "salidas"
-DIR_REGLAS = RAIZ / "reglas_exclusion"
 
 DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+
+# Claves de primer nivel que puede llevar un protocolo.
+#
+# Están aquí, y no repartidas por los módulos que las leen, porque motor/revisar.py
+# necesita una lista cerrada contra la que comparar: una clave que nadie consume no
+# falla en ninguna parte —el motor simplemente no la mira— y quien escribió el
+# protocolo se queda creyendo que la regla se aplica. Eso ya pasó con
+# `reglas_exclusion:`, `prioridades:` y `cena_puede_repetir_almuerzo:`.
+#
+# Si añades una clave al esquema, añádela también aquí, en el grupo que le toque.
+CLAVES_PROTOCOLO_CONSUMIDAS = {
+    "id",
+    "nombre",
+    "edad_min_meses",
+    "edad_max_meses",
+    "marco_diario",
+    "comidas",
+    "frecuencias_semanales",
+    "rotaciones",
+    "reglas_acopladas",
+    "prioridades",
+    "variedad",
+    "preferencias_clinicas",
+    "decisiones_pendientes",
+}
+
+# Declaradas en el protocolo, leídas por el validador y repetidas en el reporte,
+# pero NO hechas cumplir por el motor. Se avisan en cada validación para que nadie
+# las dé por aplicadas.
+CLAVES_PROTOCOLO_SOLO_AVISO = {
+    "introduccion_progresiva",
+    "progresion_textura",
+    "exclusiones_duras",
+}
+
+# Prosa para quien abre el archivo. Ningún módulo la lee, y está bien que así sea.
+CLAVES_PROTOCOLO_DOCUMENTALES = {"descripcion"}
 
 # Componentes exentos del filtro de `texturas_excluidas`.
 #
@@ -200,6 +236,95 @@ def comprobar_rango_edad(protocolo: dict, ficha: dict) -> tuple[str, str]:
         "fuera_sin_justificar",
         f"{base} y la ficha no declara «protocolo_fuera_de_rango».",
     )
+
+
+def comidas_activas(protocolo: dict, n_semana: int) -> list[dict]:
+    """Las comidas que existen en esa semana del plan.
+
+    `activo_desde_semana` sirve para las comidas que no arrancan el primer día:
+    una media tarde que entra cuando el niño ya tolera dos tiempos, por ejemplo.
+    Sin este filtro el campo era decorativo y la comida aparecía desde el lunes
+    de la semana 1, que es justo lo contrario de lo que el protocolo declaraba.
+
+    Ausente o vacío significa 1: activa desde el principio.
+    """
+    activas = []
+    for comida in protocolo.get("comidas") or []:
+        desde = comida.get("activo_desde_semana")
+        if desde is None or int(desde) <= n_semana:
+            activas.append(comida)
+    return activas
+
+
+def ajustes_clinicos(protocolo: dict, ficha: dict) -> tuple[list[dict], set[str], list[str]]:
+    """Aplica los `preferencias_clinicas` de los diagnósticos de esta ficha.
+
+    Devuelve tres cosas:
+
+      frecuencias   la lista `frecuencias_semanales` del protocolo con
+                    `subir_frecuencia` ya aplicado. Copia: el protocolo no se toca.
+      exclusiones   las etiquetas de `exclusiones_extra`, normalizadas. Filtran
+                    exactamente igual que una alergia declarada en la ficha.
+      problemas     ajustes declarados que no se pueden aplicar, con su porqué.
+
+    Es una función pura de (protocolo, ficha). El validador la llama por su
+    cuenta y llega al mismo resultado sin mirar nada que haya producido el
+    ensamblador: esa independencia es la razón de ser del validador y no se
+    negocia. Lo que ambos comparten es la lectura del protocolo, no el plan.
+    """
+    protocolo_id = str(protocolo.get("id") or "(sin id)")
+    prefs = protocolo.get("preferencias_clinicas") or {}
+    frecuencias = [dict(r) for r in (protocolo.get("frecuencias_semanales") or [])]
+    exclusiones: set[str] = set()
+    problemas: list[str] = []
+
+    for dx in ficha.get("diagnosticos") or []:
+        ajuste = prefs.get(dx) or {}
+
+        for etiqueta in ajuste.get("exclusiones_extra") or []:
+            if str(etiqueta).strip():
+                exclusiones.add(normalizar(etiqueta))
+
+        subir = ajuste.get("subir_frecuencia")
+        if not subir:
+            continue
+        for regla in subir if isinstance(subir, list) else [subir]:
+            comp = regla.get("componente")
+            familia = regla.get("familia")
+            objetivo = regla.get("a")
+            if not comp or objetivo is None:
+                problemas.append(
+                    f"«subir_frecuencia» de {dx} en el protocolo «{protocolo_id}» está "
+                    f"incompleta: necesita «componente» y «a». Trae: {regla}."
+                )
+                continue
+            candidatas = [
+                r
+                for r in frecuencias
+                if r.get("componente") == comp
+                and normalizar(r.get("familia") or "") == normalizar(familia or "")
+                and r.get("modo") != "relleno"
+                and not r.get("cada_dias")
+                and r.get("veces") is not None
+            ]
+            if not candidatas:
+                etiqueta = f"{comp}/{familia}" if familia else comp
+                problemas.append(
+                    f"«subir_frecuencia» de {dx} en el protocolo «{protocolo_id}» apunta a "
+                    f"{etiqueta}, que no tiene ninguna regla de frecuencia con «veces» en "
+                    f"«frecuencias_semanales»: no hay nada que subir y el ajuste no se "
+                    f"aplica.\n"
+                    f"    Solución: añade esa regla al protocolo, o corrige el nombre del "
+                    f"componente/familia en «preferencias_clinicas»."
+                )
+                continue
+            for r in candidatas:
+                if int(objetivo) > int(r["veces"]):
+                    r["veces"] = int(objetivo)
+                if r.get("minimo") is not None and int(objetivo) > int(r["minimo"]):
+                    r["minimo"] = int(objetivo)
+
+    return frecuencias, exclusiones, problemas
 
 
 def resolver_regla_acoplada(regla: dict, protocolo: dict) -> tuple[dict | None, str]:
@@ -349,8 +474,17 @@ class Opcion:
         c = normalizar(clave)
         return c == normalizar(self.familia) or c == normalizar(self.id)
 
-    def apta_para(self, ficha: dict) -> tuple[bool, str]:
-        """¿Puede esta opción entrar en el plan de este paciente?"""
+    def apta_para(
+        self, ficha: dict, exclusiones_extra: set[str] | None = None
+    ) -> tuple[bool, str]:
+        """¿Puede esta opción entrar en el plan de este paciente?
+
+        `exclusiones_extra` son las etiquetas que el protocolo excluye por el
+        diagnóstico (APLV → lácteos, por ejemplo). Filtran exactamente igual que
+        una alergia escrita en la ficha, y a propósito: la madre de un niño con
+        APLV no tiene por qué escribir "lácteos" en la lista de alergias para que
+        el motor deje de ponerle yogurt.
+        """
         # Va primero, antes que la edad y antes que las alergias: no depende de
         # este paciente ni admite excepción. Es una decisión clínica de Paty
         # escrita en el catálogo para que no dependa de que alguien se acuerde.
@@ -359,9 +493,13 @@ class Opcion:
         if self.edad_min_meses > ficha["edad_meses"]:
             return False, f"edad mínima {self.edad_min_meses} m"
         alergias = {normalizar(a) for a in ficha.get("alergias") or []}
-        choque = alergias & {normalizar(a) for a in self.alergenos}
+        etiquetas = {normalizar(a) for a in self.alergenos}
+        choque = alergias & etiquetas
         if choque:
             return False, f"alérgeno: {', '.join(sorted(choque))}"
+        choque_dx = (exclusiones_extra or set()) & etiquetas
+        if choque_dx:
+            return False, f"excluido por diagnóstico: {', '.join(sorted(choque_dx))}"
         if any(coincide_rechazo(r, self) for r in ficha.get("rechazos") or []):
             return False, "rechazo declarado"
 

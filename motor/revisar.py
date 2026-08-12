@@ -52,6 +52,9 @@ import yaml  # noqa: E402
 
 sys.path.insert(0, str(RAIZ / "motor"))
 from comun import (  # noqa: E402
+    CLAVES_PROTOCOLO_CONSUMIDAS,
+    CLAVES_PROTOCOLO_DOCUMENTALES,
+    CLAVES_PROTOCOLO_SOLO_AVISO,
     DIR_BIBLIOTECA,
     DIR_DATOS,
     DIR_PACIENTES,
@@ -59,8 +62,16 @@ from comun import (  # noqa: E402
     ErrorNutriOS,
     cargar_alimentos_base,
     cargar_biblioteca,
+    cargar_protocolo,
+    comprobar_rango_edad,
     leer_front_matter,
     resolver_regla_acoplada,
+)
+
+CLAVES_PROTOCOLO_VALIDAS = (
+    CLAVES_PROTOCOLO_CONSUMIDAS
+    | CLAVES_PROTOCOLO_SOLO_AVISO
+    | CLAVES_PROTOCOLO_DOCUMENTALES
 )
 
 print("\n— Protocolos —")
@@ -78,6 +89,21 @@ for ruta in sorted(DIR_PROTOCOLOS.glob("*.yaml")):
         else:
             comps = {c for m in d["comidas"] for c in m["componentes"]}
             linea(True, f"{ruta.name} — {len(d['comidas'])} comidas, {len(comps)} componentes")
+
+        # Una clave que el motor no consume no falla en ninguna parte: el motor
+        # sencillamente no la mira, y quien escribió el protocolo se queda
+        # creyendo que la regla se aplica. Así vivieron años 'reglas_exclusion',
+        # 'prioridades' y 'cena_puede_repetir_almuerzo'.
+        sobrantes = sorted(set(d) - CLAVES_PROTOCOLO_VALIDAS)
+        if sobrantes:
+            linea(
+                False,
+                f"{ruta.name} — claves que el motor no consume: {', '.join(sobrantes)}. "
+                f"O se implementan, o se retiran del archivo: dejarlas ahí hace creer "
+                f"que la regla se aplica. Las válidas están en "
+                f"motor/comun.py (CLAVES_PROTOCOLO_*).",
+            )
+            errores.append(ruta.name)
     except yaml.YAMLError as e:
         linea(False, f"{ruta.name} — YAML mal formado: {str(e).splitlines()[0]}")
         errores.append(ruta.name)
@@ -173,6 +199,54 @@ else:
         else:
             linea(True, f"{ruta.name} — {len(claves)} clave(s) de rotación/frecuencia resuelven")
 
+print("\n— Frecuencias contra la edad del protocolo —")
+# Que una familia tenga alimentos detrás no basta: tienen que ser alimentos que
+# ese paciente pueda comer a la edad del protocolo. El protocolo de 6 meses pedía
+# 2 menestras por semana cuando las tres menestras del catálogo empezaban a los 7
+# y 8 meses: contradicción entre protocolo y catálogo, imposible de cumplir por
+# construcción, y el resultado era un plan degradado en silencio con la misma
+# proteína seis días de siete. Este chequeo tenía que haberlo cazado.
+if "biblioteca" in errores:
+    linea(False, "no se puede comprobar: la biblioteca no cargó")
+else:
+    for ruta in sorted(DIR_PROTOCOLOS.glob("*.yaml")):
+        d = yaml.safe_load(ruta.read_text(encoding="utf-8")) or {}
+        edad_min = d.get("edad_min_meses")
+        edad_max = d.get("edad_max_meses")
+        if edad_min is None or edad_max is None:
+            continue
+        imposibles, tardias = [], []
+        for regla in d.get("frecuencias_semanales") or []:
+            comp = regla.get("componente")
+            fam = regla.get("familia")
+            etiqueta = f"{comp}/{fam}" if fam else str(comp)
+            viables = [
+                o
+                for o in universo
+                if o.componente == comp and not o.nunca_recomendar and o.responde_a(fam or "")
+            ]
+            if not viables:
+                continue  # ya lo dice el bloque anterior
+            edades = sorted(o.edad_min_meses for o in viables)
+            if edades[0] > int(edad_max):
+                imposibles.append(f"{etiqueta} (la más temprana, {edades[0]} m)")
+            elif edades[0] > int(edad_min):
+                tardias.append(f"{etiqueta} (nada antes de los {edades[0]} m)")
+        for texto in imposibles:
+            linea(
+                False,
+                f"{ruta.name} — {texto}: ninguna opción es apta dentro del rango "
+                f"{edad_min}–{edad_max} m que declara el protocolo. La regla no se puede "
+                f"cumplir nunca y el motor degradará la ranura en silencio. "
+                f"Corrige 'edad_min_meses' en datos/alimentos_base.yaml si el alimento sí "
+                f"es apto a esa edad, o retira la frecuencia del protocolo.",
+            )
+            errores.append(ruta.name)
+        for texto in tardias:
+            avisos.append(f"{ruta.name}: {texto}; los pacientes más pequeños del rango la degradarán")
+        if not imposibles:
+            linea(True, f"{ruta.name} — todas las frecuencias tienen opción en {edad_min}–{edad_max} m")
+
 print("\n— Fotografía —")
 try:
     from fotos import DIR_IMAGENES, DIR_PROMPTS, cargar_variantes
@@ -204,8 +278,21 @@ for c in carpetas:
         if meta.get("bloqueantes"):
             linea(False, f"{c.name} — ficha con bloqueantes: {meta['bloqueantes']}")
             avisos.append(f"{c.name}: ficha bloqueada")
-        else:
-            linea(True, f"{c.name} — {meta.get('edad_texto','?')}, protocolo {meta.get('protocolo_sugerido','?')}")
+            continue
+        linea(True, f"{c.name} — {meta.get('edad_texto','?')}, protocolo {meta.get('protocolo_sugerido','?')}")
+
+        # El protocolo lo elige un modelo en la Fase 1, y un escolar con el
+        # protocolo de ablactancia produce un plan entero, válido y equivocado.
+        # Comprobarlo es aritmética, y por eso lo hace el código.
+        if meta.get("edad_meses") is None or not meta.get("protocolo_sugerido"):
+            continue
+        protocolo = cargar_protocolo(str(meta["protocolo_sugerido"]))
+        estado, mensaje = comprobar_rango_edad(protocolo, meta)
+        if estado == "fuera_sin_justificar":
+            linea(False, f"{c.name} — {mensaje}")
+            errores.append(c.name)
+        elif estado == "fuera_justificado":
+            avisos.append(f"{c.name}: {mensaje}")
     except ErrorNutriOS as e:
         linea(False, f"{c.name} — {e}")
         errores.append(c.name)

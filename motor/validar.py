@@ -25,15 +25,18 @@ from collections import Counter
 from pathlib import Path
 
 from comun import (
+    CLAVES_PROTOCOLO_SOLO_AVISO,
     COMPONENTES_SIN_FILTRO_TEXTURA,
     DIR_PACIENTES,
     ErrorNutriOS,
+    ajustes_clinicos,
     cargar_alimentos_base,
     cargar_biblioteca,
     cargar_ficha,
     cargar_protocolo,
-    comprobar_rango_edad,
     coincide_rechazo,
+    comidas_activas,
+    comprobar_rango_edad,
     normalizar,
     resolver_regla_acoplada,
 )
@@ -86,6 +89,14 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
     elif estado_rango == "fuera_justificado":
         r.aviso(mensaje_rango)
 
+    # Los ajustes por diagnóstico se resuelven aquí de nuevo, desde el protocolo y
+    # la ficha, sin mirar el plan: el validador tiene que llegar a la misma
+    # frecuencia efectiva que el ensamblador por su cuenta, o no está validando
+    # nada.
+    frecuencias, exclusiones_dx, problemas_ajustes = ajustes_clinicos(protocolo, ficha)
+    for p in problemas_ajustes:
+        r.error(p)
+
     # --- 1. Coherencia paciente / plan -------------------------------------
     if plan.get("paciente") != ficha["paciente"]:
         r.error("El plan no corresponde a la ficha: los nombres de paciente no coinciden.")
@@ -116,6 +127,22 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
                 f"o corrige el nombre en la ficha."
             )
 
+    # Misma comprobación para lo que excluye el protocolo por diagnóstico, y por
+    # la misma razón: una `exclusiones_extra` con una etiqueta que el catálogo no
+    # conoce no excluye nada, y el caso concreto —APLV— termina con el niño
+    # comiendo lácteos sin que nadie se entere.
+    for e in sorted(exclusiones_dx - alergias):
+        if e not in etiquetas_catalogo:
+            r.error(
+                f"El protocolo «{protocolo.get('id')}» excluye «{e}» por el diagnóstico del "
+                f"paciente, pero esa etiqueta no existe en el catálogo: NO está excluyendo "
+                f"nada.\n"
+                f"    Etiquetas reconocidas: {', '.join(sorted(etiquetas_catalogo)) or '(ninguna)'}.\n"
+                f"    Corrige «exclusiones_extra» en preferencias_clinicas del protocolo, o "
+                f"etiqueta con «{e}» los alimentos que la lleven en datos/alimentos_base.yaml "
+                f"y en el front-matter de las recetas afectadas."
+            )
+
     # Igual para los rechazos, pero como aviso: un rechazo mal escrito molesta,
     # no hace daño.
     for x in sorted(rechazos):
@@ -144,9 +171,16 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
                 f"si está aquí, el motor tiene un fallo."
             )
 
-        choque = alergias & {normalizar(a) for a in opcion.alergenos}
+        etiquetas_opcion = {normalizar(a) for a in opcion.alergenos}
+        choque = alergias & etiquetas_opcion
         if choque:
             r.error(f"{donde}: «{item['nombre']}» contiene {', '.join(sorted(choque))} — ALERGIA declarada.")
+        choque_dx = (exclusiones_dx - alergias) & etiquetas_opcion
+        if choque_dx:
+            r.error(
+                f"{donde}: «{item['nombre']}» contiene {', '.join(sorted(choque_dx))}, que el "
+                f"protocolo excluye por el diagnóstico de este paciente."
+            )
 
         if any(coincide_rechazo(x, opcion) for x in rechazos):
             r.error(f"{donde}: «{item['nombre']}» está en la lista de rechazos.")
@@ -259,6 +293,26 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
                 f"el motor: decide Paty, y a veces la respuesta es derivar."
             )
 
+    # --- 2d. Comidas que todavía no deberían existir ------------------------
+    # `activo_desde_semana` es la única forma que tiene un protocolo de decir
+    # "esta comida entra más tarde". Si el plan la trae antes, el niño está
+    # recibiendo un tiempo de comida que el protocolo no ha abierto todavía.
+    for s in plan["semanas"]:
+        activas = {c["id"] for c in comidas_activas(protocolo, s["semana"])}
+        desde = {
+            c["id"]: c.get("activo_desde_semana")
+            for c in protocolo.get("comidas") or []
+        }
+        for dia, comidas in s["dias"].items():
+            for cid in comidas:
+                if cid in activas:
+                    continue
+                r.error(
+                    f"S{s['semana']} · {dia}: la comida «{cid}» aparece en la semana "
+                    f"{s['semana']}, y el protocolo la activa desde la semana "
+                    f"{desde.get(cid, '?')}."
+                )
+
     # --- 3. Frecuencias del protocolo, recontadas ---------------------------
     for s in plan["semanas"]:
         n = s["semana"]
@@ -274,11 +328,11 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
                     if op:
                         opciones_en.setdefault((item["componente"], cid), []).append(op)
 
-        for regla in protocolo.get("frecuencias_semanales") or []:
+        for regla in frecuencias:
             if regla.get("cada_dias") or regla.get("modo") == "relleno":
                 continue
             comp = regla["componente"]
-            ambito = regla.get("en") or [c["id"] for c in protocolo["comidas"]]
+            ambito = regla.get("en") or [c["id"] for c in comidas_activas(protocolo, n)]
             fam = regla.get("familia")
             veces = regla.get("veces")
             if veces is None:
@@ -421,7 +475,7 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
     # Mejor decirlo que dejar creer que se cumplieron.
     # Solo lo que ensamblar.py aplica de verdad: ampliar esta lista sin implementar
     # la funcionalidad apaga el aviso que protege la revisión clínica.
-    IMPLEMENTADAS = {"priorizar_aporta"}
+    IMPLEMENTADAS = {"priorizar_aporta", "subir_frecuencia", "exclusiones_extra"}
     for dx in ficha.get("diagnosticos") or []:
         ajuste = (protocolo.get("preferencias_clinicas") or {}).get(dx) or {}
         for clave in ajuste:
@@ -433,12 +487,24 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
         if ajuste.get("nota_qa"):
             r.aviso(f"Nota del protocolo ({dx}): {ajuste['nota_qa']}")
 
-    for clave in ("introduccion_progresiva", "progresion_textura", "exclusiones_duras"):
+    if exclusiones_dx:
+        r.aviso(
+            "Exclusiones aplicadas por el diagnóstico, además de las alergias de la "
+            "ficha: " + ", ".join(sorted(exclusiones_dx)) + "."
+        )
+
+    for clave in sorted(CLAVES_PROTOCOLO_SOLO_AVISO):
         if protocolo.get(clave):
             r.aviso(
                 f"El protocolo declara «{clave}», que el motor aún no hace cumplir. "
                 f"Revísalo a mano."
             )
+
+    # --- 6c. Decisiones que el protocolo deja abiertas ----------------------
+    # Los números sin respaldo público no se adivinan: se dejan como están y se
+    # repiten aquí, en un solo sitio, hasta que Paty los cierre.
+    for pendiente in protocolo.get("decisiones_pendientes") or []:
+        r.aviso(f"Decisión pendiente del protocolo: {' '.join(str(pendiente).split())}")
 
     # --- 7. Degradaciones del ensamblador -----------------------------------
     for d in plan.get("degradaciones", []):

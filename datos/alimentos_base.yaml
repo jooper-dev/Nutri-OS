@@ -89,9 +89,15 @@ proteina_hierro:
   - {id: sangrecita,   nombre: "Sangrecita",      edad_min_meses: 6, alergenos: [], familia: higado, aporta: [hierro], textura: blanda, nunca_recomendar: true}
   - {id: bazo,         nombre: "Bazo",            edad_min_meses: 7, alergenos: [carne_mamifero], familia: higado, aporta: [hierro], textura: blanda}
   - {id: pollo_desm,   nombre: "Pollo deshilachado", edad_min_meses: 6, alergenos: [], familia: pollo, aporta: [proteina, hierro], textura: seca}
-  - {id: lentejas_pure, nombre: "Lentejas aplastadas",      edad_min_meses: 7, alergenos: [], familia: menestra, aporta: [hierro, fibra], textura: humeda}
+  # Menestra aplastada desde los 6 meses: OMS 2023, «Guideline for complementary
+  # feeding of infants and young children 6–23 months of age» — «Pulses, nuts and
+  # seeds should be consumed frequently». La condición es la preparación, y estas
+  # dos la cumplen: lenteja y arveja partida se deshacen al cocer y van sin
+  # cáscara. El frejol panamito se queda en 8 m porque la piel entera no se
+  # deshace igual y es la que da el problema.
+  - {id: lentejas_pure, nombre: "Lentejas aplastadas",      edad_min_meses: 6, alergenos: [], familia: menestra, aporta: [hierro, fibra], textura: humeda}
   - {id: panamito_pure, nombre: "Frejol panamito aplastado", edad_min_meses: 8, alergenos: [], familia: menestra, aporta: [hierro, fibra], textura: humeda}
-  - {id: arveja_pure,   nombre: "Arveja partida aplastada",  edad_min_meses: 7, alergenos: [], familia: menestra, aporta: [hierro, fibra], textura: humeda}
+  - {id: arveja_pure,   nombre: "Arveja partida aplastada",  edad_min_meses: 6, alergenos: [], familia: menestra, aporta: [hierro, fibra], textura: humeda}
 
 verdura:
   - {id: zanahoria, nombre: "Zanahoria",  edad_min_meses: 6, alergenos: [], aporta: [betacarotenos], textura: blanda}

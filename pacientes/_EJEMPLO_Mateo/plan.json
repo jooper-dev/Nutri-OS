@@ -26,25 +26,25 @@
             "items": [
               {
                 "componente": "cereal",
-                "nombre": "Cañihua",
+                "nombre": "Avena",
                 "cantidad": "3 cdas",
                 "receta_id": null
               },
               {
                 "componente": "acompanante",
-                "nombre": "Revuelto con palta",
+                "nombre": "Panqueques de avena",
                 "cantidad": "1 porción",
-                "receta_id": "huevo-revuelto-palta"
+                "receta_id": "panqueques-avena-huevo"
               },
               {
                 "componente": "grasa",
-                "nombre": "Mantequilla de anacardos",
+                "nombre": "Aceite de oliva",
                 "cantidad": "1 cdta",
                 "receta_id": null
               },
               {
                 "componente": "fruta",
-                "nombre": "Mango",
+                "nombre": "Durazno",
                 "cantidad": "1 unidad pequeña",
                 "receta_id": null
               }
@@ -56,9 +56,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Mazamorra de kiwicha",
+                "nombre": "Paletas de mango",
                 "cantidad": "1 porción",
-                "receta_id": "mazamorra-kiwicha"
+                "receta_id": "paletas-mango-papaya"
               },
               {
                 "componente": "crujiente",
@@ -86,7 +86,7 @@
               },
               {
                 "componente": "ensalada_grasa",
-                "nombre": "Ensalada con aceite de oliva",
+                "nombre": "Ensalada con palta",
                 "cantidad": "½ taza",
                 "receta_id": null
               },
@@ -104,9 +104,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Trufas de garbanzo",
+                "nombre": "Barritas de kiwicha",
                 "cantidad": "1 porción",
-                "receta_id": "trufas-garbanzo-cacao"
+                "receta_id": "barritas-kiwicha-datil"
               }
             ]
           },
@@ -116,7 +116,7 @@
             "items": [
               {
                 "componente": "carbohidrato",
-                "nombre": "Camote sancochado",
+                "nombre": "Arroz",
                 "cantidad": "4 cdas",
                 "receta_id": null
               },
@@ -148,9 +148,9 @@
             "items": [
               {
                 "componente": "cereal",
-                "nombre": "Granola de kiwicha",
+                "nombre": "Avena",
                 "cantidad": "3 cdas",
-                "receta_id": "granola-kiwicha-quinua"
+                "receta_id": null
               },
               {
                 "componente": "acompanante",
@@ -160,13 +160,13 @@
               },
               {
                 "componente": "grasa",
-                "nombre": "Mantequilla de almendras",
+                "nombre": "Mantequilla de anacardos",
                 "cantidad": "1 cdta",
                 "receta_id": null
               },
               {
                 "componente": "fruta",
-                "nombre": "Durazno",
+                "nombre": "Manzana",
                 "cantidad": "1 unidad pequeña",
                 "receta_id": null
               }
@@ -178,9 +178,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Barritas de kiwicha",
+                "nombre": "Mazamorra de kiwicha",
                 "cantidad": "1 porción",
-                "receta_id": "barritas-kiwicha-datil"
+                "receta_id": "mazamorra-kiwicha"
               },
               {
                 "componente": "crujiente",
@@ -208,19 +208,19 @@
               },
               {
                 "componente": "menestra",
-                "nombre": "Lentejas",
+                "nombre": "Garbanzo",
                 "cantidad": "3 cdas",
                 "receta_id": null
               },
               {
                 "componente": "ensalada_grasa",
-                "nombre": "Ensalada con aceite de ajonjolí",
+                "nombre": "Ensalada con palta",
                 "cantidad": "½ taza",
                 "receta_id": null
               },
               {
                 "componente": "fruta_vitc",
-                "nombre": "Piña Golden",
+                "nombre": "Fresa",
                 "cantidad": "1 unidad pequeña",
                 "receta_id": null
               },
@@ -238,9 +238,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Paletas de mango",
+                "nombre": "Trufas de garbanzo",
                 "cantidad": "1 porción",
-                "receta_id": "paletas-mango-papaya"
+                "receta_id": "trufas-garbanzo-cacao"
               }
             ]
           },
@@ -261,21 +261,9 @@
                 "receta_id": null
               },
               {
-                "componente": "menestra",
-                "nombre": "Frejol panamito",
-                "cantidad": "3 cdas",
-                "receta_id": null
-              },
-              {
                 "componente": "ensalada_grasa",
-                "nombre": "Ensalada con palta",
+                "nombre": "Ensalada con aceite de ajonjolí",
                 "cantidad": "½ taza",
-                "receta_id": null
-              },
-              {
-                "componente": "fruta_vitc",
-                "nombre": "Fresa",
-                "cantidad": "1 unidad pequeña",
                 "receta_id": null
               },
               {
@@ -306,13 +294,13 @@
               },
               {
                 "componente": "grasa",
-                "nombre": "Mantequilla de maní",
+                "nombre": "Palta",
                 "cantidad": "1 cdta",
                 "receta_id": null
               },
               {
                 "componente": "fruta",
-                "nombre": "Manzana",
+                "nombre": "Pera",
                 "cantidad": "1 unidad pequeña",
                 "receta_id": null
               }
@@ -324,13 +312,135 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Fruta picada",
+                "nombre": "Chifles de bellaco",
                 "cantidad": "1 porción",
-                "receta_id": null
+                "receta_id": "chifles-platano-bellaco"
               },
               {
                 "componente": "crujiente",
                 "nombre": "Kiwicha pop",
+                "cantidad": "2 cdas",
+                "receta_id": null
+              }
+            ]
+          },
+          "almuerzo": {
+            "nombre": "Almuerzo",
+            "hora": "12:30 – 1:30",
+            "items": [
+              {
+                "componente": "carbohidrato",
+                "nombre": "Arroz",
+                "cantidad": "4 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "proteina",
+                "nombre": "Pollo",
+                "cantidad": "40 g en crudo",
+                "receta_id": null
+              },
+              {
+                "componente": "ensalada_grasa",
+                "nombre": "Ensalada con aceite de oliva",
+                "cantidad": "½ taza",
+                "receta_id": null
+              },
+              {
+                "componente": "bebida",
+                "nombre": "Agua",
+                "cantidad": "½ taza",
+                "receta_id": null
+              }
+            ]
+          },
+          "media_tarde": {
+            "nombre": "Media tarde",
+            "hora": "3:30 – 4:30",
+            "items": [
+              {
+                "componente": "base",
+                "nombre": "Galletas de quinua",
+                "cantidad": "1 porción",
+                "receta_id": "galletas-quinua-camote"
+              }
+            ]
+          },
+          "cena": {
+            "nombre": "Cena",
+            "hora": "6:00 – 7:00",
+            "items": [
+              {
+                "componente": "carbohidrato",
+                "nombre": "Camote sancochado",
+                "cantidad": "4 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "proteina",
+                "nombre": "Pavita",
+                "cantidad": "40 g en crudo",
+                "receta_id": null
+              },
+              {
+                "componente": "ensalada_grasa",
+                "nombre": "Ensalada con aceite de oliva",
+                "cantidad": "½ taza",
+                "receta_id": null
+              },
+              {
+                "componente": "bebida",
+                "nombre": "Agua",
+                "cantidad": "½ taza",
+                "receta_id": null
+              }
+            ]
+          }
+        },
+        "Jueves": {
+          "desayuno": {
+            "nombre": "Desayuno",
+            "hora": "7:30 – 8:30",
+            "items": [
+              {
+                "componente": "cereal",
+                "nombre": "Harina de maca",
+                "cantidad": "3 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "acompanante",
+                "nombre": "Revuelto con palta",
+                "cantidad": "1 porción",
+                "receta_id": "huevo-revuelto-palta"
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Mantequilla de almendras",
+                "cantidad": "1 cdta",
+                "receta_id": null
+              },
+              {
+                "componente": "fruta",
+                "nombre": "Mango",
+                "cantidad": "1 unidad pequeña",
+                "receta_id": null
+              }
+            ]
+          },
+          "media_manana": {
+            "nombre": "Media mañana",
+            "hora": "10:00 – 10:30",
+            "items": [
+              {
+                "componente": "base",
+                "nombre": "Compota de pera",
+                "cantidad": "1 porción",
+                "receta_id": "compota-pera-avena"
+              },
+              {
+                "componente": "crujiente",
+                "nombre": "Quinua pop",
                 "cantidad": "2 cdas",
                 "receta_id": null
               }
@@ -372,9 +482,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Chifles de bellaco",
+                "nombre": "Fruta picada",
                 "cantidad": "1 porción",
-                "receta_id": "chifles-platano-bellaco"
+                "receta_id": null
               }
             ]
           },
@@ -395,131 +505,21 @@
                 "receta_id": null
               },
               {
-                "componente": "ensalada_grasa",
-                "nombre": "Ensalada con aceite de ajonjolí",
-                "cantidad": "½ taza",
-                "receta_id": null
-              },
-              {
-                "componente": "bebida",
-                "nombre": "Agua",
-                "cantidad": "½ taza",
-                "receta_id": null
-              }
-            ]
-          }
-        },
-        "Jueves": {
-          "desayuno": {
-            "nombre": "Desayuno",
-            "hora": "7:30 – 8:30",
-            "items": [
-              {
-                "componente": "cereal",
-                "nombre": "Avena",
+                "componente": "menestra",
+                "nombre": "Frejol castilla",
                 "cantidad": "3 cdas",
                 "receta_id": null
               },
               {
-                "componente": "acompanante",
-                "nombre": "Panqueques de avena",
-                "cantidad": "1 porción",
-                "receta_id": "panqueques-avena-huevo"
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Palta",
-                "cantidad": "1 cdta",
+                "componente": "ensalada_grasa",
+                "nombre": "Ensalada con aceite de oliva",
+                "cantidad": "½ taza",
                 "receta_id": null
               },
               {
-                "componente": "fruta",
-                "nombre": "Plátano",
+                "componente": "fruta_vitc",
+                "nombre": "Lima",
                 "cantidad": "1 unidad pequeña",
-                "receta_id": null
-              }
-            ]
-          },
-          "media_manana": {
-            "nombre": "Media mañana",
-            "hora": "10:00 – 10:30",
-            "items": [
-              {
-                "componente": "base",
-                "nombre": "Galletas de quinua",
-                "cantidad": "1 porción",
-                "receta_id": "galletas-quinua-camote"
-              },
-              {
-                "componente": "crujiente",
-                "nombre": "Quinua pop",
-                "cantidad": "2 cdas",
-                "receta_id": null
-              }
-            ]
-          },
-          "almuerzo": {
-            "nombre": "Almuerzo",
-            "hora": "12:30 – 1:30",
-            "items": [
-              {
-                "componente": "carbohidrato",
-                "nombre": "Arroz",
-                "cantidad": "4 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "proteina",
-                "nombre": "Pollo",
-                "cantidad": "40 g en crudo",
-                "receta_id": null
-              },
-              {
-                "componente": "ensalada_grasa",
-                "nombre": "Ensalada con palta",
-                "cantidad": "½ taza",
-                "receta_id": null
-              },
-              {
-                "componente": "bebida",
-                "nombre": "Agua",
-                "cantidad": "½ taza",
-                "receta_id": null
-              }
-            ]
-          },
-          "media_tarde": {
-            "nombre": "Media tarde",
-            "hora": "3:30 – 4:30",
-            "items": [
-              {
-                "componente": "base",
-                "nombre": "Compota de pera",
-                "cantidad": "1 porción",
-                "receta_id": "compota-pera-avena"
-              }
-            ]
-          },
-          "cena": {
-            "nombre": "Cena",
-            "hora": "6:00 – 7:00",
-            "items": [
-              {
-                "componente": "carbohidrato",
-                "nombre": "Arroz",
-                "cantidad": "4 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "proteina",
-                "nombre": "Pavita",
-                "cantidad": "40 g en crudo",
-                "receta_id": null
-              },
-              {
-                "componente": "ensalada_grasa",
-                "nombre": "Ensalada con palta",
-                "cantidad": "½ taza",
                 "receta_id": null
               },
               {
@@ -538,19 +538,19 @@
             "items": [
               {
                 "componente": "cereal",
-                "nombre": "Avena",
+                "nombre": "Hojuelas de kiwicha",
                 "cantidad": "3 cdas",
                 "receta_id": null
               },
               {
                 "componente": "acompanante",
-                "nombre": "Pollo dorado en tiras",
+                "nombre": "Bastones de yuca dorada",
                 "cantidad": "1 porción",
-                "receta_id": "pollo-dorado-tiras"
+                "receta_id": "bastones-yuca-dorada"
               },
               {
                 "componente": "grasa",
-                "nombre": "Palta",
+                "nombre": "Mantequilla de anacardos",
                 "cantidad": "1 cdta",
                 "receta_id": null
               },
@@ -586,7 +586,7 @@
             "items": [
               {
                 "componente": "carbohidrato",
-                "nombre": "Arroz",
+                "nombre": "Papa sancochada",
                 "cantidad": "4 cdas",
                 "receta_id": null
               },
@@ -616,9 +616,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Mazamorra de kiwicha",
+                "nombre": "Barritas de kiwicha",
                 "cantidad": "1 porción",
-                "receta_id": "mazamorra-kiwicha"
+                "receta_id": "barritas-kiwicha-datil"
               }
             ]
           },
@@ -628,7 +628,7 @@
             "items": [
               {
                 "componente": "carbohidrato",
-                "nombre": "Papa sancochada",
+                "nombre": "Arroz",
                 "cantidad": "4 cdas",
                 "receta_id": null
               },
@@ -639,9 +639,21 @@
                 "receta_id": null
               },
               {
+                "componente": "menestra",
+                "nombre": "Frejol panamito",
+                "cantidad": "3 cdas",
+                "receta_id": null
+              },
+              {
                 "componente": "ensalada_grasa",
-                "nombre": "Ensalada con aceite de oliva",
+                "nombre": "Ensalada con palta",
                 "cantidad": "½ taza",
+                "receta_id": null
+              },
+              {
+                "componente": "fruta_vitc",
+                "nombre": "Mandarina",
+                "cantidad": "1 unidad pequeña",
                 "receta_id": null
               },
               {
@@ -660,25 +672,25 @@
             "items": [
               {
                 "componente": "cereal",
-                "nombre": "Harina 7 semillas",
+                "nombre": "Cañihua",
                 "cantidad": "3 cdas",
                 "receta_id": null
               },
               {
                 "componente": "acompanante",
-                "nombre": "Revuelto con palta",
+                "nombre": "Muffins de zanahoria",
                 "cantidad": "1 porción",
-                "receta_id": "huevo-revuelto-palta"
+                "receta_id": "muffins-zanahoria-avena"
               },
               {
                 "componente": "grasa",
-                "nombre": "Aceite de oliva",
+                "nombre": "Palta",
                 "cantidad": "1 cdta",
                 "receta_id": null
               },
               {
                 "componente": "fruta",
-                "nombre": "Pera",
+                "nombre": "Plátano",
                 "cantidad": "1 unidad pequeña",
                 "receta_id": null
               }
@@ -690,9 +702,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Barritas de kiwicha",
+                "nombre": "Mazamorra de kiwicha",
                 "cantidad": "1 porción",
-                "receta_id": "barritas-kiwicha-datil"
+                "receta_id": "mazamorra-kiwicha"
               },
               {
                 "componente": "crujiente",
@@ -708,32 +720,20 @@
             "items": [
               {
                 "componente": "carbohidrato",
-                "nombre": "Arroz",
+                "nombre": "Camote sancochado",
                 "cantidad": "4 cdas",
                 "receta_id": null
               },
               {
                 "componente": "proteina",
-                "nombre": "Carne de res",
+                "nombre": "Pollo",
                 "cantidad": "40 g en crudo",
                 "receta_id": null
               },
               {
-                "componente": "menestra",
-                "nombre": "Garbanzo",
-                "cantidad": "3 cdas",
-                "receta_id": null
-              },
-              {
                 "componente": "ensalada_grasa",
-                "nombre": "Ensalada con aceite de oliva",
+                "nombre": "Ensalada con aceite de ajonjolí",
                 "cantidad": "½ taza",
-                "receta_id": null
-              },
-              {
-                "componente": "fruta_vitc",
-                "nombre": "Papaya",
-                "cantidad": "1 unidad pequeña",
                 "receta_id": null
               },
               {
@@ -762,7 +762,7 @@
             "items": [
               {
                 "componente": "carbohidrato",
-                "nombre": "Camote sancochado",
+                "nombre": "Arroz",
                 "cantidad": "4 cdas",
                 "receta_id": null
               },
@@ -774,7 +774,7 @@
               },
               {
                 "componente": "ensalada_grasa",
-                "nombre": "Ensalada con aceite de ajonjolí",
+                "nombre": "Ensalada con palta",
                 "cantidad": "½ taza",
                 "receta_id": null
               },
@@ -800,19 +800,19 @@
               },
               {
                 "componente": "acompanante",
-                "nombre": "Tacacho de bellaco",
+                "nombre": "Revuelto con palta",
                 "cantidad": "1 porción",
-                "receta_id": "tacacho-platano-bellaco"
+                "receta_id": "huevo-revuelto-palta"
               },
               {
                 "componente": "grasa",
-                "nombre": "Mantequilla de anacardos",
+                "nombre": "Mantequilla de maní",
                 "cantidad": "1 cdta",
                 "receta_id": null
               },
               {
                 "componente": "fruta",
-                "nombre": "Uva cortada a lo largo",
+                "nombre": "Plátano",
                 "cantidad": "1 unidad pequeña",
                 "receta_id": null
               }
@@ -824,9 +824,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Chifles de bellaco",
+                "nombre": "Galletas de quinua",
                 "cantidad": "1 porción",
-                "receta_id": "chifles-platano-bellaco"
+                "receta_id": "galletas-quinua-camote"
               },
               {
                 "componente": "crujiente",
@@ -853,9 +853,21 @@
                 "receta_id": null
               },
               {
+                "componente": "menestra",
+                "nombre": "Lentejas",
+                "cantidad": "3 cdas",
+                "receta_id": null
+              },
+              {
                 "componente": "ensalada_grasa",
-                "nombre": "Ensalada con palta",
+                "nombre": "Ensalada con aceite de oliva",
                 "cantidad": "½ taza",
+                "receta_id": null
+              },
+              {
+                "componente": "fruta_vitc",
+                "nombre": "Piña Golden",
+                "cantidad": "1 unidad pequeña",
                 "receta_id": null
               },
               {
@@ -872,9 +884,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Compota de pera",
+                "nombre": "Chifles de bellaco",
                 "cantidad": "1 porción",
-                "receta_id": "compota-pera-avena"
+                "receta_id": "chifles-platano-bellaco"
               }
             ]
           },
@@ -896,7 +908,7 @@
               },
               {
                 "componente": "ensalada_grasa",
-                "nombre": "Ensalada con aceite de oliva",
+                "nombre": "Ensalada con aceite de ajonjolí",
                 "cantidad": "½ taza",
                 "receta_id": null
               },
@@ -931,19 +943,19 @@
               },
               {
                 "componente": "acompanante",
-                "nombre": "Panqueques de avena",
+                "nombre": "Bastón relleno",
                 "cantidad": "1 porción",
-                "receta_id": "panqueques-avena-huevo"
+                "receta_id": "baston-relleno-pollo"
               },
               {
                 "componente": "grasa",
-                "nombre": "Mantequilla de almendras",
+                "nombre": "Mantequilla de anacardos",
                 "cantidad": "1 cdta",
                 "receta_id": null
               },
               {
                 "componente": "fruta",
-                "nombre": "Uva cortada a lo largo",
+                "nombre": "Durazno",
                 "cantidad": "1 unidad pequeña",
                 "receta_id": null
               }
@@ -985,7 +997,7 @@
               },
               {
                 "componente": "ensalada_grasa",
-                "nombre": "Ensalada con aceite de oliva",
+                "nombre": "Ensalada con palta",
                 "cantidad": "½ taza",
                 "receta_id": null
               },
@@ -1003,9 +1015,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Barritas de kiwicha",
+                "nombre": "Mazamorra de kiwicha",
                 "cantidad": "1 porción",
-                "receta_id": "barritas-kiwicha-datil"
+                "receta_id": "mazamorra-kiwicha"
               }
             ]
           },
@@ -1027,7 +1039,7 @@
               },
               {
                 "componente": "ensalada_grasa",
-                "nombre": "Ensalada con aceite de ajonjolí",
+                "nombre": "Ensalada con palta",
                 "cantidad": "½ taza",
                 "receta_id": null
               },
@@ -1047,141 +1059,7 @@
             "items": [
               {
                 "componente": "cereal",
-                "nombre": "Hojuelas de kiwicha",
-                "cantidad": "3 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "acompanante",
-                "nombre": "Bastón relleno",
-                "cantidad": "1 porción",
-                "receta_id": "baston-relleno-pollo"
-              },
-              {
-                "componente": "grasa",
-                "nombre": "Mantequilla de anacardos",
-                "cantidad": "1 cdta",
-                "receta_id": null
-              },
-              {
-                "componente": "fruta",
-                "nombre": "Pera",
-                "cantidad": "1 unidad pequeña",
-                "receta_id": null
-              }
-            ]
-          },
-          "media_manana": {
-            "nombre": "Media mañana",
-            "hora": "10:00 – 10:30",
-            "items": [
-              {
-                "componente": "base",
-                "nombre": "Mazamorra de kiwicha",
-                "cantidad": "1 porción",
-                "receta_id": "mazamorra-kiwicha"
-              },
-              {
-                "componente": "crujiente",
-                "nombre": "Quinua pop",
-                "cantidad": "2 cdas",
-                "receta_id": null
-              }
-            ]
-          },
-          "almuerzo": {
-            "nombre": "Almuerzo",
-            "hora": "12:30 – 1:30",
-            "items": [
-              {
-                "componente": "carbohidrato",
-                "nombre": "Arroz",
-                "cantidad": "4 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "proteina",
-                "nombre": "Pollo",
-                "cantidad": "40 g en crudo",
-                "receta_id": null
-              },
-              {
-                "componente": "ensalada_grasa",
-                "nombre": "Ensalada con palta",
-                "cantidad": "½ taza",
-                "receta_id": null
-              },
-              {
-                "componente": "bebida",
-                "nombre": "Agua",
-                "cantidad": "½ taza",
-                "receta_id": null
-              }
-            ]
-          },
-          "media_tarde": {
-            "nombre": "Media tarde",
-            "hora": "3:30 – 4:30",
-            "items": [
-              {
-                "componente": "base",
-                "nombre": "Trufas de garbanzo",
-                "cantidad": "1 porción",
-                "receta_id": "trufas-garbanzo-cacao"
-              }
-            ]
-          },
-          "cena": {
-            "nombre": "Cena",
-            "hora": "6:00 – 7:00",
-            "items": [
-              {
-                "componente": "carbohidrato",
-                "nombre": "Camote sancochado",
-                "cantidad": "4 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "proteina",
-                "nombre": "Pavita",
-                "cantidad": "40 g en crudo",
-                "receta_id": null
-              },
-              {
-                "componente": "menestra",
-                "nombre": "Frejol castilla",
-                "cantidad": "3 cdas",
-                "receta_id": null
-              },
-              {
-                "componente": "ensalada_grasa",
-                "nombre": "Ensalada con aceite de oliva",
-                "cantidad": "½ taza",
-                "receta_id": null
-              },
-              {
-                "componente": "fruta_vitc",
-                "nombre": "Aguaymanto",
-                "cantidad": "1 unidad pequeña",
-                "receta_id": null
-              },
-              {
-                "componente": "bebida",
-                "nombre": "Agua",
-                "cantidad": "½ taza",
-                "receta_id": null
-              }
-            ]
-          }
-        },
-        "Miércoles": {
-          "desayuno": {
-            "nombre": "Desayuno",
-            "hora": "7:30 – 8:30",
-            "items": [
-              {
-                "componente": "cereal",
-                "nombre": "Harina de algarrobo",
+                "nombre": "Cañihua",
                 "cantidad": "3 cdas",
                 "receta_id": null
               },
@@ -1211,9 +1089,143 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Chifles de bellaco",
+                "nombre": "Barritas de kiwicha",
                 "cantidad": "1 porción",
-                "receta_id": "chifles-platano-bellaco"
+                "receta_id": "barritas-kiwicha-datil"
+              },
+              {
+                "componente": "crujiente",
+                "nombre": "Quinua pop",
+                "cantidad": "2 cdas",
+                "receta_id": null
+              }
+            ]
+          },
+          "almuerzo": {
+            "nombre": "Almuerzo",
+            "hora": "12:30 – 1:30",
+            "items": [
+              {
+                "componente": "carbohidrato",
+                "nombre": "Camote sancochado",
+                "cantidad": "4 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "proteina",
+                "nombre": "Pollo",
+                "cantidad": "40 g en crudo",
+                "receta_id": null
+              },
+              {
+                "componente": "ensalada_grasa",
+                "nombre": "Ensalada con palta",
+                "cantidad": "½ taza",
+                "receta_id": null
+              },
+              {
+                "componente": "bebida",
+                "nombre": "Agua",
+                "cantidad": "½ taza",
+                "receta_id": null
+              }
+            ]
+          },
+          "media_tarde": {
+            "nombre": "Media tarde",
+            "hora": "3:30 – 4:30",
+            "items": [
+              {
+                "componente": "base",
+                "nombre": "Trufas de garbanzo",
+                "cantidad": "1 porción",
+                "receta_id": "trufas-garbanzo-cacao"
+              }
+            ]
+          },
+          "cena": {
+            "nombre": "Cena",
+            "hora": "6:00 – 7:00",
+            "items": [
+              {
+                "componente": "carbohidrato",
+                "nombre": "Arroz",
+                "cantidad": "4 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "proteina",
+                "nombre": "Pavita",
+                "cantidad": "40 g en crudo",
+                "receta_id": null
+              },
+              {
+                "componente": "menestra",
+                "nombre": "Lentejas",
+                "cantidad": "3 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "ensalada_grasa",
+                "nombre": "Ensalada con aceite de oliva",
+                "cantidad": "½ taza",
+                "receta_id": null
+              },
+              {
+                "componente": "fruta_vitc",
+                "nombre": "Papaya",
+                "cantidad": "1 unidad pequeña",
+                "receta_id": null
+              },
+              {
+                "componente": "bebida",
+                "nombre": "Agua",
+                "cantidad": "½ taza",
+                "receta_id": null
+              }
+            ]
+          }
+        },
+        "Miércoles": {
+          "desayuno": {
+            "nombre": "Desayuno",
+            "hora": "7:30 – 8:30",
+            "items": [
+              {
+                "componente": "cereal",
+                "nombre": "Cañihua",
+                "cantidad": "3 cdas",
+                "receta_id": null
+              },
+              {
+                "componente": "acompanante",
+                "nombre": "Crema de quinua",
+                "cantidad": "1 porción",
+                "receta_id": "crema-quinua-manzana"
+              },
+              {
+                "componente": "grasa",
+                "nombre": "Aceite de oliva",
+                "cantidad": "1 cdta",
+                "receta_id": null
+              },
+              {
+                "componente": "fruta",
+                "nombre": "Uva cortada a lo largo",
+                "cantidad": "1 unidad pequeña",
+                "receta_id": null
+              }
+            ]
+          },
+          "media_manana": {
+            "nombre": "Media mañana",
+            "hora": "10:00 – 10:30",
+            "items": [
+              {
+                "componente": "base",
+                "nombre": "Compota de pera",
+                "cantidad": "1 porción",
+                "receta_id": "compota-pera-avena"
               },
               {
                 "componente": "crujiente",
@@ -1229,7 +1241,7 @@
             "items": [
               {
                 "componente": "carbohidrato",
-                "nombre": "Arroz",
+                "nombre": "Quinua",
                 "cantidad": "4 cdas",
                 "receta_id": null
               },
@@ -1241,19 +1253,19 @@
               },
               {
                 "componente": "menestra",
-                "nombre": "Frejol panamito",
+                "nombre": "Frejol castilla",
                 "cantidad": "3 cdas",
                 "receta_id": null
               },
               {
                 "componente": "ensalada_grasa",
-                "nombre": "Ensalada con palta",
+                "nombre": "Ensalada con aceite de oliva",
                 "cantidad": "½ taza",
                 "receta_id": null
               },
               {
                 "componente": "fruta_vitc",
-                "nombre": "Mandarina",
+                "nombre": "Fresa",
                 "cantidad": "1 unidad pequeña",
                 "receta_id": null
               },
@@ -1271,9 +1283,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Fruta picada",
+                "nombre": "Chifles de bellaco",
                 "cantidad": "1 porción",
-                "receta_id": null
+                "receta_id": "chifles-platano-bellaco"
               }
             ]
           },
@@ -1295,7 +1307,7 @@
               },
               {
                 "componente": "ensalada_grasa",
-                "nombre": "Ensalada con aceite de ajonjolí",
+                "nombre": "Ensalada con palta",
                 "cantidad": "½ taza",
                 "receta_id": null
               },
@@ -1315,25 +1327,25 @@
             "items": [
               {
                 "componente": "cereal",
-                "nombre": "Harina de maca",
+                "nombre": "Harina de algarrobo",
                 "cantidad": "3 cdas",
                 "receta_id": null
               },
               {
                 "componente": "acompanante",
-                "nombre": "Pollo dorado en tiras",
+                "nombre": "Panqueques de avena",
                 "cantidad": "1 porción",
-                "receta_id": "pollo-dorado-tiras"
+                "receta_id": "panqueques-avena-huevo"
               },
               {
                 "componente": "grasa",
-                "nombre": "Palta",
+                "nombre": "Mantequilla de almendras",
                 "cantidad": "1 cdta",
                 "receta_id": null
               },
               {
                 "componente": "fruta",
-                "nombre": "Durazno",
+                "nombre": "Plátano",
                 "cantidad": "1 unidad pequeña",
                 "receta_id": null
               }
@@ -1345,9 +1357,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Galletas de quinua",
+                "nombre": "Fruta picada",
                 "cantidad": "1 porción",
-                "receta_id": "galletas-quinua-camote"
+                "receta_id": null
               },
               {
                 "componente": "crujiente",
@@ -1363,7 +1375,7 @@
             "items": [
               {
                 "componente": "carbohidrato",
-                "nombre": "Arroz",
+                "nombre": "Papa sancochada",
                 "cantidad": "4 cdas",
                 "receta_id": null
               },
@@ -1375,7 +1387,7 @@
               },
               {
                 "componente": "ensalada_grasa",
-                "nombre": "Ensalada con aceite de ajonjolí",
+                "nombre": "Ensalada con aceite de oliva",
                 "cantidad": "½ taza",
                 "receta_id": null
               },
@@ -1393,9 +1405,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Compota de pera",
+                "nombre": "Galletas de quinua",
                 "cantidad": "1 porción",
-                "receta_id": "compota-pera-avena"
+                "receta_id": "galletas-quinua-camote"
               }
             ]
           },
@@ -1405,7 +1417,7 @@
             "items": [
               {
                 "componente": "carbohidrato",
-                "nombre": "Quinua",
+                "nombre": "Camote sancochado",
                 "cantidad": "4 cdas",
                 "receta_id": null
               },
@@ -1416,21 +1428,9 @@
                 "receta_id": null
               },
               {
-                "componente": "menestra",
-                "nombre": "Lentejas",
-                "cantidad": "3 cdas",
-                "receta_id": null
-              },
-              {
                 "componente": "ensalada_grasa",
-                "nombre": "Ensalada con palta",
+                "nombre": "Ensalada con aceite de ajonjolí",
                 "cantidad": "½ taza",
-                "receta_id": null
-              },
-              {
-                "componente": "fruta_vitc",
-                "nombre": "Naranja",
-                "cantidad": "1 unidad pequeña",
                 "receta_id": null
               },
               {
@@ -1449,19 +1449,19 @@
             "items": [
               {
                 "componente": "cereal",
-                "nombre": "Cañihua",
+                "nombre": "Harina 7 semillas",
                 "cantidad": "3 cdas",
                 "receta_id": null
               },
               {
                 "componente": "acompanante",
-                "nombre": "Muffins de zanahoria",
+                "nombre": "Revuelto con palta",
                 "cantidad": "1 porción",
-                "receta_id": "muffins-zanahoria-avena"
+                "receta_id": "huevo-revuelto-palta"
               },
               {
                 "componente": "grasa",
-                "nombre": "Palta",
+                "nombre": "Mantequilla de anacardos",
                 "cantidad": "1 cdta",
                 "receta_id": null
               },
@@ -1479,9 +1479,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Paletas de mango",
+                "nombre": "Barritas de kiwicha",
                 "cantidad": "1 porción",
-                "receta_id": "paletas-mango-papaya"
+                "receta_id": "barritas-kiwicha-datil"
               },
               {
                 "componente": "crujiente",
@@ -1508,9 +1508,21 @@
                 "receta_id": null
               },
               {
+                "componente": "menestra",
+                "nombre": "Garbanzo",
+                "cantidad": "3 cdas",
+                "receta_id": null
+              },
+              {
                 "componente": "ensalada_grasa",
-                "nombre": "Ensalada con aceite de oliva",
+                "nombre": "Ensalada con aceite de ajonjolí",
                 "cantidad": "½ taza",
+                "receta_id": null
+              },
+              {
+                "componente": "fruta_vitc",
+                "nombre": "Kiwi",
+                "cantidad": "1 unidad pequeña",
                 "receta_id": null
               },
               {
@@ -1550,9 +1562,21 @@
                 "receta_id": null
               },
               {
+                "componente": "menestra",
+                "nombre": "Frejol panamito",
+                "cantidad": "3 cdas",
+                "receta_id": null
+              },
+              {
                 "componente": "ensalada_grasa",
                 "nombre": "Ensalada con palta",
                 "cantidad": "½ taza",
+                "receta_id": null
+              },
+              {
+                "componente": "fruta_vitc",
+                "nombre": "Naranja",
+                "cantidad": "1 unidad pequeña",
                 "receta_id": null
               },
               {
@@ -1571,25 +1595,25 @@
             "items": [
               {
                 "componente": "cereal",
-                "nombre": "Avena",
+                "nombre": "Granola de kiwicha",
                 "cantidad": "3 cdas",
-                "receta_id": null
+                "receta_id": "granola-kiwicha-quinua"
               },
               {
                 "componente": "acompanante",
-                "nombre": "Bastones de yuca dorada",
+                "nombre": "Pollo dorado en tiras",
                 "cantidad": "1 porción",
-                "receta_id": "bastones-yuca-dorada"
+                "receta_id": "pollo-dorado-tiras"
               },
               {
                 "componente": "grasa",
-                "nombre": "Mantequilla de anacardos",
+                "nombre": "Palta",
                 "cantidad": "1 cdta",
                 "receta_id": null
               },
               {
                 "componente": "fruta",
-                "nombre": "Plátano",
+                "nombre": "Pera",
                 "cantidad": "1 unidad pequeña",
                 "receta_id": null
               }
@@ -1601,9 +1625,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Barritas de kiwicha",
+                "nombre": "Paletas de mango",
                 "cantidad": "1 porción",
-                "receta_id": "barritas-kiwicha-datil"
+                "receta_id": "paletas-mango-papaya"
               },
               {
                 "componente": "crujiente",
@@ -1661,7 +1685,7 @@
             "items": [
               {
                 "componente": "carbohidrato",
-                "nombre": "Papa sancochada",
+                "nombre": "Arroz",
                 "cantidad": "4 cdas",
                 "receta_id": null
               },
@@ -1673,7 +1697,7 @@
               },
               {
                 "componente": "ensalada_grasa",
-                "nombre": "Ensalada con aceite de oliva",
+                "nombre": "Ensalada con aceite de ajonjolí",
                 "cantidad": "½ taza",
                 "receta_id": null
               },
@@ -1693,25 +1717,25 @@
             "items": [
               {
                 "componente": "cereal",
-                "nombre": "Cañihua",
+                "nombre": "Avena",
                 "cantidad": "3 cdas",
                 "receta_id": null
               },
               {
                 "componente": "acompanante",
-                "nombre": "Panqueques de avena",
+                "nombre": "Tacacho de bellaco",
                 "cantidad": "1 porción",
-                "receta_id": "panqueques-avena-huevo"
+                "receta_id": "tacacho-platano-bellaco"
               },
               {
                 "componente": "grasa",
-                "nombre": "Aceite de oliva",
+                "nombre": "Palta",
                 "cantidad": "1 cdta",
                 "receta_id": null
               },
               {
                 "componente": "fruta",
-                "nombre": "Durazno",
+                "nombre": "Uva cortada a lo largo",
                 "cantidad": "1 unidad pequeña",
                 "receta_id": null
               }
@@ -1723,9 +1747,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Compota de pera",
+                "nombre": "Galletas de quinua",
                 "cantidad": "1 porción",
-                "receta_id": "compota-pera-avena"
+                "receta_id": "galletas-quinua-camote"
               },
               {
                 "componente": "crujiente",
@@ -1771,9 +1795,9 @@
             "items": [
               {
                 "componente": "base",
-                "nombre": "Galletas de quinua",
+                "nombre": "Chifles de bellaco",
                 "cantidad": "1 porción",
-                "receta_id": "galletas-quinua-camote"
+                "receta_id": "chifles-platano-bellaco"
               }
             ]
           },
@@ -1783,19 +1807,19 @@
             "items": [
               {
                 "componente": "carbohidrato",
-                "nombre": "Camote sancochado",
+                "nombre": "Arroz",
                 "cantidad": "4 cdas",
                 "receta_id": null
               },
               {
                 "componente": "proteina",
-                "nombre": "Pavita",
+                "nombre": "Carne de res",
                 "cantidad": "40 g en crudo",
                 "receta_id": null
               },
               {
                 "componente": "ensalada_grasa",
-                "nombre": "Ensalada con palta",
+                "nombre": "Ensalada con aceite de oliva",
                 "cantidad": "½ taza",
                 "receta_id": null
               },

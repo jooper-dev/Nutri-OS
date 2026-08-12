@@ -2,7 +2,6 @@ id: escolar_6_11
 nombre: Escolar 6–11 años
 edad_min_meses: 72
 edad_max_meses: 143
-reglas_exclusion: reglas_6_11_anos.md
 descripcion: >
   Plan de 5 tiempos para niño escolar que ya come de la olla familiar.
   Transcripción fiel de la estructura escrita por Paty en fase_3_ensamblaje.md

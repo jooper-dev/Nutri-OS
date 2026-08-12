@@ -2,7 +2,6 @@ id: escolar_eliminacion_4
 nombre: Escolar 6–11 años · dieta de eliminación de 4 alimentos
 edad_min_meses: 72
 edad_max_meses: 143
-reglas_exclusion: reglas_6_11_anos.md
 descripcion: >
   Copia de escolar_6_11 adaptada a niño escolar en dieta de eliminación empírica
   de cuatro alimentos (leche de vaca, trigo, huevo, soya) por esofagitis

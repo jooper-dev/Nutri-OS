@@ -1,14 +1,14 @@
 # =========================================================================
-# ESQUELETO — Paty debe validar todos los campos marcados '# REVISAR' antes
-# del primer uso clínico. La anatomía del archivo es correcta; los números
-# son marcadores de posición tomados de guías generales, no una recomendación.
+# Los valores con fuente pública llevan la cita en la línea de al lado.
+# Lo que queda por decidir es criterio de Paty y vive en un solo sitio:
+# el bloque 'decisiones_pendientes' de abajo, que el validador repite en
+# cada reporte hasta que se cierre.
 # =========================================================================
 
 id: ablactancia_6_meses
 nombre: Inicio de alimentación complementaria — 6 meses
 edad_min_meses: 6
 edad_max_meses: 6
-reglas_exclusion: reglas_6_meses.md
 descripcion: >
   Primer mes de alimentación complementaria. La leche materna o fórmula sigue
   siendo la fuente principal de energía; la comida cumple función de aprendizaje,
@@ -27,16 +27,22 @@ marco_diario:
     no la reemplazan: la acompañan.
 
 comidas:
+  # 'fruta_vitc' no es un capricho de estructura: es el sitio donde el motor
+  # coloca la fruta que exige la regla acoplada de la menestra (hierro no
+  # hemínico + vitamina C en la misma toma). Sin este componente la regla no
+  # tenía dónde aterrizar y no se cumplía nunca.
   - id: almuerzo
     nombre: Almuerzo
     hora: "12:00 – 1:00"
-    componentes: [base_energetica, proteina_hierro, verdura, grasa]
+    componentes: [base_energetica, proteina_hierro, verdura, grasa, fruta_vitc]
 
-  - id: media_tarde            # REVISAR: ¿se introduce ya en el mes 6 o al mes 7?
+  # Dos comidas al día desde los 6 meses: MINSA/INS Perú, alimentación
+  # complementaria 6–8 meses, «2 a 3 comidas al día». Por eso no lleva
+  # 'activo_desde_semana': la segunda toma entra desde la semana 1.
+  - id: media_tarde
     nombre: Media tarde
     hora: "3:30 – 4:00"
     componentes: [fruta]
-    activo_desde_semana: 3     # REVISAR
 
 # ---------------------------------------------------------------
 # FRECUENCIAS SEMANALES
@@ -54,16 +60,24 @@ frecuencias_semanales:
     modo: exacto
     razon: densidad calórica en volumen pequeño
 
+  # 1×/semana y no más: el hígado es la fuente más concentrada de vitamina A
+  # preformada del catálogo y el margen entre la recomendación (500 µg/d a los
+  # 7–12 m) y el límite superior es estrecho. El hierro animal de los otros seis
+  # días lo cubre la regla de arriba — MINSA: dos cucharadas diarias de alimento
+  # de origen animal rico en hierro.
   - componente: proteina_hierro
-    familia: higado                # REVISAR frecuencia con Paty
+    familia: higado
     en: [almuerzo]
     veces: 1
     modo: exacto
 
+  # OMS 2023, alimentación complementaria 6–23 meses: «Pulses, nuts and seeds
+  # should be consumed frequently». Se sostiene a los 6 meses con la menestra
+  # bien cocida y aplastada; ver la nota de edad en datos/alimentos_base.yaml.
   - componente: proteina_hierro
     familia: menestra
     en: [almuerzo]
-    veces: 2                       # REVISAR
+    veces: 2
     modo: exacto
 
 # ---------------------------------------------------------------
@@ -72,24 +86,27 @@ frecuencias_semanales:
 # ---------------------------------------------------------------
 introduccion_progresiva:
   activa: true
-  dias_por_alimento_nuevo: 3       # REVISAR (2–3 días es el rango habitual)
-  max_alimentos_nuevos_semana: 3   # REVISAR
+  dias_por_alimento_nuevo: 3       # 2–3 días es el rango de las guías; ver reglas_exclusion/reglas_6_meses.md
+  max_alimentos_nuevos_semana: 3   # derivado: 7 días / 3 días por alimento
   alergenos_mayores:
     introducir: true
     uno_por_vez: true
-    dias_observacion: 3            # REVISAR
+    dias_observacion: 3            # mismo rango 2–3 días, para poder aislar la reacción
     nota_qa: >
       El plan debe señalar explícitamente qué día se introduce cada alérgeno
       mayor y dejar constancia de la ventana de observación.
 
 # ---------------------------------------------------------------
 # TEXTURA
+# MINSA/INS fija la banda de los 6–8 meses —«comidas espesas: papillas, puré o
+# mazamorras»— y sitúa el aplastado con grumos en los 7–8 meses. Dentro de esa
+# banda, el ritmo semana a semana es criterio de Paty: ver decisiones_pendientes.
 # ---------------------------------------------------------------
 progresion_textura:
   semana_1: papilla lisa
   semana_2: papilla lisa
-  semana_3: aplastado con tenedor       # REVISAR
-  semana_4: aplastado con grumos suaves # REVISAR
+  semana_3: aplastado con tenedor
+  semana_4: aplastado con grumos suaves
 
 # ---------------------------------------------------------------
 # ROTACIONES
@@ -99,9 +116,11 @@ rotaciones:
     en: [almuerzo]
     reparto: {papa_pure: 2, camote_pure: 2, zapallo_pure: 1, arroz_pure: resto}
 
+  # Espinaca y brócoli no hace falta excluirlos aquí: el catálogo ya los deja
+  # fuera por edad (12 m y 8 m), y el filtro de edad corre antes que la rotación.
   - componente: verdura
     en: [almuerzo]
-    reparto: {zanahoria: 3, zapallo: resto}   # REVISAR: espinaca y brócoli fuera a los 6 m
+    reparto: {zanahoria: 3, zapallo: resto}
 
 # ---------------------------------------------------------------
 # REGLAS ACOPLADAS
@@ -117,8 +136,10 @@ reglas_acopladas:
 
 # ---------------------------------------------------------------
 # EXCLUSIONES DURAS
-# Redundan con reglas_6_meses.md a propósito: el validador comprueba
-# ambas fuentes y falla si discrepan.
+# El motor NO las hace cumplir: ninguno de estos alimentos está en el catálogo,
+# así que no hay nada que filtrar. El validador las repite como aviso en cada
+# reporte para que consten en la revisión clínica. reglas_exclusion/ es material
+# de lectura humana y no lo lee ningún módulo.
 # ---------------------------------------------------------------
 exclusiones_duras:
   - miel
@@ -135,8 +156,12 @@ exclusiones_duras:
 # ---------------------------------------------------------------
 variedad:
   no_repetir_dia_completo: false   # a esta edad la repetición es deseable
-  max_veces_misma_receta_semana: 4 # REVISAR
-  min_recetas_distintas_semana: 3
+  max_veces_misma_receta_semana: 4
+  # 0 = el recetario no es obligatorio en este protocolo. A los 6 meses la comida
+  # es puré de un alimento, y este mismo archivo limita a 3 los alimentos nuevos
+  # por semana con 3 días de observación cada uno: exigir además 3 recetas
+  # distintas de varios ingredientes por semana contradice esa regla.
+  min_recetas_distintas_semana: 0
 
 # ---------------------------------------------------------------
 # AJUSTES POR DIAGNÓSTICO
@@ -151,5 +176,28 @@ preferencias_clinicas:
     nota_qa: revisar aporte hídrico y proporción de plátano/manzana
 
   aplv:
-    exclusiones_extra: [lacteos, derivados_lacteos]
+    # Solo 'lacteos'. Antes decía [lacteos, derivados_lacteos] y esa segunda
+    # etiqueta no existe en el catálogo: una etiqueta inventada no excluye nada.
+    # 'lacteos' ya cubre la leche y sus derivados (yogurt, queso) en
+    # datos/alimentos_base.yaml, y el validador bloquea el plan si alguna vez
+    # deja de existir.
+    exclusiones_extra: [lacteos]
     nota_qa: verificar trazas en productos procesados
+
+# ---------------------------------------------------------------
+# DECISIONES PENDIENTES
+# Lo que no resuelve ninguna guía pública y sí resuelve Paty. El validador las
+# repite en cada reporte. Se cierran borrando la línea y poniendo el valor.
+# ---------------------------------------------------------------
+decisiones_pendientes:
+  - >
+    Progresión de textura dentro del primer mes: hoy semana 1–2 papilla lisa,
+    semana 3 aplastado con tenedor, semana 4 aplastado con grumos suaves.
+    ¿Se queda así? (sí / no)
+  - >
+    Recetario a los 6 meses: hoy el protocolo no exige ninguna receta del
+    recetario (min_recetas_distintas_semana = 0). ¿Cuántas quieres exigir por
+    semana? (un número; 0 = ninguna)
+  - >
+    Una misma receta puede repetirse hasta 4 veces por semana
+    (max_veces_misma_receta_semana). ¿Cuántas? (un número)

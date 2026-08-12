@@ -84,7 +84,8 @@ ficticios, para probar el sistema sin tocar información real.
 ```
 prompts/           PC_CLINICO (F1) · P1_RECETAS (F3)
 protocolos/        un .yaml por tipo de plan — estructura y frecuencias
-reglas_exclusion/  restricciones por edad, con evidencia
+reglas_exclusion/  restricciones por edad, con evidencia — LECTURA HUMANA:
+                   ningún módulo del motor lo lee
 biblioteca/        una receta por archivo, crece con el uso
   prompts_imagen/  prompt de foto de cada receta (generado)
   imagenes/        la foto de cada receta (una vez y para siempre)
@@ -145,6 +146,18 @@ lactante prematura de 11 meses cronológicos y ~9 corregidos, con APLV, anemia
 y estreñimiento, y una madre que pide un plan de un mes que cruza el primer
 cumpleaños. No hay protocolo para esa edad. Comprueba que el sistema se
 detenga en la selección de protocolo y no en F1, que es donde se detiene Thiago.
+
+---
+
+## Reglas de exclusión
+
+`reglas_exclusion/` son seis documentos de evidencia por franja de edad —qué se
+prohíbe a los 6 meses, qué deja de ser riesgo a los 9, qué cambia en el escolar—.
+**Los lee una persona, no el motor.** Ningún módulo abre esa carpeta y ningún
+protocolo la referencia: lo que tiene que filtrar de verdad está en
+`datos/alimentos_base.yaml`, en forma de `edad_min_meses`, `alergenos` y
+`nunca_recomendar`, que es lo único que el código puede comprobar y hacer cumplir.
+Sirven para escribir un protocolo nuevo y para revisar uno viejo.
 
 ---
 
