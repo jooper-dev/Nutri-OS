@@ -1,0 +1,23 @@
+LABORATORIO CLÍNICO — Trujillo
+Informe de resultados
+
+Paciente: VASQUEZ CHUQUIPOMA, ARIANA M.
+Fecha de toma: 04/08/2026
+
+HEMOGRAMA
+  Hemoglobina .............. 9.6 g/dL      (ref. 11.0 - 14.0)
+  Hematocrito .............. 29.4 %
+  VCM ...................... 68 fL         (ref. 70 - 86)
+  HCM ...................... 22 pg
+  RDW ...................... 16.8 %
+  Leucocitos ............... 8,400 /uL
+  Plaquetas ................ 402,000 /uL
+
+BIOQUÍMICA
+  (no solicitada)
+
+Observación del laboratorio: no se procesó ferritina ni perfil de hierro;
+no figuraba en la orden.
+
+Nota manuscrita en la hoja, de la mamá:
+"la seño del laboratorio dijo que estaba bajita la sangre"

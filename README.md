@@ -131,7 +131,7 @@ productos distintos. Aquí se trata del anexo personalizado de cada paciente.
 
 ---
 
-## Caso de prueba
+## Casos de prueba
 
 `pacientes/_BENCHMARK_Thiago/` es un caso sintético difícil a propósito:
 esofagitis eosinofílica con dieta de eliminación de cuatro alimentos,
@@ -139,6 +139,12 @@ selectividad alimentaria severa, aversión a texturas mixtas, una alergia rara
 fuera del vocabulario del sistema, familia amazónica recién mudada a la costa y
 datos contradictorios entre documentos. Sirve para comprobar que el sistema se
 detiene donde debe en lugar de producir un plan bonito y equivocado.
+
+`pacientes/_BENCHMARK_Ariana/` es el segundo, y ataca zonas distintas: una
+lactante prematura de 11 meses cronológicos y ~9 corregidos, con APLV, anemia
+y estreñimiento, y una madre que pide un plan de un mes que cruza el primer
+cumpleaños. No hay protocolo para esa edad. Comprueba que el sistema se
+detenga en la selección de protocolo y no en F1, que es donde se detiene Thiago.
 
 ---
 
