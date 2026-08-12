@@ -13,8 +13,8 @@
     <tr><td class="k">Fecha</td><td class="v">{{ p.fecha }}</td></tr>
     <tr><td class="k">Duración</td><td class="v">{{ p.semanas|length }} semana{{ 's' if p.semanas|length > 1 else '' }}</td></tr>
     {% if p.diagnostico_texto %}<tr><td class="k">Enfoque</td><td class="v">{{ p.diagnostico_texto|trim }}</td></tr>{% endif %}
-    {% if p.alergias %}<tr><td class="k">Alergias</td><td class="v">{{ p.alergias|join(', ') }}</td></tr>{% endif %}
-    {% if p.rechazos %}<tr><td class="k">No consume</td><td class="v">{{ p.rechazos|join(', ') }}</td></tr>{% endif %}
+    {% if p.alergias_visibles %}<tr><td class="k">Alergias</td><td class="v">{{ p.alergias_visibles|join(', ') }}</td></tr>{% endif %}
+    {% if p.rechazos_visibles %}<tr><td class="k">No consume</td><td class="v">{{ p.rechazos_visibles|join(', ') }}</td></tr>{% endif %}
   </table>
 
   <div class="aviso">
@@ -35,7 +35,7 @@
       {% if h.cara %}<span class="cara">{{ h.cara }}</span>{% endif %}
     </div>
     <div class="der">
-      <strong>{{ p.paciente }}</strong> · {{ p.edad_texto }}{% if p.alergias %} · sin {{ p.alergias|join(', ') }}{% endif %}
+      <strong>{{ p.paciente }}</strong> · {{ p.edad_texto }}{% if p.alergias_visibles %} · sin {{ p.alergias_visibles|join(', ')|lower }}{% endif %}
     </div>
   </div>
 

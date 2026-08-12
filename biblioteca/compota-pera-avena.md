@@ -13,7 +13,7 @@ componente: base
 familia: 
 textura: humeda
 aporta: [fibra]
-alergenos_presentes: []
+alergenos_presentes: [gluten]
 etiquetas: [sin-huevo]
 conservacion:
   ambiente_dias: 0

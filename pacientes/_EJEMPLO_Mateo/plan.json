@@ -220,7 +220,7 @@
               },
               {
                 "componente": "fruta_vitc",
-                "nombre": "Fresa",
+                "nombre": "Naranja",
                 "cantidad": "1 unidad pequeña",
                 "receta_id": null
               },
@@ -518,7 +518,7 @@
               },
               {
                 "componente": "fruta_vitc",
-                "nombre": "Lima",
+                "nombre": "Mandarina",
                 "cantidad": "1 unidad pequeña",
                 "receta_id": null
               },
@@ -652,7 +652,7 @@
               },
               {
                 "componente": "fruta_vitc",
-                "nombre": "Mandarina",
+                "nombre": "Lima",
                 "cantidad": "1 unidad pequeña",
                 "receta_id": null
               },
@@ -1173,7 +1173,7 @@
               },
               {
                 "componente": "fruta_vitc",
-                "nombre": "Papaya",
+                "nombre": "Naranja",
                 "cantidad": "1 unidad pequeña",
                 "receta_id": null
               },
@@ -1265,7 +1265,7 @@
               },
               {
                 "componente": "fruta_vitc",
-                "nombre": "Fresa",
+                "nombre": "Mandarina",
                 "cantidad": "1 unidad pequeña",
                 "receta_id": null
               },
@@ -1521,7 +1521,7 @@
               },
               {
                 "componente": "fruta_vitc",
-                "nombre": "Kiwi",
+                "nombre": "Lima",
                 "cantidad": "1 unidad pequeña",
                 "receta_id": null
               },
@@ -1575,7 +1575,7 @@
               },
               {
                 "componente": "fruta_vitc",
-                "nombre": "Naranja",
+                "nombre": "Piña Golden",
                 "cantidad": "1 unidad pequeña",
                 "receta_id": null
               },

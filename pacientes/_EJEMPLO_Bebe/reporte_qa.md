@@ -8,6 +8,9 @@ Protocolo: Inicio de alimentación complementaria — 6 meses  ·  1 semana(s)  
 
 ## Avisos
 
+- Este plan no usa ninguna receta del recetario, así que solo se generará el PDF del plan y no habrá Recetario.
+    Motivo: de los componentes que pide el protocolo «ablactancia_6_meses», estos no tienen ninguna receta en biblioteca/: base_energetica, fruta, fruta_vitc, grasa, proteina_hierro, verdura.
+    Se llenan con alimentos base, que se preparan sin instrucciones.
 - El protocolo declara «exclusiones_duras», que el motor aún no hace cumplir. Revísalo a mano.
 - El protocolo declara «introduccion_progresiva», que el motor aún no hace cumplir. Revísalo a mano.
 - El protocolo declara «progresion_textura», que el motor aún no hace cumplir. Revísalo a mano.

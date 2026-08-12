@@ -41,9 +41,68 @@ from comun import (
     ErrorNutriOS,
     huella_plan,
     leer_front_matter,
+    normalizar,
 )
 
 PLANTILLAS = Path(__file__).resolve().parent / "plantillas"
+
+# Cómo se escribe cada identificador interno cuando lo va a leer una madre.
+#
+# La portada del plan imprimía «ALERGIAS: lacteos» y «NO CONSUME: pescado» tal
+# cual salían del sistema: en minúscula, sin tildes y con el identificador
+# interno. Es un documento que recibe la familia de un paciente, no un volcado
+# de la base de datos.
+#
+# Vive aquí, en la capa de presentación, y solo aquí: los identificadores de
+# datos/alimentos_base.yaml y de las fichas no cambian, porque de ellos dependen
+# el filtrado y el recuento. Lo que se traduce es la impresión.
+NOMBRES_VISIBLES = {
+    # Etiquetas de alérgeno del catálogo
+    "lacteos": "Lácteos",
+    "gluten": "Gluten",
+    "huevo": "Huevo",
+    "mani": "Maní",
+    "frutos_secos": "Frutos secos",
+    "pescado": "Pescado",
+    "soya": "Soya",
+    "ajonjoli": "Ajonjolí",
+    "carne_mamifero": "Carnes rojas (res, cerdo, cordero)",
+    # Alimentos que suelen aparecer escritos como rechazo
+    "res": "Carne de res",
+    "pollo": "Pollo",
+    "pavita": "Pavita",
+    "higado": "Hígado",
+    "sangrecita": "Sangrecita",
+    "menestra": "Menestras",
+    "brocoli": "Brócoli",
+    "espinaca": "Espinaca",
+    "vainita": "Vainita",
+    "betarraga": "Betarraga",
+    "zanahoria": "Zanahoria",
+    "zapallo": "Zapallo",
+    "camote": "Camote",
+    "platano": "Plátano",
+    "papaya": "Papaya",
+    "quinua": "Quinua",
+    "kiwicha": "Kiwicha",
+    "canihua": "Cañihua",
+    "yuca": "Yuca",
+    "avena": "Avena",
+    "yogurt": "Yogurt",
+    "ensalada": "Ensaladas",
+}
+
+
+def nombre_visible(clave: str) -> str:
+    """El identificador interno, escrito como se imprime."""
+    conocido = NOMBRES_VISIBLES.get(normalizar(clave))
+    if conocido:
+        return conocido
+    # Lo que no esté en la tabla se imprime tal como lo escribió Paty en la
+    # ficha, solo con la primera letra en mayúscula: si ella puso «brócoli» con
+    # tilde, sale con tilde.
+    texto = str(clave).replace("_", " ").strip()
+    return texto[:1].upper() + texto[1:]
 
 
 # ---------------------------------------------------------------------------
@@ -290,6 +349,9 @@ def renderizar(nombre_carpeta: str, caras: bool = False, fotos: bool = True) -> 
         )
 
     plan = json.loads(ruta_plan.read_text(encoding="utf-8"))
+    # Solo para imprimir: el plan en disco conserva sus identificadores.
+    plan["alergias_visibles"] = [nombre_visible(a) for a in plan.get("alergias") or []]
+    plan["rechazos_visibles"] = [nombre_visible(x) for x in plan.get("rechazos") or []]
     env = _entorno()
     css_base = CSS(filename=str(PLANTILLAS / "estilo.css"))
     css_plan = CSS(filename=str(PLANTILLAS / "plan.css"))
@@ -323,6 +385,17 @@ def renderizar(nombre_carpeta: str, caras: bool = False, fotos: bool = True) -> 
         destino = carpeta / f"Recetario_{slug}.pdf"
         _escribir_pdf(doc, destino, [css_base], base)
         salidas.append(destino)
+    else:
+        # Un PDF donde se esperaban dos, y hasta ahora sin una palabra que lo
+        # explicara. El plan es correcto: es la biblioteca la que no cubre este
+        # protocolo todavía.
+        print(
+            f"  · Sin recetario: este plan no usa ninguna receta de biblioteca/.\n"
+            f"    Todas sus preparaciones son alimentos base, que se preparan sin\n"
+            f"    instrucciones y por eso no tienen ficha. El reporte de QA dice qué\n"
+            f"    componentes del protocolo «{plan.get('protocolo')}» no tienen ninguna\n"
+            f"    receta todavía; se escriben con prompts/P1_RECETAS.md (Fase 3)."
+        )
 
     return salidas
 

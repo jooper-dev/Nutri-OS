@@ -13,7 +13,7 @@ componente: base
 familia: 
 textura: seca
 aporta: [hierro, fibra]
-alergenos_presentes: [frutos_secos]
+alergenos_presentes: [mani]
 etiquetas: [sin-gluten, sin-huevo, sin-azucar-anadida]
 conservacion:
   ambiente_dias: 4

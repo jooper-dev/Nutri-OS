@@ -123,7 +123,7 @@ textura: blanda                       # seca | crujiente | blanda | humeda | liq
 componente: acompanante               # qué ranura del protocolo llena (ver lista abajo)
 familia: huevo                        # subgrupo para reglas de frecuencia; vacío si no aplica
 aporta: [fibra, betacarotenos]        # nutrientes reales y defendibles
-alergenos_presentes: [gluten]         # gluten | lacteos | huevo | frutos_secos | pescado | soya | ajonjoli
+alergenos_presentes: [gluten]         # gluten | lacteos | huevo | mani | frutos_secos | pescado | soya | ajonjoli | carne_mamifero
 etiquetas: [sin-huevo]                # solo las que sobrevivan la regla de seguridad
 conservacion:
   ambiente_dias: 0
@@ -142,7 +142,9 @@ Reglas del front-matter:
 - `componente` es la ranura exacta que la receta ocupa dentro del protocolo. Valores válidos: `cereal` · `acompanante` · `carbohidrato` · `proteina` · `proteina_hierro` · `menestra` · `base_energetica` · `verdura` · `ensalada_grasa` · `base` · `crujiente` · `fruta` · `fruta_vitc` · `grasa` · `bebida`. Un solo valor: si dudas entre dos, elige el papel principal que cumple en el plato.
 - `familia` agrupa recetas para las reglas de frecuencia del protocolo (`pescado`, `pollo`, `res`, `huevo`, `higado`, `menestra`, `yogurt`). Déjalo vacío si la receta no cae en ninguna familia regulada.
 - `aporta` alimenta la priorización clínica (anemia → hierro, estreñimiento → fibra). Solo nutrientes que los ingredientes sostienen de verdad.
-- `alergenos_presentes` se deriva de la lista final completa, incluidas opciones y Evolución. Es lo que usa el filtro de seguridad: **ante duda, incluye el alérgeno.** Un falso positivo descarta una receta; un falso negativo llega al plato de un niño alérgico.
+- `alergenos_presentes` se deriva de la lista final completa, incluidas opciones y Evolución. Es lo que usa el filtro de seguridad: **ante duda, incluye el alérgeno.** Un falso positivo descarta una receta; un falso negativo llega al plato de un niño alérgico. Dos precisiones que el sistema comprueba con `datos/alergenos_ingredientes.yaml`:
+  - **`mani` va aparte de `frutos_secos`.** El maní es una leguminosa y en alergia pediátrica es otro alérgeno: la mantequilla de maní declara `mani`, la de almendras o anacardos declara `frutos_secos`.
+  - **La avena cuenta como `gluten`** salvo que la receta especifique avena *certificada* sin gluten. No lo lleva ella: lo lleva el molino que comparte con el trigo.
 - `textura` es **la que domina el bocado terminado**, un solo valor. Un muffin es `blanda` aunque la corteza sea seca; un arroz con guiso encima es `mixta` aunque cada parte por separado no lo sea. Guía: `seca` (bastón, tacacho, carne a la plancha) · `crujiente` (pop de cereal, frito muy seco) · `blanda` (sancochado, fruta en trozos, horneado esponjoso) · `humeda` (crema, compota, guiso, mazamorra) · `liquida` (refresco, batido, sopa) · `mixta` (dos texturas en el mismo plato).
   Este campo no es decorativo: en aversión textural y en disfagia decide si el plato se come o si termina en arcada, y **el nombre del alimento nunca la delata** — "compota de pera" no dice "aguado" por ningún lado. Si dudas entre dos, elige la que más se note al comer.
 - `etiquetas` sigue la lógica inversa: **ante duda, omite.**

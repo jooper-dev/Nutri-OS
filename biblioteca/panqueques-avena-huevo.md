@@ -13,7 +13,7 @@ componente: acompanante
 familia: huevo
 textura: blanda
 aporta: [fibra, proteina]
-alergenos_presentes: [huevo]
+alergenos_presentes: [huevo, gluten]
 etiquetas: [sin-azucar-anadida]
 conservacion:
   ambiente_dias: 0

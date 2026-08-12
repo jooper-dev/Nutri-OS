@@ -461,6 +461,27 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
                 f"(el protocolo sugiere {minimo}). La biblioteca necesita crecer."
             )
 
+    # --- 5b. Un plan sin recetario ------------------------------------------
+    # Cuando `recetas_usadas` sale vacío no hay Recetario_[Paciente].pdf, y hasta
+    # ahora eso ocurría sin que nada lo explicara: Paty recibía un PDF donde
+    # esperaba dos. No es un error —el plan es correcto—, pero tiene que decirse
+    # y tiene que decirse por qué.
+    if not plan.get("recetas_usadas"):
+        componentes_protocolo = {
+            c for m in protocolo.get("comidas") or [] for c in m["componentes"]
+        }
+        con_receta = {op.componente for op in recetas}
+        sin_receta = sorted(componentes_protocolo - con_receta)
+        r.aviso(
+            "Este plan no usa ninguna receta del recetario, así que solo se generará el "
+            "PDF del plan y no habrá Recetario.\n"
+            "    Motivo: de los componentes que pide el protocolo «"
+            + str(protocolo.get("id"))
+            + "», estos no tienen ninguna receta en biblioteca/: "
+            + (", ".join(sin_receta) or "(ninguno; las hay, pero ninguna encaja con este paciente)")
+            + ".\n    Se llenan con alimentos base, que se preparan sin instrucciones."
+        )
+
     # --- 6. Recetas sin validar en cocina -----------------------------------
     sin_probar = [
         rid for rid in plan.get("recetas_usadas", [])

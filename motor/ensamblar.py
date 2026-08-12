@@ -81,6 +81,15 @@ class Repertorio:
         for dx in ficha.get("diagnosticos") or []:
             self.priorizar |= set((prefs.get(dx) or {}).get("priorizar_aporta") or [])
 
+        # `prioridades` del protocolo: el orden en que Paty prefiere los
+        # alimentos de un componente. Desempata, no manda: la variedad va
+        # primero, así que decide cuál de las frutas cítricas abre la semana y
+        # cuál entra después, no cuáles aparecen.
+        self.prioridades: dict[str, list[str]] = {
+            comp: [str(x) for x in (lista or [])]
+            for comp, lista in (protocolo.get("prioridades") or {}).items()
+        }
+
     def candidatas(self, componente: str, comida: str, familia: str = "") -> list[Opcion]:
         salida = []
         for o in self.por_componente.get(componente, []):
@@ -119,9 +128,23 @@ class Repertorio:
         if not disponibles:
             return None
 
+        orden = self.prioridades.get(componente) or []
+
+        def preferencia(o: Opcion) -> int:
+            for i, clave in enumerate(orden):
+                if o.responde_a(clave):
+                    return i
+            return len(orden)   # lo que no está en la lista va al final
+
         def puntaje(o: Opcion) -> tuple:
             clinico = -len(self.priorizar & set(o.aporta))   # menor = mejor
-            return (usos[o.id], clinico, 0 if o.validada_en_cocina else 1, rng.random())
+            return (
+                usos[o.id],
+                clinico,
+                preferencia(o),
+                0 if o.validada_en_cocina else 1,
+                rng.random(),
+            )
 
         return min(disponibles, key=puntaje)
 

@@ -157,7 +157,10 @@ variedad:
   no_repetir_dia_completo: true
   max_veces_misma_receta_semana: 2
   min_recetas_distintas_semana: 12
-  cena_puede_repetir_almuerzo: true      # regla original: "se puede repetir lo del almuerzo"
+  # La cena puede repetir el almuerzo — regla original de Paty, "se puede repetir
+  # lo del almuerzo". Va como comentario y no como campo porque es lo que el motor
+  # hace por defecto: no existe ninguna regla que lo impida. Un campo que nadie lee
+  # hace creer que hay una decisión detrás.
 
 # ---------------------------------------------------------------
 # AJUSTES POR DIAGNÓSTICO

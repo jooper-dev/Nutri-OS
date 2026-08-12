@@ -1,0 +1,161 @@
+# Ingredientes que delatan un alérgeno — Nutri-OS
+#
+# Existe por un desajuste real: la misma avena estaba etiquetada de tres formas
+# distintas en tres recetas —`[gluten]`, `[huevo]` y `[]`—, así que un niño con
+# evitación de gluten quedaba filtrado de una y expuesto a las otras dos. Un
+# alérgeno declarado a mano receta por receta se desincroniza solo.
+#
+# `motor/revisar.py` lee este archivo, mira la lista de ingredientes de cada
+# receta de /biblioteca/ y comprueba que `alergenos_presentes` no se deje
+# ninguno. No sustituye el criterio de P1: lo verifica.
+#
+# CÓMO SE COMPARA
+#   Se normaliza la línea del ingrediente (minúsculas, sin tildes) y se busca
+#   cada término como PALABRA COMPLETA, no como subcadena: 'mani' no encuentra
+#   'manzana' ni 'mandarina'. Los términos de varias palabras se buscan enteros.
+#
+#   `excepciones` son las expresiones que contienen un término pero no llevan el
+#   alérgeno. Si una excepción aparece en la línea, esa línea deja de contar para
+#   ese alérgeno. Es lo que separa la mantequilla de vaca de la de maní.
+#
+# CRITERIO DE LA AVENA
+#   La avena no contiene gluten por sí misma, pero comparte campo, cosecha,
+#   transporte y molino con el trigo, y la contaminación cruzada es real y
+#   medible. Por eso `avena` cuenta como gluten, salvo que la receta especifique
+#   avena CERTIFICADA sin gluten, que es la excepción que la libera. Es el mismo
+#   criterio que P1_RECETAS.md ya aplicaba a las etiquetas: «La avena solo
+#   permite `sin gluten` si la receta especifica avena certificada».
+#
+# El maní va aparte de los frutos secos a propósito: es una leguminosa y en
+# alergia pediátrica es otro alérgeno. Ver datos/alimentos_base.yaml.
+
+gluten:
+  terminos:
+    - trigo
+    - harina de trigo
+    - pan
+    - panes
+    - pan integral
+    - pan de molde
+    - avena
+    - hojuelas de avena
+    - harina de avena
+    - salvado de avena
+    - cebada
+    - centeno
+    - semola
+    - fideos
+    - pasta de trigo
+    - galletas de trigo
+    - pan rallado
+    - couscous
+  excepciones:
+    - avena certificada
+    - avena certificada sin gluten
+    - harina de avena certificada
+    - hojuelas de avena certificadas
+
+lacteos:
+  terminos:
+    - leche
+    - leche de vaca
+    - leche evaporada
+    - queso
+    - queso fresco
+    - yogurt
+    - yogur
+    - mantequilla
+    - crema de leche
+    - manjar blanco
+    - suero de leche
+    - caseina
+  excepciones:
+    - mantequilla de mani
+    - mantequilla de almendras
+    - mantequilla de anacardos
+    - mantequilla de pecanas
+    - leche de coco
+    - leche vegetal
+    - leche de almendras
+    - leche de avena
+
+huevo:
+  terminos:
+    - huevo
+    - huevos
+    - clara
+    - claras
+    - yema
+    - yemas
+  excepciones: []
+
+mani:
+  terminos:
+    - mani
+    - manies
+    - mantequilla de mani
+    - crema de mani
+    - pasta de mani
+  excepciones: []
+
+frutos_secos:
+  terminos:
+    - almendra
+    - almendras
+    - anacardo
+    - anacardos
+    - nuez
+    - nueces
+    - pecana
+    - pecanas
+    - castana
+    - castanas
+    - pistacho
+    - pistachos
+    - avellana
+    - avellanas
+    - mantequilla de almendras
+    - mantequilla de anacardos
+  excepciones: []
+
+pescado:
+  terminos:
+    - pescado
+    - atun
+    - bonito
+    - jurel
+    - anchoveta
+    - paiche
+    - doncella
+    - trucha
+    - filete de pescado
+  excepciones: []
+
+soya:
+  terminos:
+    - soya
+    - soja
+    - tofu
+    - salsa de soya
+    - lecitina de soya
+  excepciones: []
+
+ajonjoli:
+  terminos:
+    - ajonjoli
+    - sesamo
+    - tahini
+    - aceite de ajonjoli
+    - pasta de ajonjoli
+  excepciones: []
+
+carne_mamifero:
+  terminos:
+    - res
+    - carne de res
+    - cerdo
+    - cordero
+    - higado de res
+    - bazo
+    - carne molida de res
+  excepciones: []

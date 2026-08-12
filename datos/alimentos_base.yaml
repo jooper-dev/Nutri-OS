@@ -119,7 +119,13 @@ grasa:
   - {id: aceite_oliva_g, nombre: "Aceite de oliva",  edad_min_meses: 6,  alergenos: [], familia: aceite,       aporta: [grasas_saludables], textura: liquida}
   - {id: palta_g,        nombre: "Palta",            edad_min_meses: 6,  alergenos: [], familia: fruto_graso,  aporta: [grasas_saludables], textura: humeda}
   - {id: mant_anacardo,  nombre: "Mantequilla de anacardos", edad_min_meses: 12, alergenos: [frutos_secos], familia: mantequilla_anacardos, textura: humeda}
-  - {id: mant_mani,      nombre: "Mantequilla de maní",      edad_min_meses: 12, alergenos: [frutos_secos], familia: mantequilla_mani, textura: humeda}
+  # 'mani', no 'frutos_secos': el maní es una leguminosa y en alergia pediátrica
+  # es un alérgeno distinto, con su propia prevalencia y su propio manejo. Con
+  # una sola etiqueta pasaban las dos cosas malas a la vez: una alergia escrita
+  # como 'mani' no coincidía con nada y bloqueaba el plan por etiqueta
+  # desconocida, y un niño alérgico solo a los frutos secos se quedaba sin maní
+  # sin ninguna razón.
+  - {id: mant_mani,      nombre: "Mantequilla de maní",      edad_min_meses: 12, alergenos: [mani], familia: mantequilla_mani, textura: humeda}
   - {id: mant_almendra,  nombre: "Mantequilla de almendras", edad_min_meses: 12, alergenos: [frutos_secos], familia: mantequilla_almendras, textura: humeda}
 
 fruta:

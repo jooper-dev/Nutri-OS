@@ -20,6 +20,6 @@ Protocolo: Escolar 6–11 años  ·  2 semana(s)  ·  fecha 2026-08-10
 
 Este reporte lo genera código, no un modelo de lenguaje: los conteos son aritmética sobre el plan ya construido. Un error aquí siempre es real.
 
-Huella del plan validado: `sha256:c530934ba367e8b10b06995b4f5be3e1ae45a29a58ef15de7ee0fffdd55a3a33`
+Huella del plan validado: `sha256:22e2228b2f664c05f8e77bd25802cc73a266d91726be8fc504c4802f6d5790d0`
 
 Revisión final y firma clínica: Nut. Patricia López.

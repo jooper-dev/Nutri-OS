@@ -93,6 +93,20 @@ reglas_acopladas:
 
 `razon` no la lee el código: se imprime en el reporte de QA para que Paty entienda por qué el sistema tomó una decisión.
 
+### `prioridades`
+
+Orden de preferencia dentro de un componente. **Desempata, no manda:** la variedad va primero, así que decide cuál de las frutas cítricas abre la semana y cuál entra después, no cuáles aparecen.
+
+```yaml
+prioridades:
+  fruta_vitc:
+    - naranja
+    - mandarina
+    - piña golden
+```
+
+Cada nombre se resuelve como familia o como `id`, igual que las claves de rotación, y `motor/revisar.py` falla si alguno no corresponde a ningún alimento.
+
 ### `variedad`
 
 ```yaml
@@ -101,6 +115,8 @@ variedad:
   max_veces_misma_receta_semana: 2
   min_recetas_distintas_semana: 12
 ```
+
+`min_recetas_distintas_semana` no es una sugerencia: si con los filtros de este paciente no pueden entrar tantas recetas distintas, el ensamblador se detiene con «Biblioteca insuficiente» y dice cuántas faltan por componente y momento. Es lo que arranca el ciclo F2 → F3. Ponlo en `0` si ese protocolo no necesita recetario.
 
 ### `preferencias_clinicas`
 

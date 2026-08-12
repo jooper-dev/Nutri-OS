@@ -13,6 +13,7 @@ Uso:
 
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -65,6 +66,7 @@ from comun import (  # noqa: E402
     cargar_protocolo,
     comprobar_rango_edad,
     leer_front_matter,
+    normalizar,
     resolver_regla_acoplada,
 )
 
@@ -186,6 +188,11 @@ else:
             for r in (d.get("frecuencias_semanales") or [])
             if r.get("familia")
         ]
+        claves += [
+            (comp, alimento)
+            for comp, lista in (d.get("prioridades") or {}).items()
+            for alimento in (lista or [])
+        ]
         huerfanas = sorted(
             {
                 f"{comp}/{clave}"
@@ -246,6 +253,104 @@ else:
             avisos.append(f"{ruta.name}: {texto}; los pacientes más pequeños del rango la degradarán")
         if not imposibles:
             linea(True, f"{ruta.name} — todas las frecuencias tienen opción en {edad_min}–{edad_max} m")
+
+print("\n— Alérgenos declarados contra ingredientes —")
+# La misma avena estaba etiquetada de tres formas distintas en tres recetas, así
+# que un niño con evitación de gluten quedaba filtrado de una y expuesto a las
+# otras dos. Declarar el alérgeno a mano receta por receta se desincroniza solo;
+# esto lo comprueba contra la lista de ingredientes.
+RUTA_ALERGENOS = DIR_DATOS / "alergenos_ingredientes.yaml"
+
+
+def _clave(texto: str) -> str:
+    """La línea normalizada y con topes, para buscar palabras completas."""
+    return "_" + normalizar(texto) + "_"
+
+
+def _lineas_ingredientes(cuerpo: str) -> list[str]:
+    m = re.search(
+        r"^##\s+Ingredientes\s*$(.*?)(?=^##\s|\Z)", cuerpo, re.MULTILINE | re.DOTALL | re.IGNORECASE
+    )
+    if not m:
+        return []
+    return [l.strip() for l in m.group(1).splitlines() if l.strip().startswith("•")]
+
+
+def _alergenos_implicados(lineas: list[str], tabla: dict) -> set[str]:
+    hallados: set[str] = set()
+    for linea in lineas:
+        clave = _clave(linea)
+        for etiqueta, regla in tabla.items():
+            if any(_clave(x) in clave for x in (regla.get("excepciones") or [])):
+                continue
+            if any(_clave(t) in clave for t in (regla.get("terminos") or [])):
+                hallados.add(etiqueta)
+    return hallados
+
+
+if "biblioteca" in errores:
+    linea(False, "no se puede comprobar: la biblioteca no cargó")
+elif not RUTA_ALERGENOS.exists():
+    linea(False, f"falta {RUTA_ALERGENOS.name}, que es la tabla de ingredientes → alérgeno")
+    errores.append(RUTA_ALERGENOS.name)
+else:
+    tabla = yaml.safe_load(RUTA_ALERGENOS.read_text(encoding="utf-8")) or {}
+    desajustes = 0
+    for receta in recetas:
+        try:
+            meta, cuerpo = leer_front_matter(RAIZ / receta.ruta)
+        except ErrorNutriOS:
+            continue
+        lineas = _lineas_ingredientes(cuerpo)
+        if not lineas:
+            avisos.append(f"{receta.id}: no se encontró la sección '## Ingredientes'")
+            continue
+        declarados = {normalizar(a) for a in (meta.get("alergenos_presentes") or [])}
+        implicados = _alergenos_implicados(lineas, tabla)
+        faltan = sorted(implicados - declarados)
+        sobran = sorted(declarados - implicados)
+        if faltan:
+            desajustes += 1
+            linea(
+                False,
+                f"{receta.id} — sus ingredientes llevan {', '.join(faltan)} y "
+                f"'alergenos_presentes' no lo declara. Un falso negativo aquí llega al "
+                f"plato de un niño alérgico: añádelo al front-matter, o corrige la "
+                f"tabla de datos/alergenos_ingredientes.yaml si el término no "
+                f"corresponde.",
+            )
+            errores.append(receta.id)
+        if sobran:
+            avisos.append(
+                f"{receta.id}: declara {', '.join(sobran)} y ningún ingrediente lo delata "
+                f"(declarar de más es seguro, pero descarta la receta para pacientes que "
+                f"sí podrían comerla)"
+            )
+    if not desajustes:
+        linea(True, f"{len(recetas)} receta(s) coherentes con sus ingredientes")
+
+print("\n— Componentes sin receta —")
+# El recetario solo puede crecer si se sabe dónde le falta. Hoy las 17 recetas
+# cubren tres componentes de los escolares y ninguno del protocolo de 6 meses,
+# y eso no se veía por ningún lado: el plan de un lactante salía con un solo
+# PDF y nadie explicaba por qué.
+if "biblioteca" in errores:
+    linea(False, "no se puede comprobar: la biblioteca no cargó")
+else:
+    con_receta = {r.componente for r in recetas}
+    for ruta in sorted(DIR_PROTOCOLOS.glob("*.yaml")):
+        d = yaml.safe_load(ruta.read_text(encoding="utf-8")) or {}
+        comps = sorted({c for m in d.get("comidas") or [] for c in m["componentes"]})
+        sin = [c for c in comps if c not in con_receta]
+        if sin:
+            # Ni ✓ ni ✗: es un hueco de biblioteca, no un fallo de configuración.
+            print(f"  · {ruta.name} — {len(sin)} de {len(comps)} componentes sin ninguna receta")
+            avisos.append(
+                f"{ruta.name}: sin ninguna receta en la biblioteca — {', '.join(sin)}. "
+                f"Esas ranuras solo pueden llenarse con alimentos base."
+            )
+        else:
+            linea(True, f"{ruta.name} — todos los componentes tienen alguna receta")
 
 print("\n— Fotografía —")
 try:
