@@ -150,6 +150,163 @@ def normalizar(s: str) -> str:
     return s.strip().lower().replace(" ", "_")
 
 
+def coincide_rechazo(rechazo: str, opcion: "Opcion") -> bool:
+    """¿El rechazo aparece como palabra o secuencia completa en la opción?"""
+    rechazo_normalizado = normalizar(rechazo)
+    if not rechazo_normalizado:
+        return False
+    patron = f"_{rechazo_normalizado}_"
+    return any(
+        f"_{normalizar(valor)}_".find(patron) >= 0
+        for valor in (opcion.id, opcion.familia, opcion.nombre)
+        if valor
+    )
+
+
+def comprobar_rango_edad(protocolo: dict, ficha: dict) -> tuple[str, str]:
+    """Comprueba el rango del protocolo y distingue los desvíos justificados."""
+    edad = int(ficha["edad_meses"])
+    protocolo_id = str(protocolo.get("id") or "(sin id)")
+    edad_min = protocolo.get("edad_min_meses")
+    edad_max = protocolo.get("edad_max_meses")
+    if edad_min is None or edad_max is None:
+        return (
+            "fuera_sin_justificar",
+            f"No se puede comprobar la edad del paciente ({edad} meses) contra el "
+            f"protocolo «{protocolo_id}»: no declara un rango completo "
+            "edad_min_meses–edad_max_meses.",
+        )
+
+    edad_min = int(edad_min)
+    edad_max = int(edad_max)
+    base = (
+        f"La edad del paciente ({edad} meses) está fuera del rango del protocolo "
+        f"«{protocolo_id}» ({edad_min}–{edad_max} meses)"
+    )
+    if edad_min <= edad <= edad_max:
+        return (
+            "dentro_de_rango",
+            f"La edad del paciente ({edad} meses) está dentro del rango del protocolo "
+            f"«{protocolo_id}» ({edad_min}–{edad_max} meses).",
+        )
+
+    justificacion = str(ficha.get("protocolo_fuera_de_rango") or "").strip()
+    if justificacion:
+        return (
+            "fuera_justificado",
+            f"{base}. Justificación declarada: {justificacion}",
+        )
+    return (
+        "fuera_sin_justificar",
+        f"{base} y la ficha no declara «protocolo_fuera_de_rango».",
+    )
+
+
+def resolver_regla_acoplada(regla: dict, protocolo: dict) -> tuple[dict | None, str]:
+    """Resuelve una regla acoplada o explica por qué no se puede aplicar."""
+    protocolo_id = str(protocolo.get("id") or "(sin id)")
+    comidas = {
+        str(comida.get("id") or ""): set(comida.get("componentes") or [])
+        for comida in protocolo.get("comidas") or []
+        if comida.get("id")
+    }
+    componentes = {componente for lista in comidas.values() for componente in lista}
+    disparador = str(regla.get("si") or "").strip()
+    objetivo = str(regla.get("entonces") or "").strip()
+    ambito = str(regla.get("ambito") or "misma_comida")
+
+    if not disparador:
+        return None, f"la regla del protocolo «{protocolo_id}» no declara «si»"
+    if not objetivo:
+        return None, f"la regla «{disparador}» del protocolo «{protocolo_id}» no declara «entonces»"
+    if ambito not in {"misma_comida", "mismo_dia"}:
+        return None, f"el ámbito «{ambito}» no es «misma_comida» ni «mismo_dia»"
+
+    partes_disparador = disparador.split(".")
+    if len(partes_disparador) == 1:
+        componente_disparador = partes_disparador[0]
+        familia_disparador = ""
+        comidas_disparador = [
+            comida for comida, comps in comidas.items() if componente_disparador in comps
+        ]
+        if not comidas_disparador:
+            return None, (
+                f"el disparador «{disparador}» no es un componente declarado en ninguna "
+                f"comida del protocolo «{protocolo_id}»"
+            )
+    elif len(partes_disparador) == 2:
+        primero, segundo = partes_disparador
+        if primero in comidas:
+            componente_disparador = segundo
+            familia_disparador = ""
+            if segundo not in comidas[primero]:
+                return None, (
+                    f"la comida «{primero}» no declara el componente «{segundo}» en el "
+                    f"protocolo «{protocolo_id}»"
+                )
+            comidas_disparador = [primero]
+        elif primero in componentes:
+            componente_disparador = primero
+            familia_disparador = segundo
+            comidas_disparador = [
+                comida for comida, comps in comidas.items() if primero in comps
+            ]
+        else:
+            return None, (
+                f"«{primero}» no es id de comida ni componente declarado en el "
+                f"protocolo «{protocolo_id}»"
+            )
+    else:
+        return None, f"el disparador «{disparador}» tiene más de un punto"
+
+    partes_objetivo = objetivo.split(".")
+    if len(partes_objetivo) == 1:
+        componente_objetivo = partes_objetivo[0]
+        comidas_objetivo = [
+            comida for comida, comps in comidas.items() if componente_objetivo in comps
+        ]
+        if not comidas_objetivo:
+            return None, (
+                f"el objetivo «{objetivo}» no es un componente de ninguna comida del "
+                f"protocolo «{protocolo_id}»"
+            )
+    elif len(partes_objetivo) == 2:
+        comida_objetivo, componente_objetivo = partes_objetivo
+        if comida_objetivo not in comidas:
+            return None, (
+                f"la comida objetivo «{comida_objetivo}» no existe en el protocolo "
+                f"«{protocolo_id}»"
+            )
+        if componente_objetivo not in comidas[comida_objetivo]:
+            return None, (
+                f"la comida «{comida_objetivo}» no declara el componente objetivo "
+                f"«{componente_objetivo}» en el protocolo «{protocolo_id}»"
+            )
+        comidas_objetivo = [comida_objetivo]
+    else:
+        return None, f"el objetivo «{objetivo}» tiene más de un punto"
+
+    if ambito == "misma_comida":
+        faltantes = [c for c in comidas_disparador if c not in comidas_objetivo]
+        if faltantes:
+            return None, (
+                f"el objetivo «{objetivo}» no puede colocarse en "
+                f"{', '.join(faltantes)}, donde puede dispararse «{disparador}»"
+            )
+
+    return (
+        {
+            "disparador_componente": componente_disparador,
+            "disparador_familia": familia_disparador,
+            "comidas_disparador": comidas_disparador,
+            "objetivo_componente": componente_objetivo,
+            "comidas_objetivo": comidas_objetivo,
+            "ambito": ambito,
+        },
+        "",
+    )
+
+
 # ---------------------------------------------------------------------------
 # Modelos
 # ---------------------------------------------------------------------------
@@ -205,12 +362,8 @@ class Opcion:
         choque = alergias & {normalizar(a) for a in self.alergenos}
         if choque:
             return False, f"alérgeno: {', '.join(sorted(choque))}"
-        rechazos = {normalizar(r) for r in ficha.get("rechazos") or []}
-        if normalizar(self.id) in rechazos or normalizar(self.familia) in rechazos:
+        if any(coincide_rechazo(r, self) for r in ficha.get("rechazos") or []):
             return False, "rechazo declarado"
-        for r in rechazos:
-            if r and r in normalizar(self.nombre):
-                return False, "rechazo declarado"
 
         # La aversión a una textura no es una manía: en selectividad severa y en
         # disfagia decide si el plato se come o si termina en arcada. Se filtra

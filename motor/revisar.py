@@ -60,13 +60,18 @@ from comun import (  # noqa: E402
     cargar_alimentos_base,
     cargar_biblioteca,
     leer_front_matter,
+    resolver_regla_acoplada,
 )
 
 print("\n— Protocolos —")
 for ruta in sorted(DIR_PROTOCOLOS.glob("*.yaml")):
     try:
         d = yaml.safe_load(ruta.read_text(encoding="utf-8"))
-        faltan = [c for c in ("id", "nombre", "comidas") if c not in d]
+        faltan = [
+            c
+            for c in ("id", "nombre", "edad_min_meses", "edad_max_meses", "comidas")
+            if c not in d
+        ]
         if faltan:
             linea(False, f"{ruta.name} — faltan campos: {', '.join(faltan)}")
             errores.append(ruta.name)
@@ -76,6 +81,29 @@ for ruta in sorted(DIR_PROTOCOLOS.glob("*.yaml")):
     except yaml.YAMLError as e:
         linea(False, f"{ruta.name} — YAML mal formado: {str(e).splitlines()[0]}")
         errores.append(ruta.name)
+
+print("\n— Reglas acopladas —")
+for ruta in sorted(DIR_PROTOCOLOS.glob("*.yaml")):
+    try:
+        d = yaml.safe_load(ruta.read_text(encoding="utf-8")) or {}
+    except yaml.YAMLError:
+        continue
+    problemas = []
+    for regla in d.get("reglas_acopladas") or []:
+        _, problema = resolver_regla_acoplada(regla, d)
+        if problema:
+            problemas.append(
+                f"«{regla.get('si', '?')} -> {regla.get('entonces', '?')}»: {problema}"
+            )
+    if problemas:
+        for problema in problemas:
+            linea(False, f"{ruta.name} — regla no resoluble {problema}")
+        errores.append(ruta.name)
+    else:
+        linea(
+            True,
+            f"{ruta.name} — {len(d.get('reglas_acopladas') or [])} regla(s) resuelven",
+        )
 
 print("\n— Alimentos base —")
 try:

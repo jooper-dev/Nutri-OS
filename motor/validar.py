@@ -32,7 +32,10 @@ from comun import (
     cargar_biblioteca,
     cargar_ficha,
     cargar_protocolo,
+    comprobar_rango_edad,
+    coincide_rechazo,
     normalizar,
+    resolver_regla_acoplada,
 )
 
 
@@ -77,6 +80,12 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
     for a in avisos_bib:
         r.aviso(f"Biblioteca: {a}")
 
+    estado_rango, mensaje_rango = comprobar_rango_edad(protocolo, ficha)
+    if estado_rango == "fuera_sin_justificar":
+        r.error(mensaje_rango)
+    elif estado_rango == "fuera_justificado":
+        r.aviso(mensaje_rango)
+
     # --- 1. Coherencia paciente / plan -------------------------------------
     if plan.get("paciente") != ficha["paciente"]:
         r.error("El plan no corresponde a la ficha: los nombres de paciente no coinciden.")
@@ -109,15 +118,8 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
 
     # Igual para los rechazos, pero como aviso: un rechazo mal escrito molesta,
     # no hace daño.
-    ids_catalogo = {normalizar(o.id) for o in catalogo.values()}
-    familias_catalogo = {normalizar(o.familia) for o in catalogo.values() if o.familia}
-    nombres_catalogo = {normalizar(o.nombre) for o in catalogo.values()}
     for x in sorted(rechazos):
-        if x and not (
-            x in ids_catalogo
-            or x in familias_catalogo
-            or any(x in n for n in nombres_catalogo)
-        ):
+        if x and not any(coincide_rechazo(x, o) for o in catalogo.values()):
             r.aviso(
                 f"El rechazo «{x}» no coincide con ningún alimento del catálogo: "
                 f"no está excluyendo nada. Revisa cómo se escribe."
@@ -146,7 +148,7 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
         if choque:
             r.error(f"{donde}: «{item['nombre']}» contiene {', '.join(sorted(choque))} — ALERGIA declarada.")
 
-        if normalizar(opcion.familia) in rechazos or normalizar(opcion.id) in rechazos:
+        if any(coincide_rechazo(x, opcion) for x in rechazos):
             r.error(f"{donde}: «{item['nombre']}» está en la lista de rechazos.")
 
         if opcion.edad_min_meses > ficha["edad_meses"]:
@@ -317,24 +319,58 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
 
     # --- 4. Reglas acopladas ------------------------------------------------
     for regla in protocolo.get("reglas_acopladas") or []:
-        disp = regla["si"].split(".")[-1]
-        obj = regla["entonces"].split(".")[-1]
-        ambito = regla.get("ambito", "misma_comida")
+        resuelta, problema = resolver_regla_acoplada(regla, protocolo)
+        if not resuelta:
+            r.error(
+                f"Regla acoplada «{regla.get('si', '?')} -> "
+                f"{regla.get('entonces', '?')}» no resoluble: {problema}."
+            )
+            continue
+        disp = resuelta["disparador_componente"]
+        familia_disp = resuelta["disparador_familia"]
+        obj = resuelta["objetivo_componente"]
+        ambito = resuelta["ambito"]
+
+        def dispara(comida_id: str, comida: dict) -> bool:
+            if comida_id not in resuelta["comidas_disparador"]:
+                return False
+            for item in comida["items"]:
+                if item["componente"] != disp:
+                    continue
+                if not familia_disp:
+                    return True
+                ident = item.get("receta_id") or normalizar(item["nombre"])
+                opcion = catalogo.get(ident) or next(
+                    (o for o in catalogo.values() if o.nombre == item["nombre"]), None
+                )
+                if opcion and opcion.responde_a(familia_disp):
+                    return True
+            return False
+
+        def tiene_objetivo(comida_id: str, comida: dict) -> bool:
+            return comida_id in resuelta["comidas_objetivo"] and any(
+                item["componente"] == obj for item in comida["items"]
+            )
+
         for s in plan["semanas"]:
             for dia, comidas in s["dias"].items():
                 if ambito == "misma_comida":
                     for cid, comida in comidas.items():
-                        comps = {i["componente"] for i in comida["items"]}
-                        if disp in comps and obj not in comps:
+                        if dispara(cid, comida) and not tiene_objetivo(cid, comida):
                             r.error(
-                                f"S{s['semana']} · {dia} · {cid}: hay {disp} sin {obj} "
+                                f"S{s['semana']} · {dia} · {cid}: hay {regla['si']} "
+                                f"sin {regla['entonces']} "
                                 f"({regla.get('razon', 'regla acoplada')})."
                             )
                 else:
-                    comps = {i["componente"] for c in comidas.values() for i in c["items"]}
-                    if disp in comps and obj not in comps:
+                    hay_disparador = any(dispara(cid, comida) for cid, comida in comidas.items())
+                    hay_objetivo = any(
+                        tiene_objetivo(cid, comida) for cid, comida in comidas.items()
+                    )
+                    if hay_disparador and not hay_objetivo:
                         r.error(
-                            f"S{s['semana']} · {dia}: hay {disp} sin {obj} en todo el día "
+                            f"S{s['semana']} · {dia}: hay {regla['si']} sin "
+                            f"{regla['entonces']} en todo el día "
                             f"({regla.get('razon', 'regla acoplada')})."
                         )
 
@@ -383,7 +419,9 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
 
     # --- 6b. Reglas del protocolo que el motor todavía no aplica ------------
     # Mejor decirlo que dejar creer que se cumplieron.
-    IMPLEMENTADAS = {"priorizar_aporta", "subir_frecuencia", "exclusiones_extra"}
+    # Solo lo que ensamblar.py aplica de verdad: ampliar esta lista sin implementar
+    # la funcionalidad apaga el aviso que protege la revisión clínica.
+    IMPLEMENTADAS = {"priorizar_aporta"}
     for dx in ficha.get("diagnosticos") or []:
         ajuste = (protocolo.get("preferencias_clinicas") or {}).get(dx) or {}
         for clave in ajuste:

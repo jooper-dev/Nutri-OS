@@ -49,6 +49,7 @@ zscore_pt: -0.4                # null si no hay dato para calcularlo
 zscore_te: -1.1
 semanas_plan: 2                # 1 | 2 | 3 | 4
 protocolo_sugerido: escolar_6_11
+protocolo_fuera_de_rango: null # opcional; justificación clínica si se aparta del rango por edad
 requerimiento_kcal: 1650
 metodo_kcal: "IOM/DRI 2023 — EER niños 3–8 a, AF moderada"
 
@@ -104,6 +105,7 @@ bloqueantes: []                # lista de datos vitales ausentes; si NO está va
 - **`rechazos`** son aversiones, no riesgos. Van separados porque el ensamblador los trata distinto: un rechazo se puede ofrecer una vez en el plan como reintroducción; una alergia jamás.
 - **`porciones`** traduce el requerimiento calórico a medidas caseras ejecutables. Las llaves deben coincidir con los `componentes` del protocolo elegido. Sin corchetes, sin rangos: un valor concreto por componente.
 - **`protocolo_sugerido`** se elige por edad, salvo que el diagnóstico justifique otro. Si te apartas del protocolo por edad, explica por qué en la Nota para Paty — Paty tiene la última palabra.
+- **`protocolo_fuera_de_rango`** es opcional, pero apartarse del rango por edad exige rellenarlo con la justificación clínica.
 
 ---
 

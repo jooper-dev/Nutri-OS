@@ -31,8 +31,10 @@ from comun import (
     cargar_biblioteca,
     cargar_ficha,
     cargar_protocolo,
+    comprobar_rango_edad,
     guardar_json,
     normalizar,
+    resolver_regla_acoplada,
 )
 
 MAX_INTENTOS = 60
@@ -167,7 +169,14 @@ def construir_semana(
 
     # --- componentes que NO se llenan siempre -------------------------------
     acopladas = protocolo.get("reglas_acopladas") or []
-    dependientes = {r["entonces"].split(".")[-1] for r in acopladas}
+    acopladas_resueltas = []
+    for regla in acopladas:
+        resuelta, _ = resolver_regla_acoplada(regla, protocolo)
+        if resuelta:
+            acopladas_resueltas.append((regla, resuelta))
+    dependientes = {
+        resuelta["objetivo_componente"] for _, resuelta in acopladas_resueltas
+    }
 
     # --- 1. Reglas de frecuencia con familia (proteína, huevo, yogurt...) ---
     familia_forzada: dict[tuple[int, str, str], str] = {}
@@ -227,19 +236,24 @@ def construir_semana(
             a_llenar += [(d, comida["id"], comp) for d in range(7)]
 
     # --- 4. Reglas acopladas ------------------------------------------------
-    for regla in acopladas:
-        disparador = regla["si"].split(".")[-1]
-        objetivo = regla["entonces"].split(".")[-1]
-        ambito = regla.get("ambito", "misma_comida")
+    for regla, resuelta in acopladas_resueltas:
+        disparador = resuelta["disparador_componente"]
+        familia_disparador = resuelta["disparador_familia"]
+        objetivo = resuelta["objetivo_componente"]
+        ambito = resuelta["ambito"]
         nuevas = []
         for d, c, comp in a_llenar:
-            if comp != disparador:
+            if comp != disparador or c not in resuelta["comidas_disparador"]:
+                continue
+            if familia_disparador and not normalizar(
+                familia_forzada.get((d, c, comp), "")
+            ) == normalizar(familia_disparador):
                 continue
             comida_obj = c if ambito == "misma_comida" else None
             candidatas_comida = (
                 [comida_obj]
                 if comida_obj
-                else [m["id"] for m in protocolo["comidas"] if objetivo in m["componentes"]]
+                else resuelta["comidas_objetivo"]
             )
             for cm in candidatas_comida:
                 estructura = next((m for m in protocolo["comidas"] if m["id"] == cm), None)
@@ -391,6 +405,9 @@ def ensamblar(nombre_carpeta: str, semilla: int | None = None) -> dict:
 
     ficha = cargar_ficha(carpeta)
     protocolo = cargar_protocolo(ficha["protocolo_sugerido"])
+    estado_rango, mensaje_rango = comprobar_rango_edad(protocolo, ficha)
+    if estado_rango == "fuera_sin_justificar":
+        raise ErrorNutriOS(mensaje_rango)
     recetas, avisos = cargar_biblioteca()
     rep = Repertorio(recetas + cargar_alimentos_base(), ficha, protocolo)
 

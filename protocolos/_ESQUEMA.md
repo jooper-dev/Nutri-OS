@@ -22,7 +22,7 @@ descripcion: >
   Para qué caso clínico existe este protocolo.
 ```
 
-El ensamblador elige protocolo por `edad_min_meses`/`edad_max_meses`, salvo que la Fase 1 fuerce otro por diagnóstico (ej.: un niño de 3 años con selectividad severa puede requerir un protocolo específico en vez del de su edad).
+La Fase 1 propone el protocolo, y el código comprueba que la edad caiga en su rango; si no cae y la ficha no declara una justificación, el pipeline se detiene.
 
 ### `comidas`
 
