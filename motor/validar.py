@@ -358,7 +358,14 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
 
             modo = regla.get("modo", "exacto")
             minimo = regla.get("minimo")
-            degradada = any(etiqueta in d for d in plan.get("degradaciones", []))
+            # Comparación exacta contra la etiqueta que escribe el ensamblador
+            # ("proteina/pescado: sin opciones para este paciente; ..."), no por
+            # subcadena: con `in`, una degradación de «proteina/pescado» rebajaba
+            # a aviso el error de cualquier regla llamada «proteina» a secas, que
+            # es justo el error que no se puede perdonar.
+            degradada = any(
+                d.split(":", 1)[0].strip() == etiqueta for d in plan.get("degradaciones", [])
+            )
 
             if modo == "exacto" and real != int(veces):
                 (r.aviso if degradada else r.error)(

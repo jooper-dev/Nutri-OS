@@ -3,3 +3,6 @@
 PyYAML>=6.0
 Jinja2>=3.1
 weasyprint>=60
+# Recorta a A4 las imágenes que devuelve la API, que salen en 2:3. Sin ella el
+# recorte no se hace y las fotos entran deformadas en el recetario.
+Pillow>=10.0

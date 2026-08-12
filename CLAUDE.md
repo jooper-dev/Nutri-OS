@@ -72,15 +72,18 @@ estás haciendo el trabajo del validador y lo vas a hacer peor. Ejecuta el scrip
    clínica y no se sigue sin ella. Dile qué falta, en llano y en una lista corta:
    eso sí es una pregunta que merece interrumpirla.
 
-### F2 · Huecos de biblioteca
+### F2 · Huecos de biblioteca · y F4 · Ensamblado
+
+Un solo comando hace las dos cosas: primero comprueba si la biblioteca alcanza
+para este paciente (F2) y solo después construye el plan (F4).
 
 ```bash
 python motor/ensamblar.py [carpeta]
 ```
 
-- Si termina bien, pasa a F4.
+- Si termina bien, pasa a F5.
 - Si falla con **"Biblioteca insuficiente"**, el mensaje te dice exactamente qué
-  componente falta y cuántas recetas hacen falta. Ve a F3.
+  componente falta, en qué momento del día y cuántas recetas hacen falta. Ve a F3.
 - Si falla por otra causa, léela y avisa a Paty. No improvises un arreglo.
 
 ### F3 · Recetas nuevas (solo si F2 lo pidió)
@@ -98,7 +101,7 @@ Por **cada** receta que falte:
 
 Vuelve a F2.
 
-### F4 · Validación
+### F5 · Validación
 
 ```bash
 python motor/validar.py [carpeta]
@@ -107,7 +110,7 @@ python motor/validar.py [carpeta]
 Genera `reporte_qa.md`. Si sale **BLOQUEADO**, no continúes: los errores son
 aritméticos y siempre reales. Corrige la causa y vuelve a ensamblar.
 
-### F5 · Render
+### F7 · Render
 
 ```bash
 python motor/render.py [carpeta]            # una hoja apaisada por semana
@@ -117,6 +120,12 @@ python motor/render.py [carpeta] --caras    # dos hojas por semana, letra mayor
 Produce `Plan_[Paciente].pdf` (horario apaisado) y `Recetario_[Paciente].pdf` en
 la carpeta del paciente. **Se niega a correr si el validador marcó BLOQUEADO**, y
 ese bloqueo es automático y no se salta: es la única puerta que cierra sola.
+También se niega si `plan.json` cambió después de validarse —el reporte lleva su
+huella—: si eso pasa, vuelve a validar y renderiza otra vez.
+
+Si el plan no usa ninguna receta, el recetario no se genera y el render dice por
+qué en una línea. No es un fallo: es que la biblioteca no cubre todavía ningún
+componente de ese protocolo.
 
 Usa `--caras` cuando Paty lo pida o cuando la semana venga muy cargada: es lo
 que ella hace a mano cuando la letra no se lee impresa.
@@ -138,7 +147,7 @@ Si Paty te la escribe en el chat, no la guardes en ningún archivo, no la repita
 en tus mensajes y dile que hay que rotarla: una clave que pasó por un chat ya
 está quemada.
 
-### F6 · Puerta de Paty ⛔
+### F6 · Puerta de Paty ⛔ — va después de F7
 
 **Aquí te detienes siempre, y le entregas los PDF, no el reporte.** Paty no lee
 markdown: pedirle el visto bueno sobre `reporte_qa.md` era pedirle que aprobara
@@ -163,7 +172,7 @@ PDF nuevos. Nunca se edita `plan.json` ni el PDF a mano.
 La firma clínica sigue siendo suya. Lo que cambió es que ahora firma sobre el
 documento terminado, no sobre un informe técnico.
 
-### F7 · Registro
+### F8 · Registro
 
 ```bash
 python motor/registrar.py [carpeta] --costo 189 --tipo primera_vez

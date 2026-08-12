@@ -68,7 +68,10 @@ def main() -> int:
     filas.sort(key=lambda r: r[0])
 
     with destino.open("w", newline="", encoding="utf-8") as f:
-        w = csv.writer(f)
+        # lineterminator="\n": csv.writer escribe CRLF por defecto y el archivo
+        # está en LF, así que cada registro reescribía el CSV entero y el diff
+        # salía con las 40 filas cambiadas para ver una consulta nueva.
+        w = csv.writer(f, lineterminator="\n")
         w.writerow(CABECERA)
         w.writerows(filas)
 

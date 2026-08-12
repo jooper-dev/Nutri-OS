@@ -1,3 +1,3 @@
 fecha,paciente,edad_meses,tipo_consulta,protocolo,semanas_plan,diagnosticos,recetas_plan,importe,estado
-2026-08-10,Mateo R.,84,primera_vez,escolar_6_11,2,anemia,10,189.00,entregado
 2026-08-10,Luana T.,6,plan,ablactancia_6_meses,1,ninguno,0,150.00,entregado
+2026-08-10,Mateo R.,84,primera_vez,escolar_6_11,2,anemia,16,189.00,entregado

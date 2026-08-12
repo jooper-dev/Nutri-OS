@@ -134,12 +134,23 @@ def llamar(prompt: str, modelo: str, api_key: str) -> bytes:
     )
 
 
-def recortar_a4(bruto: bytes) -> bytes:
-    """Recorta a proporción A4 quitando SOLO por abajo."""
+def recortar_a4(bruto: bytes) -> tuple[bytes, str]:
+    """Recorta a proporción A4 quitando SOLO por abajo.
+
+    Devuelve (bytes, aviso). El aviso va vacío si se recortó de verdad.
+
+    Antes, sin Pillow, esto devolvía la imagen intacta y no decía nada: las
+    fotos se guardaban en 2:3, entraban deformadas en el recetario y no había
+    forma de saber por qué. Un recorte que no ocurre tiene que decirse.
+    """
     try:
         from PIL import Image
     except ImportError:
-        return bruto  # sin Pillow se guarda tal cual; el recorte se hace a mano
+        return bruto, (
+            "Pillow no está instalado: la imagen se guarda en "
+            f"{PROPORCION} sin recortar a A4 y saldrá deformada en el recetario.\n"
+            "    Instálala con:  pip install -r requirements.txt"
+        )
 
     im = Image.open(io.BytesIO(bruto)).convert("RGB")
     alto_objetivo = round(im.width / A4)
@@ -147,7 +158,7 @@ def recortar_a4(bruto: bytes) -> bytes:
         im = im.crop((0, 0, im.width, alto_objetivo))
     salida = io.BytesIO()
     im.save(salida, format="PNG")
-    return salida.getvalue()
+    return salida.getvalue(), ""
 
 
 def generar(
@@ -166,6 +177,7 @@ def generar(
     saltadas: list[str] = []
     fallidas: list[tuple[str, str]] = []
 
+    aviso_recorte = ""
     for ruta in rutas:
         rid = ruta.stem
         destino = DIR_IMAGENES / f"{rid}.png"
@@ -178,7 +190,11 @@ def generar(
         for intento in range(1, MAX_INTENTOS + 1):
             try:
                 bruto = llamar(prompt, modelo, api_key)
-                destino.write_bytes(recortar_a4(bruto))
+                recortada, aviso = recortar_a4(bruto)
+                destino.write_bytes(recortada)
+                if aviso and not aviso_recorte:
+                    aviso_recorte = aviso
+                    print(f"  ⚠ {aviso}")
                 hechas.append(rid)
                 print(f"  ✓ {rid}")
                 break

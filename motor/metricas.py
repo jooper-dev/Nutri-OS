@@ -9,6 +9,7 @@ Uso:
     python motor/metricas.py                 mes en curso
     python motor/metricas.py --mes 2026-07   un mes concreto
     python motor/metricas.py --todo          histórico por meses
+    python motor/metricas.py --html          panel; con --mes, ese mes
 """
 
 from __future__ import annotations
@@ -96,7 +97,20 @@ footer{margin-top:42px;padding-top:16px;border-top:1px solid var(--linea);
 </style></head><body><div class="wrap">{cuerpo}</div></body></html>"""
 
 
-def escribir_html(filas: list[dict]) -> Path:
+def edad_legible(meses_totales: int) -> str:
+    """Edad media en algo que se pueda leer.
+
+    Antes se calculaba `sum // len // 12` y se imprimía en años: una consulta de
+    84 y 6 meses daba «3 años», y un mes de puros lactantes daba «0 años», que
+    no es una métrica, es un cero.
+    """
+    if meses_totales < 24:
+        return f"{meses_totales} meses"
+    anos, meses = divmod(meses_totales, 12)
+    return f"{anos} a" + (f" {meses} m" if meses else "")
+
+
+def escribir_html(filas: list[dict], mes: str | None = None) -> Path:
     from datetime import datetime
     from html import escape
 
@@ -104,14 +118,22 @@ def escribir_html(filas: list[dict]) -> Path:
     for r in filas:
         meses[str(r.get("fecha", ""))[:7]].append(r)
     orden = sorted(meses, reverse=True)
-    actual = orden[0] if orden else date.today().strftime("%Y-%m")
+    # `--html` ignoraba `--mes` y siempre mostraba el último mes con datos,
+    # rotulado "Mes en curso". Dos cosas falsas de una vez: ni obedecía el
+    # argumento, ni ese mes tenía por qué ser el corriente.
+    if mes:
+        actual, rotulo = mes, "Mes"
+    elif orden:
+        actual, rotulo = orden[0], "Último mes con datos"
+    else:
+        actual, rotulo = date.today().strftime("%Y-%m"), "Mes en curso"
     del_mes = meses.get(actual, [])
     total_mes = sum(importe(r) for r in del_mes)
 
     p: list[str] = []
     p.append('<div class="marca">GrowKids · Nut. Patricia López</div>')
     p.append("<h1>Métricas de consulta</h1>")
-    p.append(f'<div class="sub">Mes en curso: {escape(actual)} · '
+    p.append(f'<div class="sub">{rotulo}: {escape(actual)} · '
              f'{len(filas)} consulta(s) registradas en total</div>')
 
     def tarjeta(k: str, v: str) -> str:
@@ -123,7 +145,7 @@ def escribir_html(filas: list[dict]) -> Path:
     p.append(tarjeta("Ticket promedio",
                      f"S/ {total_mes / len(del_mes):,.0f}" if del_mes else "—"))
     edades = [int(r["edad_meses"]) for r in del_mes if str(r.get("edad_meses", "")).isdigit()]
-    p.append(tarjeta("Edad media", f"{sum(edades) // len(edades) // 12} años" if edades else "—"))
+    p.append(tarjeta("Edad media", edad_legible(round(sum(edades) / len(edades))) if edades else "—"))
     p.append("</div>")
 
     if len(orden) > 1:
@@ -183,7 +205,11 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Resumen de consultas.")
     ap.add_argument("--mes", default=None, help="YYYY-MM")
     ap.add_argument("--todo", action="store_true", help="histórico mes a mes")
-    ap.add_argument("--html", action="store_true", help="genera salidas/metricas.html para abrir en el navegador")
+    ap.add_argument(
+        "--html",
+        action="store_true",
+        help="genera salidas/metricas.html para abrir en el navegador; respeta --mes",
+    )
     args = ap.parse_args()
 
     filas = cargar()
@@ -193,7 +219,7 @@ def main() -> int:
         return 0
 
     if args.html:
-        destino = escribir_html(filas)
+        destino = escribir_html(filas, args.mes)
         print(f"\n✓ Panel generado.\n  → {destino}\n  Ábrelo con doble clic.\n")
         return 0
 

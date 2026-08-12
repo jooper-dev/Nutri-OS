@@ -45,6 +45,15 @@ for mod, paquete in [("yaml", "PyYAML"), ("jinja2", "Jinja2"), ("weasyprint", "w
         linea(False, f"{paquete} — falta. Instala con: pip install -r requirements.txt")
         errores.append(paquete)
 
+# Pillow no detiene nada, pero sin ella el recorte a A4 de las fotografías se
+# saltaba EN SILENCIO y las imágenes quedaban en 2:3, deformadas en el recetario.
+try:
+    __import__("PIL")
+    linea(True, "Pillow")
+except ImportError:
+    linea(False, "Pillow — falta. Sin ella las fotos no se recortan a A4 y salen deformadas")
+    avisos.append("Pillow no está instalado: las fotos nuevas saldrán sin recortar a A4")
+
 if errores:
     print("\n✗ Faltan dependencias; el resto del chequeo no puede ejecutarse.\n")
     raise SystemExit(1)
@@ -151,6 +160,11 @@ def _fm(receta) -> bool:
 
 
 print("\n— Biblioteca —")
+# Se inicializa antes del try a propósito: si cargar_biblioteca() lanza, todos
+# los bloques de abajo que la usan reventaban con NameError, que no es
+# ErrorNutriOS y por tanto ninguno de sus `except` lo atrapaba. El chequeo moría
+# con una traza de Python en lugar de decir qué pasaba.
+recetas: list = []
 try:
     recetas, avs = cargar_biblioteca()
     linea(True, f"{len(recetas)} receta(s) legible(s)")
@@ -365,7 +379,7 @@ try:
         avisos.append(f"sin 'variante_foto': {', '.join(sin_variante)}")
     if n_img < len(recetas):
         avisos.append(f"{len(recetas) - n_img} receta(s) sin imagen (el recetario sale igual, sin foto)")
-except ErrorNutriOS as e:
+except (ErrorNutriOS, ImportError) as e:
     linea(False, str(e))
     errores.append("fotografia")
 

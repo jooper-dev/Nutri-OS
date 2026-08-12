@@ -19,9 +19,15 @@ personalizado con solo las recetas que ese plan usa.
 | F3b | Fotografía de cada receta nueva | prompt por código, imagen por modelo |
 | F4 | Ensambla el plan | **código** |
 | F5 | Valida | **código** |
-| F6 | Revisión y firma | **Paty** |
 | F7 | Renderiza los PDF | **código** |
+| F6 | Revisión y firma, sobre los PDF terminados | **Paty** |
 | F8 | Registra la consulta | código |
+
+F2 y F4 son el mismo comando: `motor/ensamblar.py` comprueba primero si la
+biblioteca alcanza y solo después construye el plan. Y F6 va después de F7 desde
+que la firma se hace sobre los dos PDF y no sobre el reporte técnico: Paty no lee
+markdown, y pedirle el visto bueno sobre `reporte_qa.md` era pedirle que aprobara
+un documento que no puede leer.
 
 El reparto es el punto entero del sistema: **el modelo redacta y juzga; el código
 cuenta y maqueta.** Contar menestras no es trabajo para un modelo de lenguaje, y
@@ -55,21 +61,22 @@ mkdir -p pacientes/Mateo/fuente
 # 2. F1 — en Cowork o Claude Code, con prompts/PC_CLINICO.md
 #    Produce pacientes/Mateo/ficha.md
 
-# 3. Ensambla y valida
+# 3. F4 + F5 — ensambla y valida
 python motor/correr.py Mateo
 
-# 4. Paty revisa reporte_qa.md y da el visto bueno
-
-# 5. PDF
+# 4. F7 — los dos PDF
 python motor/render.py Mateo             # horario apaisado, una hoja por semana
 python motor/render.py Mateo --caras     # dos hojas por semana, letra más grande
 
-# 6. Fotos de las recetas nuevas (opcional)
-python motor/fotos.py Mateo              # escribe los prompts
-export GEMINI_API_KEY="..."              # nunca dentro del repositorio
-python motor/generar_imagenes.py Mateo   # genera y recorta las imágenes
+# 5. F6 — Paty revisa los PDF terminados y da el visto bueno
 
-# 7. Registro y métricas
+# F3b — las fotos van DENTRO del render: no hay comando que recordar.
+#       Estos dos siguen existiendo para trabajar la biblioteca entera,
+#       y --sin-fotos las salta en un render concreto.
+python motor/fotos.py --todas            # escribe los prompts que falten
+python motor/generar_imagenes.py --todas # genera y recorta las imágenes
+
+# 6. Registro y métricas
 python motor/registrar.py Mateo --costo 189 --tipo primera_vez
 python motor/metricas.py --html          # panel en salidas/metricas.html
 ```
@@ -109,6 +116,10 @@ ese plan usa. La negrita de cantidades y verbos la aplica la hoja de estilo: no
 hay que resaltar nada a mano. Si la receta tiene foto en `biblioteca/imagenes/`,
 va a sangre en el tercio superior; si no la tiene, va una banda del color de
 acento y la página se maqueta igual.
+
+Si el plan no usa ninguna receta —hoy le pasa a cualquier plan de ablactancia,
+porque la biblioteca todavía no cubre ninguno de sus componentes— **este segundo
+PDF no se genera**, y tanto el render como el reporte de QA dicen por qué.
 
 ---
 
@@ -175,7 +186,9 @@ código, ni un prompt tocado. Ver `protocolos/_ESQUEMA.md`.
   en la biblioteca o en la ficha, y se vuelve a ensamblar. Editar la salida
   destruye la única garantía que da el sistema.
 - **La puerta de revisión no se salta.** El renderizador se niega a trabajar si el
-  validador marcó BLOQUEADO, pero el visto bueno clínico lo da Paty, no el código.
+  validador marcó BLOQUEADO, y también si el `plan.json` ha cambiado desde que se
+  validó: el reporte lleva la huella SHA-256 del plan que aprobó. El visto bueno
+  clínico lo da Paty, no el código.
 - **Las recetas no se inventan dentro del plan.** Pasan por P1, con su auditoría
   de seguridad pediátrica, y aterrizan en la biblioteca antes de aparecer en un menú.
 
