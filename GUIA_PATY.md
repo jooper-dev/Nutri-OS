@@ -78,6 +78,11 @@ buscarlos: si no los encuentras, pídeselos y te los pone delante.
 - **`Recetario_Mateo.pdf`** — solo las recetas que aparecen en ese plan, con
   ingredientes, preparación y conservación.
 
+Hay un caso en que sale **un solo PDF**: cuando el plan no lleva ninguna receta
+porque todo lo que come ese niño son preparaciones simples que no necesitan
+instrucciones —un puré de camote, una fruta picada—. Hoy es lo que pasa con los
+planes de 6 meses. Claude te lo dice cuando ocurre; no es un fallo.
+
 Si una semana te queda con la letra muy apretada, pídele:
 
 > Genera el plan en dos caras.

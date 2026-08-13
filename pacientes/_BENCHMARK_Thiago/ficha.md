@@ -22,7 +22,7 @@ diagnostico_texto: >
   con pérdida ponderal sostenida de −1.5 kg en 9 meses. Sospecha no documentada de
   síndrome alfa-gal (alergia a carne de mamífero) tras picadura de garrapata.
 
-alergias: [lacteos, gluten, huevo, soya, carne_mamifero, frutos_secos]
+alergias: [lacteos, gluten, huevo, soya, carne_mamifero, mani]
 rechazos: [brocoli, espinaca, vainita, betarraga, zanahoria, zapallo, ensalada]
 texturas_excluidas: [humeda, liquida, mixta]
 riesgo_disfagia: true
@@ -175,14 +175,15 @@ número entra en el PDF y conviene que sepas qué está leyendo quien lo mire.
   favorito de allá.** La cecina es chancho. O la sospecha de alfa-gal es incorrecta, o el
   niño está comiendo el alérgeno de forma habitual. Esa pregunta hay que hacerla antes de
   que salga el plan.
-- **Maní (`frutos_secos`): incluido, con una lectura alternativa.** La mamá dice que le
+- **Maní (`mani`): incluido, con una lectura alternativa.** La mamá dice que le
   picó la boca "pero no estoy segura si fue eso o el helado que comió después". El helado
   es lácteo, y la leche de vaca es uno de los cuatro alimentos que gastro ya eliminó por
   la esofagitis. **Es al menos igual de probable que la reacción haya sido al helado.**
   Lo dejé como alergia porque un falso negativo aquí es un evento adverso, pero conviene
-  resolverlo con estudio: excluir todos los frutos secos a un niño con 8 alimentos es caro.
-  Aviso técnico: el catálogo no distingue maní de almendra o anacardo —los tres llevan la
-  etiqueta `frutos_secos`—, así que la exclusión arrastra a los tres.
+  resolverlo con estudio. La exclusión es solo del maní: el catálogo ya lo distingue de la
+  almendra y el anacardo, que siguen disponibles. Antes los tres compartían la etiqueta
+  `frutos_secos` y una reacción al maní le quitaba las tres mantequillas a un niño que
+  acepta ocho alimentos.
 - **Trigo → `gluten`.** Gastro indicó trigo; la etiqueta del catálogo es `gluten`, que es
   más amplia. Excluye de más (avena por contaminación cruzada, por ejemplo), nunca de menos.
 - **"Galleta de soda" no es soya.** La mamá acertó sola: sale por el trigo. Lo anoto para
