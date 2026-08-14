@@ -43,7 +43,9 @@
   <h2>{{ r.meta.titulo }}</h2>
   {% if r.meta.subtitulo %}<div class="subtitulo">{{ r.meta.subtitulo }}</div>{% endif %}
   <div class="stats">{{ r.stats }}</div>
-  {% if r.etiquetas %}<div class="etiquetas">{{ r.etiquetas }}</div>{% endif %}
+  {# Siempre presente. Una receta sin bloque de alérgenos deja que el silencio
+     signifique dos cosas: «no lleva» y «nadie lo miró». #}
+  <div class="alergenos">{{ r.alergenos }}</div>
 
   {% if r.nota %}
   <h3>Nota de la nutricionista</h3>
@@ -56,12 +58,17 @@
   <h3>Preparación</h3>
   <ol class="pasos">{% for s in r.pasos %}<li>{{ s|safe }}</li>{% endfor %}</ol>
 
-  {% if r.ideas %}
-  <h3>Ideas</h3>
-  <ul>{% for i in r.ideas %}<li>{{ i|safe }}</li>{% endfor %}</ul>
-  {% endif %}
+  {# Ideas y el pie de conservación van dentro del mismo bloque para que no
+     puedan separarse en un salto de página: el pie huérfano llegó a ocupar una
+     página él solo. #}
+  <div class="cierre">
+    {% if r.ideas %}
+    <h3>Ideas</h3>
+    <ul>{% for i in r.ideas %}<li>{{ i|safe }}</li>{% endfor %}</ul>
+    {% endif %}
 
-  {% if r.conservacion %}<div class="conservacion">{{ r.conservacion }}</div>{% endif %}
+    {% if r.conservacion %}<div class="conservacion">{{ r.conservacion }}</div>{% endif %}
+  </div>
 </section>
 {% endfor %}
 

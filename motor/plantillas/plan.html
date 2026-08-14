@@ -14,8 +14,23 @@
     <tr><td class="k">Duración</td><td class="v">{{ p.semanas|length }} semana{{ 's' if p.semanas|length > 1 else '' }}</td></tr>
     {% if p.diagnostico_texto %}<tr><td class="k">Enfoque</td><td class="v">{{ p.diagnostico_texto|trim }}</td></tr>{% endif %}
     {% if p.alergias_visibles %}<tr><td class="k">Alergias</td><td class="v">{{ p.alergias_visibles|join(', ') }}</td></tr>{% endif %}
+    {# Íntegro, tal como lo dice la ficha. Este renglón salió una vez con cuatro
+       alimentos —«Frejol, Arveja, Bellaco, Queso»— que resultaron ser, exactamente,
+       los únicos rechazos que además existían en la biblioteca del sistema. Fuera
+       se quedaron la sopa, el pan, la trucha y otros diez. La biblioteca no filtra
+       nunca lo que se le comunica a la familia. #}
     {% if p.rechazos_visibles %}<tr><td class="k">No consume</td><td class="v">{{ p.rechazos_visibles|join(', ') }}</td></tr>{% endif %}
   </table>
+
+  {% if p.datos_sin_fuente %}
+  <div class="faltantes">
+    <span class="titulo">Datos pendientes</span>
+    Este plan se elaboró sin estos datos, porque no constan en ninguno de los
+    documentos de la consulta: <strong>{{ p.datos_sin_fuente|join(', ') }}</strong>.
+    Lo que el plan hace por esos frentes es preventivo. En cuanto estén, tráelos
+    a control y se ajusta.
+  </div>
+  {% endif %}
 
   <div class="aviso">
     Plan individual, elaborado a partir de la evaluación clínica de {{ p.paciente }}.

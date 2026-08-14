@@ -44,6 +44,27 @@ body {
   margin: 0;
 }
 
+/* ------------------------------------------------- Viudas y huérfanas ---- */
+/* Ningún bloque de texto se parte dejando menos de dos líneas a un lado del
+   salto. Va en el elemento raíz porque la regla es del documento entero, no de
+   una sección: en la primera generación real se partieron a la vez el párrafo
+   de valoración de la portada y varios pasos del recetario, y arreglarlo
+   sección por sección deja siempre una fuera.
+
+   El objetivo declarado es que el PDF salga listo para enviárselo a la familia
+   tal cual. Si algo no cabe, se reorganiza; nunca se corta. */
+p, li, div, td {
+  orphans: 2;
+  widows: 2;
+}
+
+/* Un encabezado nunca se queda solo al pie de una página. */
+h1, h2, h3 {
+  break-after: avoid;
+  page-break-after: avoid;
+  break-inside: avoid;
+}
+
 /* ----------------------------------------------------------- Portada ---- */
 
 .portada {
@@ -87,10 +108,32 @@ body {
 }
 .datos td.v { font-size: 10.5pt; color: var(--azul); }
 
+/* El párrafo de valoración —«Enfoque»— es la fila larga de esta tabla, y en la
+   primera generación real se cortó a mitad de página y siguió partido en la
+   siguiente. Una fila de la portada o cabe entera o pasa entera. */
+.datos tr { break-inside: avoid; page-break-inside: avoid; }
+
 .aviso {
   margin-top: 16mm; padding: 5mm 6mm;
   background: var(--crema-alt); border-left: 3px solid var(--cobre-claro);
   font-size: 8.5pt; color: var(--tenue); line-height: 1.5;
+  break-inside: avoid; page-break-inside: avoid;
+}
+
+/* Datos clínicos que no aparecen en ninguna fuente.
+   Va destacado y no enterrado en un párrafo: que un análisis esté pendiente
+   cambia lo que el plan puede prometer, y la familia tiene que verlo. */
+.faltantes {
+  margin-top: 10mm; padding: 4mm 5mm;
+  background: #FBF3EC; border-left: 3px solid var(--cobre);
+  font-size: 9pt; color: var(--tinta); line-height: 1.5;
+  break-inside: avoid; page-break-inside: avoid;
+}
+.faltantes .titulo {
+  display: block;
+  font-family: "Montserrat", "Carlito", sans-serif;
+  font-size: 8pt; font-weight: 600; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--cobre); margin-bottom: 2mm;
 }
 
 /* -------------------------------------------------------------- Plan ---- */
@@ -163,14 +206,20 @@ td.detalle .ref  { color: var(--cobre); font-size: 7.5pt; }
 
 .receta .acento { height: 3mm; width: 100%; margin-bottom: 8mm; }
 
-/* La foto ocupa el tercio superior de la página: la misma zona que la
-   biblioteca de prompts reserva limpia en la imagen generada. */
+/* La foto ocupa la banda superior de la página: la misma zona que la
+   biblioteca de prompts reserva limpia en la imagen generada.
+   Bajó de 82 a 68 mm por una razón medida, no estética: con 82 mm, una receta
+   con foto y siete pasos desbordaba la página por dos líneas, y lo que se iba a
+   la página siguiente era la última idea y el pie «Dura: …», solos. Recortar
+   14 mm de foto es lo que hace que la receta quepa entera, que es el objetivo
+   —si algo no cabe se reorganiza, nunca se corta—. El encuadre no se deforma:
+   `object-fit: cover` recorta, no estira. */
 .receta .foto {
-  height: 82mm; overflow: hidden;
-  margin: 0 -14mm 7mm -14mm;
+  height: 68mm; overflow: hidden;
+  margin: 0 -14mm 6mm -14mm;
   width: calc(100% + 28mm);
 }
-.receta .foto img { width: 100%; height: 82mm; object-fit: cover; display: block; }
+.receta .foto img { width: 100%; height: 68mm; object-fit: cover; display: block; }
 
 .receta h2 {
   font-family: "Montserrat", "Carlito", sans-serif;
@@ -184,13 +233,12 @@ td.detalle .ref  { color: var(--cobre); font-size: 7.5pt; }
   padding: 2mm 0; border-top: 1px solid var(--linea); border-bottom: 1px solid var(--linea);
   margin-bottom: 2mm;
 }
-.receta .etiquetas { font-size: 7.5pt; color: var(--tenue); margin-bottom: 7mm; }
 
 .receta h3 {
   font-family: "Montserrat", "Carlito", sans-serif;
   font-size: 8pt; font-weight: 600; letter-spacing: .18em;
   text-transform: uppercase; color: var(--cobre);
-  margin: 6mm 0 2.5mm 0;
+  margin: 4.5mm 0 2mm 0;
 }
 
 .receta .nota-nutri {
@@ -216,10 +264,60 @@ td.detalle .ref  { color: var(--cobre); font-size: 7.5pt; }
 }
 .receta ol.pasos li strong { color: var(--azul); font-weight: 600; }
 
+/* El pie «Dura: … refri · … congelador».
+   Participa del flujo y va atado al bloque que lo precede: en la primera
+   generación real se quedó huérfano ocupando una página él solo. `break-before:
+   avoid` es lo que impide que un salto se cuele justo encima de él. */
 .receta .conservacion {
   margin-top: 7mm; padding-top: 2.5mm; border-top: 1px solid var(--linea);
   font-size: 8pt; color: var(--tenue); letter-spacing: .04em;
+  break-before: avoid;
+  page-break-before: avoid;
+  break-inside: avoid;
+  page-break-inside: avoid;
 }
+
+/* Un paso de preparación o un ingrediente no se parten por la mitad. */
+.receta li,
+.receta ol.pasos li {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* La cabecera de la receta —foto, título, stats y alérgenos— viaja junta.
+   Una receta no empieza si no caben su cabecera y sus primeras líneas. */
+.receta .foto,
+.receta .acento { break-after: avoid; page-break-after: avoid; }
+
+.receta h2,
+.receta .subtitulo,
+.receta .stats,
+.receta .alergenos {
+  break-after: avoid;
+  page-break-after: avoid;
+  break-inside: avoid;
+}
+
+/* El bloque de alérgenos. Ya no es una línea tenue de 7,5 pt al mismo nivel
+   que un adorno: declara lo que la receta CONTIENE, y una madre tiene que
+   poder encontrarlo de un vistazo. */
+.receta .alergenos {
+  font-size: 8.5pt;
+  color: var(--tinta);
+  background: var(--crema-alt);
+  border-left: 3px solid var(--cobre);
+  padding: 2mm 3mm;
+  margin-bottom: 5mm;
+}
+
+/* El cierre de la receta —Ideas y el pie «Dura: …»— viaja como un bloque.
+   La red de seguridad por si una receta futura vuelve a desbordar: lo que se
+   iría a la página siguiente sería el cierre entero y no el pie solo, que es
+   como se quedó huérfano ocupando una página él solo. */
+.receta .cierre { break-inside: avoid; page-break-inside: avoid; }
+.receta .alergenos strong { color: var(--azul); font-weight: 600; }
+
+.receta .nota-nutri { break-inside: avoid; page-break-inside: avoid; }
 
 /* ---------------------------------------------------------- Índice ------ */
 

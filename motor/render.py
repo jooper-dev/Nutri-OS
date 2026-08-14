@@ -38,7 +38,9 @@ from comun import (
     DIAS,
     DIR_BIBLIOTECA,
     DIR_PACIENTES,
+    DIR_RECETAS_PACIENTE,
     ErrorNutriOS,
+    cargar_recetas_instanciadas,
     huella_plan,
     leer_front_matter,
     normalizar,
@@ -132,29 +134,68 @@ def _vinetas(bloque: str) -> list[str]:
     return [_negritas(l.lstrip("• ").strip()) for l in bloque.splitlines() if l.strip().startswith("•")]
 
 
-def leer_receta(rid: str) -> dict | None:
-    ruta = DIR_BIBLIOTECA / f"{rid}.md"
-    if not ruta.exists():
-        return None
-    meta, cuerpo = leer_front_matter(ruta)
-    rid = str(meta.get("id") or rid)
+def _encabezado(cuerpo: str) -> tuple[str, str]:
+    """Los stats y el bloque de alérgenos, leídos SOLO del encabezado.
 
-    # La Nota para Paty es interna: nunca entra al PDF de la paciente.
+    El bug que arregla esta función salía impreso. `Dura: 3 días refri · 1
+    congelador` aparecía **dos veces** en Compota de pera, Milanesa de pollo y
+    Panqueques de avena —una vez pegada a la cabecera y otra al final— y en
+    Quinua licuada se quedaba huérfana ocupando una página ella sola.
+
+    La causa no era de maquetación: era de lectura. La versión anterior buscaba
+    el bloque de alérgenos recorriendo el cuerpo ENTERO en busca de «la primera
+    línea con un · que no empiece por viñeta». En las recetas que sí lo tenían,
+    lo encontraba y paraba. En las que no —que son justamente las que salieron
+    sin ninguna etiqueta— seguía bajando, atravesaba ingredientes y preparación,
+    y se topaba con `Dura: 3 días refri · 1 congelador`, que cumple la condición
+    al pie de la letra. Lo pintaba como etiquetas arriba, y la sección de
+    Conservación lo volvía a pintar abajo.
+
+    Las dos anomalías del §2.2.c y del §2.3 eran la misma: las recetas con el
+    pie duplicado son exactamente las que no tenían bloque de alérgenos.
+
+    Ahora se mira solo la región del encabezado —entre el `# Título` y el primer
+    `## `—, que es donde P1 los pone. Fuera de ahí no hay nada que buscar.
+    """
+    cabeza = re.split(r"^##\s", cuerpo, maxsplit=1, flags=re.MULTILINE)[0]
+    stats = alergenos = ""
+    for cruda in cabeza.splitlines():
+        l = cruda.strip()
+        if not l or l.startswith("#") or l.startswith("•"):
+            continue
+        if not stats and "·" in l and any(c.isdigit() for c in l):
+            stats = l
+        elif stats and not alergenos:
+            alergenos = l
+            break
+    return stats, alergenos
+
+
+def leer_receta(rid: str, carpeta: Path) -> dict | None:
+    """La receta instanciada de este paciente. Nunca la base.
+
+    Lo que se imprime vive en `pacientes/<paciente>/recetas/`, resuelto contra
+    este niño. `/biblioteca/` guarda bases, y una base no se imprime jamás.
+
+    La fotografía sí se comparte: la técnica se ve igual instanciada para un
+    niño o para otro, así que la imagen sigue siendo del `base` y se genera una
+    sola vez en la vida de la técnica.
+    """
+    ruta = carpeta / DIR_RECETAS_PACIENTE / f"{rid}.md"
+    if not ruta.exists():
+        recetas, _ = cargar_recetas_instanciadas(carpeta)
+        if rid not in recetas:
+            return None
+        ruta = recetas[rid]["ruta"]
+    meta, cuerpo = leer_front_matter(ruta)
+    base = str(meta.get("base") or meta.get("id") or rid)
+
     # La Nota para Paty y la descripción para el generador de imágenes son
     # internas: ninguna de las dos entra al PDF de la paciente.
     cuerpo = cuerpo.split("--- NOTA PARA PATY ---")[0]
     cuerpo = re.split(r"^##\s+Foto\s*$", cuerpo, flags=re.MULTILINE)[0]
 
-    lineas = [l.strip() for l in cuerpo.splitlines()]
-    stats = etiquetas = ""
-    for l in lineas:
-        if not l or l.startswith("#"):
-            continue
-        if not stats and "·" in l and any(c.isdigit() for c in l):
-            stats = l
-        elif stats and not etiquetas and "·" in l and not l.startswith("•"):
-            etiquetas = l
-            break
+    stats, alergenos = _encabezado(cuerpo)
 
     pasos_txt = _seccion(cuerpo, "Preparación")
     pasos = [
@@ -163,12 +204,15 @@ def leer_receta(rid: str) -> dict | None:
         if re.match(r"^\d{2}\s", l.strip())
     ]
 
-    imagen = DIR_BIBLIOTECA / "imagenes" / f"{rid}.png"
+    imagen = DIR_BIBLIOTECA / "imagenes" / f"{base}.png"
     return {
         "imagen": imagen.resolve().as_uri() if imagen.exists() else None,
         "meta": meta,
         "stats": stats,
-        "etiquetas": etiquetas,
+        # Nunca vacío: si la receta no declara alérgenos, se dice con todas las
+        # letras. El silencio no puede significar dos cosas distintas —«no lleva»
+        # y «nadie lo miró»— en un documento que lee la madre de un niño.
+        "alergenos": alergenos or "No contiene alérgenos declarables",
         "nota": _seccion(cuerpo, "Nota de la Nutricionista"),
         "ingredientes": _vinetas(_seccion(cuerpo, "Ingredientes")),
         "pasos": pasos,
@@ -352,6 +396,30 @@ def renderizar(nombre_carpeta: str, caras: bool = False, fotos: bool = True) -> 
     # Solo para imprimir: el plan en disco conserva sus identificadores.
     plan["alergias_visibles"] = [nombre_visible(a) for a in plan.get("alergias") or []]
     plan["rechazos_visibles"] = [nombre_visible(x) for x in plan.get("rechazos") or []]
+
+    # En la parrilla se imprime el nombre de la RECETA de este niño, no el de la
+    # base. El plan.json guarda el nombre de la base porque es lo que el
+    # ensamblador eligió —«Panqueques de cereal», «Bastones de tubérculo»—, y
+    # esos son nombres de técnica: útiles dentro del sistema e inútiles en la
+    # nevera. La madre lee «Panqueques de cereal» en el horario, va al recetario
+    # a buscarlo y encuentra «Panqueques de avena».
+    #
+    # Se sustituye aquí, en la capa de presentación, y no en el plan: los
+    # identificadores del plan no se tocan, porque de ellos dependen el validador
+    # y su huella.
+    instanciadas, _ = cargar_recetas_instanciadas(carpeta)
+    titulos = {
+        rid: str(r["meta"].get("titulo") or "")
+        for rid, r in instanciadas.items()
+        if r["meta"].get("titulo")
+    }
+    for s_ in plan["semanas"]:
+        for dia in s_["dias"].values():
+            for comida in dia.values():
+                for item in comida["items"]:
+                    titulo = titulos.get(item.get("receta_id") or "")
+                    if titulo:
+                        item["nombre"] = titulo
     env = _entorno()
     css_base = CSS(filename=str(PLANTILLAS / "estilo.css"))
     css_plan = CSS(filename=str(PLANTILLAS / "plan.css"))
@@ -374,10 +442,14 @@ def renderizar(nombre_carpeta: str, caras: bool = False, fotos: bool = True) -> 
 
     recetas, faltantes = [], []
     for rid in plan.get("recetas_usadas", []):
-        r = leer_receta(rid)
+        r = leer_receta(rid, carpeta)
         (recetas.append(r) if r else faltantes.append(rid))
     if faltantes:
-        print(f"  ⚠ recetas no encontradas en la biblioteca: {', '.join(faltantes)}")
+        print(
+            f"  ⚠ sin receta instanciada para: {', '.join(faltantes)}. "
+            f"Se escriben con prompts/P1_RECETAS.md en modo INSTANCIA y se guardan en "
+            f"{DIR_RECETAS_PACIENTE}/."
+        )
 
     if recetas:
         recetas.sort(key=lambda r: r["meta"].get("titulo", ""))

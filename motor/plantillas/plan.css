@@ -21,13 +21,34 @@
 
 @page portada { size: A4 landscape; margin: 0; }
 
-.portada { page: portada; height: 210mm; padding: 32mm 30mm; }
-.portada h1 { font-size: 26pt; }
-.portada .datos { width: 62%; }
+/* La portada del plan es apaisada: 210 mm de alto, no 297. Con el padding y el
+   ancho de antes, un «Enfoque» clínico largo —y el de un caso real lo es— ya no
+   cabía, y lo que sobraba se iba a una segunda página junto con el «No consume»
+   y los datos pendientes. Aquí se resuelve dando aire a lo ancho, que es lo que
+   sobra en apaisado, en vez de recortar el texto clínico. */
+.portada { page: portada; height: 210mm; padding: 20mm 26mm; }
+.portada h1 { font-size: 22pt; margin-bottom: 2mm; }
+.portada .sub { margin-bottom: 6mm; font-size: 11pt; }
+.portada .filete { margin: 5mm 0; }
+.portada .datos { width: 100%; margin-top: 3mm; }
+.portada .datos td { padding: 1.5mm 0; }
+.portada .datos td.v { font-size: 9pt; line-height: 1.35; }
+.portada .aviso { margin-top: 6mm; padding: 3mm 4mm; font-size: 7.5pt; }
+.portada .faltantes { margin-top: 5mm; padding: 3mm 4mm; font-size: 8pt; }
 
 /* ------------------------------------------------------------- Cabecera -- */
 
-.hoja { page-break-before: always; }
+/* Una hoja de horario es una hoja: o cabe entera o no es una hoja.
+   En la primera generación real con `--caras`, la parrilla desbordaba y dejaba
+   una página con la palabra «Cena» sola y otra con solo la leyenda al pie. Un
+   horario partido no se puede pegar en la nevera, que es para lo que existe. */
+.hoja {
+  page-break-before: always;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+table.horario { break-inside: avoid; page-break-inside: avoid; }
+.leyenda { break-before: avoid; page-break-before: avoid; }
 
 .encabezado-hoja {
   display: flex;
@@ -101,11 +122,14 @@ td.celda .it.rec .cant { color: var(--cobre-claro); }
 .g7 table.horario th.dia { font-size: 9.4pt; }
 .g7 table.horario td.franja { font-size: 8pt; }
 
-.g4 table.horario { font-size: 10pt; }
-.g4 table.horario th.dia { font-size: 12pt; }
-.g4 table.horario td.franja { font-size: 10pt; }
-.g4 table.horario td.celda { padding: 3mm 3.4mm; height: 24mm; }
-.g4 table.horario td.franja { padding-right: 4mm; }
+/* La letra sigue siendo mayor que en la hoja de 7 columnas —que es para lo que
+   existe `--caras`—, pero el alto fijo de celda baja de 24 a 15 mm: con 24, y
+   con celdas que crecen si el texto envuelve, cinco franjas no cabían en los
+   187 mm útiles de un A4 apaisado y la parrilla se partía en dos páginas. */
+.g4 table.horario { font-size: 9.5pt; }
+.g4 table.horario th.dia { font-size: 11pt; }
+.g4 table.horario td.franja { font-size: 9.5pt; padding-right: 4mm; }
+.g4 table.horario td.celda { padding: 2.2mm 2.6mm; height: 15mm; }
 
 /* ------------------------------------------------------------- Pie de hoja */
 
