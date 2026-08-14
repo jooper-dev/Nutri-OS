@@ -2,8 +2,50 @@
 
 *Documento de traspaso. Léelo entero antes de tocar nada. Recoge decisiones ya tomadas y sus razones, para que no haya que rediscutirlas.*
 
-Última actualización: 11 de agosto de 2026, tras integrar la fotografía en el
-render, mover la entrada del sistema al chat y cerrar el caso Thiago.
+Última actualización: 13 de agosto de 2026, tras el **primer caso real** (Haziel
+S. G. F., 4 a 6 m) y la tanda de correcciones que destapó.
+
+---
+
+## 0. Lo que cambió tras el primer caso real
+
+El caso salió con un 7 sobre 10 de la nutricionista. Cinco cambios de fondo:
+
+1. **Hay un paso 0: `motor/ingesta.py`.** Las fuentes se convierten a texto
+   **antes** de que ningún modelo las lea, y se inventaría qué llegó, página a
+   página. Las 88 páginas y 56 MB del PDF de recomendaciones ahora son 25 KB de
+   texto repartido en cinco archivos, y las 36 páginas sin capa de texto salen
+   marcadas como **pendientes de lectura visual** en vez de perderse en silencio.
+   El pipeline lee `fuentes/`; `fuentes_originales/` no se abre nunca.
+
+2. **La biblioteca guarda BASES, no recetas.** Una base es técnica + esqueleto +
+   reglas de seguridad, y **no se imprime jamás**. Lo que va al recetario es la
+   base instanciada contra ese niño, y vive en `pacientes/<paciente>/recetas/`.
+   El error del caso real no fue tener una receta de pan con palta: fue servirla
+   sin adaptar a un niño cuya anamnesis dice «no pan, ni pan con palta». Lo que
+   se acumula entre pacientes es la técnica; el plato, no.
+
+3. **Capa de parada clínica** (`motor/parada_clinica.py`). Cuatro criterios paran
+   el pipeline —falla de medro, alérgeno sospechado sin documentar, diagnóstico
+   sin protocolo que lo soporte, edad fuera de todos los protocolos— y uno avisa
+   destacado: selectividad extrema, con derivación a valorar. El caso real tenía
+   cuatro de las seis señales de derivación y el sistema no destacó ninguna.
+
+4. **Los alérgenos declaran presencias, no solo ausencias.** Antes las etiquetas
+   solo decían «sin gluten · sin huevo», con tope de tres, y faltaban en la mitad
+   de las recetas: unas barritas con mantequilla de maní no lo decían en ninguna
+   parte y la milanesa salía muda. Ahora toda receta lleva bloque, sin tope, y el
+   validador **impide renderizar** si no cuadra con su lista de ingredientes.
+
+5. **El informe no recorta información clínica por lo que haya en catálogo.** El
+   «no consume» salía con cuatro alimentos que resultaron ser, exactamente, los
+   únicos rechazos que además existían en la biblioteca. Ahora sale íntegro.
+
+Y un puñado de bugs de comparación que se descubrieron probando lo anterior:
+`normalizar` no trataba el guion como separador (un rechazo no excluía la base
+que lo llevaba en el id), la puntuación rompía la comparación de palabra
+completa, y faltaba tolerancia de plural. Los topes que impiden que `res`
+excluya `Fresa` siguen en pie: hay prueba corrida.
 
 ---
 

@@ -54,17 +54,26 @@ añade a su caso, no se empieza otro.
 
 Después de tu mensaje, y sin preguntarte nada más:
 
-1. **Lee el caso** y escribe una ficha con edad, diagnóstico, alergias,
-   requerimiento calórico y porciones. Te la muestra.
-2. **Revisa si faltan recetas** para armar el plan.
-3. **Crea las que falten**, con la auditoría de seguridad pediátrica de siempre.
-4. **Arma el plan** y lo valida.
-5. **Genera las fotos** de las recetas que aún no tengan.
-6. **Genera los dos PDF** y se detiene para que los revises.
+1. **Pasa todo a texto y hace inventario.** Antes de leer nada, convierte tus
+   PDF y tus Word a texto y anota qué llegó: cuántos documentos, cuántas páginas,
+   y **qué páginas son solo imagen y por tanto nadie ha leído**. Si adjuntaste dos
+   veces el mismo archivo, te lo dice: casi siempre significa que falta otro.
+2. **Lee el caso** y escribe una ficha con edad, diagnóstico, alergias,
+   requerimiento calórico y porciones, **y de qué documento y página salió cada
+   dato**. Te la muestra. Lo que buscó y no encontró también te lo dice, aparte y
+   destacado, en vez de esconderlo en un párrafo.
+3. **Comprueba si el caso necesita otra cosa antes que un plan** —una pérdida de
+   peso que hay que estudiar, una alergia sospechada sin confirmar—. Si es así, se
+   para y te lo explica.
+4. **Revisa si faltan técnicas** para armar el plan y crea las que falten.
+5. **Arma el plan**, y después **adapta cada receta a este niño en concreto**:
+   su porción, su textura, sus ingredientes. Ese paso es nuevo y es el importante.
+6. **Valida**, genera las fotos que falten y **saca los dos PDF**. Ahí se detiene
+   para que los revises.
 
-Si la validación encuentra un error de verdad —una alergia en el plato, una
-cuenta que no cuadra—, **no genera nada** y te dice qué pasó. No hay PDF malo que
-se te pueda escapar.
+Si la validación encuentra un error de verdad —una alergia en el plato, un
+alimento que ese niño rechaza, una cuenta que no cuadra—, **no genera nada** y te
+dice qué pasó. No hay PDF malo que se te pueda escapar.
 
 ---
 
@@ -98,7 +107,26 @@ Aquí decides tú, sobre el documento terminado — el mismo que va a recibir la
 familia, no un informe técnico. Claude te resume en el chat lo que conviene
 mirar, y tú lo contrastas con el PDF delante.
 
-Presta atención sobre todo a dos cosas:
+Lo primero que te va a poner delante es una sección corta: **«Léelo antes que
+nada»**. Ahí va lo que no bloquea el plan y por eso mismo se pasa por alto:
+
+**Exposiciones planificadas.** Cada ingrediente nuevo que el plan le mete a un
+niño con selectividad sale nombrado, con su justificación, y **esperando tu visto
+bueno**. Por ejemplo: *"zanahoria licuada, no está en su repertorio, entra porque
+el color queda parejo y sin hebra visible"*. Si te parece pronto, dilo y esa
+receta se rehace sin ella. Ningún alimento nuevo entra a escondidas.
+
+**Estrategias de exposición encubierta.** Bajar el vaso de 300 a 250 ml sin
+avisar, sumar gotas de jugo a la quinua semana a semana: eso lo propone el
+sistema como propuesta y **lo decides tú**. Ya no se escribe dentro de una receta
+que se pega en la refrigeradora, porque ahí es una instrucción a la madre para
+modificar la comida del niño a escondidas, y esa es una decisión clínica tuya.
+
+**Datos que faltan.** Si la hemoglobina o la ferritina no estaban en ningún
+documento, te lo dice ahí y sale también en la portada del plan. Si crees que lo
+tienes en otro sitio, pásalo y se rehace la ficha.
+
+Después, dos cosas más:
 
 **Sustituciones forzadas.** Cuando tu protocolo pedía algo que este niño no puede
 comer, el sistema lo cambió. Por ejemplo: *"proteina/pescado: sin opciones para
@@ -147,6 +175,37 @@ archivo ni la pegues en el chat**: si eso pasa, hay que cambiarla.
 
 Esto es aparte de los recetarios que vendes. Aquellos siguen pasando por tu
 plantilla de Canva como siempre; esto es solo el anexo de cada paciente.
+
+---
+
+## La copia de seguridad · hazla
+
+Esto es lo más aburrido de la guía y lo más importante que hay en ella.
+
+**Los casos de tus pacientes viven solo en esta computadora.** No están en
+GitHub, y no van a estarlo nunca: son historiales clínicos de menores y están
+excluidos a propósito. Eso significa que si el disco se rompe, se pierden — y no
+se pueden volver a pedir, porque la consulta ya pasó.
+
+Conecta el disco externo, o abre la carpeta de tu nube, y dile a Claude:
+
+> Haz la copia de seguridad en D:/Respaldos/NutriOS
+
+Guarda un solo archivo `.zip` con fecha en el nombre, con todos los casos y la
+tabla de consultas dentro, y te dice qué guardó y dónde.
+
+Dos cosas que hace a propósito:
+
+- **Si la ruta no existe, se niega y te lo dice.** No la crea él. Si tu disco
+  externo no está conectado, crearla haría aparecer una carpeta vacía en la
+  computadora, escribiría ahí el respaldo, y parecería que quedó guardado.
+- **No deja guardarlo dentro del propio proyecto.** Una copia en el mismo disco
+  no te protege de que se rompa ese disco.
+
+Hazlo **después de cada día de consultas**. Es un minuto.
+
+Ese `.zip` lleva datos clínicos de menores: guárdalo donde guardarías una
+historia clínica en papel.
 
 ---
 

@@ -21,21 +21,39 @@ Cuando llegue material de un paciente, **antes de nada**:
    documentos. Si no lo encuentras, pregunta **solo el nombre del niño** y nada
    más: ni las semanas, ni el protocolo, ni las alergias. Todo eso sale del
    material, y lo que falte de verdad lo va a reclamar la ficha como bloqueante.
-2. **Crea tú `pacientes/[Nombre]/fuente/`.** Nunca le pidas a Paty que cree una
-   carpeta, que mueva un archivo ni que nombre nada. Usa el nombre de pila del
-   niño tal como ella lo escribió.
+2. **Crea tú `pacientes/[Nombre]/fuentes_originales/`.** Nunca le pidas a Paty
+   que cree una carpeta, que mueva un archivo ni que nombre nada. Usa el nombre
+   de pila del niño tal como ella lo escribió.
    - Si esa carpeta **ya existe**, es un control del mismo paciente: no crees
-     otra. Añade el material nuevo a la misma `fuente/` con la fecha en el
-     nombre, y vuelve a leer el caso entero.
+     otra. Añade el material nuevo a la misma carpeta con la fecha en el nombre,
+     y vuelve a leer el caso entero.
 3. **Guarda ahí todo lo que ella pasó, tal cual llegó:** los adjuntos con su
    nombre original —fotos, PDF, capturas, audios— y también **lo que escribió en
-   el mensaje**, en `fuente/mensaje_[AAAA-MM-DD].md`.
+   el mensaje**, en `fuentes_originales/mensaje_[AAAA-MM-DD].md`.
 
    Ese último punto no es burocracia. *«Son dos semanas»*, *«la mamá dice que no
    come nada verde»*, *«viene de la selva»* es información clínica, y si vive
    solo en el chat se pierde en la siguiente sesión y desaparece del caso. Lo que
    Paty escribe pesa igual que un documento adjunto.
-4. **Arranca la Fase 1** sin volver a preguntar. Cuéntale lo que estás haciendo
+4. **Pasa la ingesta antes de leer nada:**
+
+   ```bash
+   python motor/ingesta.py [carpeta]
+   ```
+
+   Convierte todo a texto en `pacientes/[carpeta]/fuentes/` y escribe
+   `_inventario.md` con una fila por documento y por página.
+
+   **No abras los originales. Ni para echar un vistazo.** Un PDF de 88 páginas
+   se procesa convirtiendo cada página en imagen: son 88 lecturas visuales antes
+   de la primera decisión clínica, y eso fue lo que saturó el contexto del primer
+   caso real y deterioró todo lo que vino después. La ingesta deja esas mismas 88
+   páginas en 25 KB de texto.
+
+   Lee el inventario y **dile a Paty en una línea qué llegó**, en particular si
+   hay documentos duplicados byte a byte o páginas sin capa de texto: un
+   duplicado suele ser el rastro de un archivo que no llegó.
+5. **Arranca la Fase 1** sin volver a preguntar. Cuéntale lo que estás haciendo
    en una línea, no le pidas permiso para cada paso.
 
 Si el mensaje no trae adjuntos ni datos clínicos —solo una pregunta, o una
@@ -64,13 +82,28 @@ estás haciendo el trabajo del validador y lo vas a hacer peor. Ejecuta el scrip
 
 ### F1 · Lectura clínica → `ficha.md`
 
-1. Comprueba que `/pacientes/[carpeta]/fuente/` tenga material dentro —lo acabas
-   de guardar tú en F0—. Si está vacía, detente y avisa.
+1. Comprueba que `/pacientes/[carpeta]/fuentes/` tenga material dentro —lo acaba
+   de generar la ingesta en F0—. Si está vacía, detente y avisa.
 2. Abre `prompts/PC_CLINICO.md`, síguelo al pie de la letra y escribe
    `/pacientes/[carpeta]/ficha.md`. El mensaje de Paty entra como una fuente más.
-3. Si la ficha sale con `bloqueantes` no vacíos, **detén todo**. Falta información
+3. **Cada dato clínico lleva su procedencia** —documento y página— en el campo
+   `procedencia`, y lo que buscaste y no está va en `datos_sin_fuente`. El
+   validador bloquea el plan si falta lo primero, y destaca lo segundo arriba del
+   reporte. Un dato sin procedencia no se imprime.
+4. Si la ficha sale con `bloqueantes` no vacíos, **detén todo**. Falta información
    clínica y no se sigue sin ella. Dile qué falta, en llano y en una lista corta:
    eso sí es una pregunta que merece interrumpirla.
+
+### F1b · Parada clínica
+
+El motor comprueba solo, antes de construir nada, si este caso **debe** tener un
+plan. Cuatro criterios paran —falla de medro, alérgeno sospechado sin documentar,
+diagnóstico que el protocolo no sabe tratar, y edad fuera del rango de todos los
+protocolos— y uno avisa fuerte: selectividad extrema, con derivación a valorar.
+
+Si para, el mensaje dice qué hacer. **No lo rodees.** Si Paty lo mira y decide
+seguir igual, se anota en `parada_clinica_revisada` de la ficha con su motivo y
+el pipeline continúa; la parada baja a aviso pero se sigue imprimiendo.
 
 ### F2 · Huecos de biblioteca · y F4 · Ensamblado
 
@@ -86,20 +119,47 @@ python motor/ensamblar.py [carpeta]
   componente falta, en qué momento del día y cuántas recetas hacen falta. Ve a F3.
 - Si falla por otra causa, léela y avisa a Paty. No improvises un arreglo.
 
-### F3 · Recetas nuevas (solo si F2 lo pidió)
+### F3 · Bases nuevas (solo si F2 lo pidió)
 
-Por **cada** receta que falte:
+Por **cada** base que falte:
 
 1. Abre una **conversación o subtarea nueva y limpia**. Esto no es una formalidad:
    P1 rinde mal con el contexto de otras recetas encima.
-2. Pega `prompts/P1_RECETAS.md` completo.
-3. Pasa el bloque `CONTEXTO:` con los datos de la ficha (edad, alergias, rechazos,
-   diagnóstico, momento objetivo) y la receta de partida, o el hueco a llenar.
-4. Guarda la salida íntegra en `/biblioteca/[id].md`.
-5. La receta queda con `validada_en_cocina: false`. Es correcto: solo Paty
-   cambia ese campo, y solo después de prepararla.
+2. Pega `prompts/P1_RECETAS.md` completo. **Sin bloque `CONTEXTO:`**, que es lo
+   que le dice que trabaja en modo BASE.
+3. Guarda la salida íntegra en `/biblioteca/[id].md`, con `tipo: base`.
+4. La base queda con `validada_en_cocina: false`. Es correcto: solo Paty cambia
+   ese campo, y solo después de prepararla.
 
 Vuelve a F2.
+
+### F4b · Instanciar las bases para este niño ⚠ el paso que faltaba
+
+**En `/biblioteca/` hay bases, no recetas: una base no se imprime nunca.** Una
+base es una técnica más un esqueleto de ingredientes más sus reglas de seguridad
+—«lenteja colada sin cáscara»—. Lo que va al recetario de una familia es esa base
+ya resuelta contra ESE niño.
+
+Este paso existe porque el sistema hacía lo contrario y salió caro: metía la
+receta guardada tal cual, y así le sirvió pan con palta a un paciente cuya
+anamnesis dice, con esas palabras, «no pan, ni pan con palta».
+
+Por **cada** base que use el plan:
+
+1. Conversación limpia, `prompts/P1_RECETAS.md` completo.
+2. Pasa el bloque `CONTEXTO:` con los datos de la ficha —edad, alergias,
+   **rechazos**, **repertorio_aceptado**, porción del componente, diagnóstico,
+   momento, texturas y `riesgo_disfagia`— y la base de partida.
+3. Guarda la salida en `pacientes/[carpeta]/recetas/[id_de_la_base].md`.
+
+Esa carpeta es el registro de lo que se entregó de verdad, y es donde hay que
+mirar cuando el niño vuelva a consulta. Lo que se acumula entre pacientes son las
+bases; el plato, no.
+
+El validador bloquea si falta alguna, y también si una receta trae un ingrediente
+rechazado, un alérgeno que no cuadra con su lista de ingredientes, un ingrediente
+fuera del repertorio sin declarar como **exposición planificada**, o un marcador
+de plantilla sin resolver.
 
 ### F5 · Validación
 
@@ -156,8 +216,13 @@ a entregar a la familia.
 
 Preséntale, en el chat y en lenguaje llano:
 
+- **Lo que el reporte trae en «Léelo antes que nada», y va primero.** Ahí caen la
+  parada clínica que no bloquea —selectividad extrema y su derivación—, los datos
+  clínicos que no están en ninguna fuente, y las **exposiciones planificadas**:
+  ingredientes nuevos que el plan introduce a propósito y que están pendientes de
+  su visto bueno, uno a uno. Si tumba uno, se vuelve a instanciar esa receta.
 - Dónde están los dos PDF y qué trae cada uno.
-- El resumen del plan (paciente, semanas, protocolo, recetas nuevas).
+- El resumen del plan (paciente, semanas, protocolo, bases nuevas).
 - Los avisos del reporte traducidos, en particular las **sustituciones
   forzadas**: cuando el protocolo pedía algo que este paciente no puede comer, el
   motor lo sustituyó. Paty tiene que enterarse de eso.
@@ -201,8 +266,11 @@ deduzcas de un documento.
 - **No edites `plan.json` a mano.** Si algo está mal, se arregla en el protocolo,
   en la biblioteca o en la ficha, y se vuelve a ensamblar. Editar la salida rompe
   la garantía de que el plan cumple el protocolo.
-- **No inventes recetas dentro del plan.** Toda receta pasa por P1 y aterriza en
-  `/biblioteca/` antes de aparecer en un menú.
+- **No inventes recetas dentro del plan.** Toda técnica pasa por P1 y aterriza en
+  `/biblioteca/` como base antes de aparecer en un menú, y toda receta impresa
+  sale de instanciar una base contra la ficha (F4b).
+- **Respalda el trabajo clínico.** `pacientes/` está en `.gitignore` y ahí se
+  queda, así que git no lo protege: `python motor/respaldar.py <ruta_fuera_del_repo>`.
 - **Si un script falla, muestra el error tal cual.** No lo reinterpretes ni lo
   suavices: los mensajes están escritos para que se lean enteros.
 - Si Paty pide un tipo de plan que no existe, se crea un protocolo nuevo en

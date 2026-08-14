@@ -18,8 +18,25 @@ diagnostico_texto: >
   Anemia ferropénica leve. Hb 10.8 g/dL.
 
 alergias: [lacteos]
+alergias_sospechadas: []
 rechazos: [pescado]
 favoritos: [pollo, palta]
+antropometria_previa: []
+
+# Caso de ejemplo: las «fuentes» son ficticias y están en fuentes_originales/.
+# La procedencia se rellena igual, porque es obligatoria y porque el ejemplo
+# tiene que enseñar el formato correcto.
+procedencia:
+  edad_meses: "derivado: f. nac. declarada en LEEME.txt"
+  peso_kg: "LEEME.txt · p. 1 (caso de ejemplo)"
+  talla_cm: "LEEME.txt · p. 1 (caso de ejemplo)"
+  zscore_pt: "derivado: WHO 2007 peso/edad varones 84 m"
+  zscore_te: "derivado: WHO 2007 talla/edad varones 84 m"
+  requerimiento_kcal: "derivado: IOM/DRI EER niños 3–8 a, actividad moderada"
+  diagnosticos: "LEEME.txt · p. 1 (caso de ejemplo)"
+  alergias: "LEEME.txt · p. 1 (caso de ejemplo)"
+datos_sin_fuente: []
+parada_clinica_revisada: {}
 
 porciones:
   cereal: "3 cdas"
