@@ -6,3 +6,15 @@ weasyprint>=60
 # Recorta a A4 las imágenes que devuelve la API, que salen en 2:3. Sin ella el
 # recorte no se hace y las fotos entran deformadas en el recetario.
 Pillow>=10.0
+# Capa de texto de los PDF, para motor/ingesta.py. Solo lectura: la ingesta no
+# escribe, ni cifra, ni manipula un PDF jamás.
+#
+# Es la dependencia que hace posible el paso 0. Sin ella, un PDF de 88 páginas
+# se lee convirtiendo cada página en imagen —88 lecturas visuales antes de la
+# primera decisión clínica—, que es exactamente lo que saturó la ventana de
+# contexto en el primer caso real. Con ella, esas 88 páginas son texto en disco
+# y al modelo solo le llega la página que la ficha cita.
+#
+# Python puro, sin binarios de sistema. El .docx no la necesita: es un ZIP con
+# XML dentro y lo abre la librería estándar.
+pypdf>=4.0

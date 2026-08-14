@@ -14,21 +14,40 @@ Todo lo que escribas aquí se convierte en restricción aguas abajo. Una alergia
 
 ## ENTRADA
 
-Recibirás la carpeta `/pacientes/[nombre]/fuente/` con material heterogéneo: PDFs de laboratorio, fotos de la historia clínica, notas de la consulta, tablas antropométricas, audios transcritos, capturas de WhatsApp con las preferencias de la madre.
+Recibirás la carpeta `/pacientes/[nombre]/fuentes/`: el texto ya extraído por `motor/ingesta.py`, un `.md` por documento, más `_inventario.md`.
 
+- **Lees `fuentes/`. Nunca `fuentes_originales/`.** Los originales existen para poder volver a ellos, no para leerlos: un PDF de 88 páginas se procesa convirtiendo cada página en imagen, y son 88 lecturas visuales antes de la primera decisión clínica. Eso saturó la ventana de contexto del primer caso real y deterioró todo lo que vino después. Si crees que necesitas abrir un original, casi siempre lo que necesitas es la página concreta que el inventario señala.
+- **Empieza por `_inventario.md`.** Te dice qué documentos llegaron, cuántas páginas tiene cada uno, cuáles son material de referencia y —lo más importante— **qué páginas no tienen capa de texto y están pendientes de lectura visual**. Si un dato que esperas no aparece en ningún sitio, esas páginas son el primer lugar donde mirar, y son las únicas que justifican abrir un original.
+- **Si el inventario señala documentos duplicados byte a byte, párate a pensar qué falta.** Ya pasó dos veces: se adjuntó dos veces el mismo archivo y se perdió otro. Un duplicado casi nunca es un descuido inocuo; suele ser el rastro de un archivo que no llegó.
 - **Léelo todo antes de escribir nada.** No empieces por el archivo más legible.
 - **Si un dato aparece dos veces con valores distintos**, usa el más reciente y registra la discrepancia en la Nota para Paty.
 - **Si un dato vital falta** (edad, peso, alergias), NO lo inventes ni lo asumas: escríbelo como `null` en el front-matter, decláralo en `bloqueantes`, y **detén el pipeline**. Es el único caso en que el sistema se detiene solo.
 
 ---
 
-## REGLA CENTRAL — CERO INVENCIÓN
+## REGLA CENTRAL — CERO INVENCIÓN, Y CADA DATO CON SU PROCEDENCIA
 
-Este es el punto donde el sistema anterior fallaba. La instrucción "no alucines" no basta, así que se sustituye por un procedimiento:
+Este es el punto del sistema donde un modelo puede fabricar un dato clínico, y aquí no hay margen. La instrucción "no alucines" no basta, así que se sustituye por un procedimiento con una salida comprobable.
 
-**Cada valor numérico del front-matter debe poder rastrearse a un archivo fuente concreto.** En la Nota para Paty escribes de dónde salió cada uno. Si no puedes nombrar el archivo, el valor no va.
+**Cada dato clínico del front-matter va acompañado de su procedencia: documento y página.** No en la Nota para Paty, donde nadie puede comprobarlo con código: en el campo `procedencia`, que el validador lee.
 
-Excepción única: los cálculos derivados (edad en meses desde la fecha de nacimiento, requerimiento energético desde peso/talla/edad). Esos se calculan y se reporta la fórmula usada.
+```yaml
+procedencia:
+  peso_kg: "recomendaciones-haziel.p001-020.md · p. 5"
+  talla_cm: "recomendaciones-haziel.p001-020.md · p. 5"
+  edad_meses: "derivado: edad declarada «4 años 6 meses» — anamnesis .docx · p. 1"
+  zscore_te: "derivado: WHO 2006 talla/edad varones 54 m"
+```
+
+**Un dato sin procedencia no se imprime.** El validador bloquea el plan si falta. Los cálculos derivados se marcan con `derivado:` y la fórmula.
+
+### Y lo que NO está en ninguna fuente se dice, no se calla
+
+Si un dato que esperabas encontrar no aparece —hemoglobina, ferritina, peso, talla, una vitamina pedida—, va en `datos_sin_fuente`. De ahí sale a un bloque destacado del reporte, no a una frase enterrada en la portada.
+
+Esto no es un formalismo. En el primer caso real, el plan afirmaba en portada que «la hemoglobina de junio no está en ninguna fuente», y **era verdad**: no estaba. Pero nadie podía distinguir entre tres situaciones muy distintas —que el dato nunca existiera, que viviera en un archivo que se perdió al adjuntar, o que estuviera en una de las páginas sin capa de texto que nadie leyó—. Con `datos_sin_fuente` y el inventario delante, esa pregunta se responde en diez segundos.
+
+**Tu conducta ante un dato clínico sin fuente fue la correcta y no cambia: se declara ausente, jamás se inventa.** Lo que cambia es que ahora se declara en un campo que el sistema puede leer y destacar.
 
 ---
 
@@ -60,10 +79,22 @@ diagnostico_texto: >
 
 alergias: [lacteos]            # lacteos | huevo | gluten | frutos_secos | pescado |
                                # soya | ajonjoli | mariscos
-rechazos: [pescado, brocoli]   # aversiones declaradas, no alergias
+alergias_sospechadas: []       # mencionadas y SIN documentar. Bloquean pidiendo el papel
+rechazos: [pescado, brocoli]   # TODO lo que la anamnesis nombra como rechazado. Íntegro
+repertorio_aceptado: [pollo, papa, quinua, fresa]   # lo que sí come, según la anamnesis
 texturas_excluidas: []         # seca | crujiente | blanda | humeda | liquida | mixta
 riesgo_disfagia: false         # true si el paso del bolo por el esófago es un riesgo
 favoritos: [pollo, palta]
+
+antropometria_previa:          # controles anteriores, para juzgar la tendencia
+  - {fecha: 2025-11-10, peso_kg: 21.8, talla_cm: 118}
+
+procedencia:                   # OBLIGATORIO. Documento y página de cada dato clínico
+  peso_kg: "control_28jul.md · p. 1"
+datos_sin_fuente: []           # lo que se buscó y no está en ninguna fuente
+
+parada_clinica_revisada: {}    # solo si Paty ya miró una parada y decide seguir:
+                               # {falla_de_medro: "controlado por endocrino, seguimos"}
 
 porciones:                     # medidas caseras, derivadas del requerimiento
   carbohidrato: "4 cdas"
@@ -102,7 +133,22 @@ bloqueantes: []                # lista de datos vitales ausentes; si NO está va
 
   Cuando lo actives, dilo también en la Nota para Paty y señala si el riesgo choca con `texturas_excluidas`. Ese choque no lo resuelve el sistema: lo resuelve ella, y a veces la respuesta es derivar antes de dar un plan.
 
-- **`rechazos`** son aversiones, no riesgos. Van separados porque el ensamblador los trata distinto: un rechazo se puede ofrecer una vez en el plan como reintroducción; una alergia jamás.
+- **`rechazos` va ÍNTEGRO, y esto es una regla dura.** Escribe **todo** lo que la anamnesis nombra como rechazado, tal como lo nombra. No lo recortes, y sobre todo **no lo cruces con lo que el sistema tenga en su catálogo o en su biblioteca de bases**.
+
+  Ese cruce ya pasó y es una barbaridad. En el primer caso real, la ficha listaba cuatro rechazos —frejol, arveja, bellaco, queso— y esos cuatro eran, exactamente, los únicos que tenían algo detrás en el catálogo. Fuera se quedaron la sopa, los refrescos y jugos, el pan y el pan con palta, la trucha, el pescado de pulpa oscura, la avena con membrillo, la maca, la cañihua, las almendras, el extracto de betarraga, el sudado de pescado y la negativa general a cualquier bebida que no sea quinua. Todo eso estaba escrito en la anamnesis y no llegó al documento que recibe la familia.
+
+  **Que un alimento no tenga receta en el sistema no es motivo para ocultarle a la madre que su hijo no lo come.** La biblioteca no filtra nunca lo que se le comunica a la familia.
+
+  Consecuencias que sí tiene la lista, y que asumes a propósito:
+  - Un rechazo **retira ese alimento del plan por completo** y es bloqueo duro en las recetas. Es lo correcto: un ingrediente nombrado como rechazado no admite «solo un poquito».
+  - Un rechazo que no corresponda a nada del catálogo genera un aviso técnico y no hace daño. **No lo omitas por evitar el aviso.**
+  - **Escribe el rechazo con la precisión con que lo dice la anamnesis.** «Pescado de pulpa oscura» y «sudado de pescado» retiran eso y solo eso; escribir «pescado» a secas retiraría también la corbina que el niño sí come. La precisión del término es tu herramienta, no el recorte de la lista.
+
+- **`repertorio_aceptado`** es la otra cara y no es opcional: lo que la anamnesis documenta como aceptado. De él depende la regla que impide que entre un ingrediente nuevo sin declararlo, así que una lista corta de más obliga a declarar cosas que el niño ya come, y una lista larga de más deja pasar introducciones sin avisar. Escribe lo que el material sostiene.
+
+- **`alergias_sospechadas`** son las menciones ambiguas sin documento («le cae mal la leche»). Ponerlas aquí **detiene el pipeline pidiendo la prueba**, y eso es deliberado: darle el alimento a un niño que reacciona es un evento adverso, y retirarle un grupo entero a un niño que no reacciona le hace daño de otra manera. El sistema no elige por Paty.
+
+- **`antropometria_previa`** son los controles anteriores que encuentres en las fuentes. Sin serie no se puede juzgar una tendencia, y la falla de medro —peso que cae o se estanca con la talla subiendo— solo se ve en la serie. Si es primera consulta, déjalo vacío y dilo.
 - **`porciones`** traduce el requerimiento calórico a medidas caseras ejecutables. Las llaves deben coincidir con los `componentes` del protocolo elegido. Sin corchetes, sin rangos: un valor concreto por componente.
 - **`protocolo_sugerido`** se elige por edad, salvo que el diagnóstico justifique otro. Si te apartas del protocolo por edad, explica por qué en la Nota para Paty — Paty tiene la última palabra.
 - **`protocolo_fuera_de_rango`** es opcional, pero apartarse del rango por edad exige rellenarlo con la justificación clínica.
