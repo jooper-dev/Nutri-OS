@@ -42,6 +42,11 @@ def main() -> int:
         print(f"\n✗ {e}\n", file=sys.stderr)
         return 1
 
+    # Los destacados van primero y aparte. Lo que hundió el primer caso real no
+    # fue que faltara el aviso de selectividad: fue que habría salido en la línea
+    # 40 de una lista de 60, entre notas sobre claves de protocolo sin implementar.
+    for d in r.destacados:
+        print(f"  ‼ {d}")
     for e in r.errores:
         print(f"  ✗ {e}")
     for a in r.avisos:

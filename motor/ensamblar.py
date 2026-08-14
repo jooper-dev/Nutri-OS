@@ -21,6 +21,7 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
+import parada_clinica
 from comun import (
     COMPONENTES_SIN_EXIGENCIA_DE_VARIEDAD,
     DIAS,
@@ -567,6 +568,20 @@ def ensamblar(nombre_carpeta: str, semilla: int | None = None) -> dict:
 
     ficha = cargar_ficha(carpeta)
     protocolo = cargar_protocolo(ficha["protocolo_sugerido"])
+
+    # Antes de construir nada: ¿este caso debe tener un plan?
+    #
+    # Se comprueba aquí y no solo en el validador porque un caso que hay que
+    # derivar o estudiar antes no necesita que se le calculen catorce días de
+    # menús. Parar temprano también es más honesto: quien lo ejecuta ve el
+    # motivo clínico, no un plan terminado con una nota al pie.
+    paradas = parada_clinica.bloqueantes(parada_clinica.revisar(ficha, protocolo))
+    if paradas:
+        raise ErrorNutriOS(
+            "El caso no pasa la revisión clínica previa, así que no se ensambla plan:\n\n"
+            + "\n\n".join(f"  · {h.mensaje}" for h in paradas)
+        )
+
     estado_rango, mensaje_rango = comprobar_rango_edad(protocolo, ficha)
     if estado_rango == "fuera_sin_justificar":
         raise ErrorNutriOS(mensaje_rango)
@@ -620,7 +635,12 @@ def ensamblar(nombre_carpeta: str, semilla: int | None = None) -> dict:
         "diagnostico_texto": ficha.get("diagnostico_texto", ""),
         "diagnosticos": ficha.get("diagnosticos") or [],
         "alergias": ficha.get("alergias") or [],
+        # Íntegro. Lo que sale en el informe es lo que dice la ficha, y la
+        # biblioteca del sistema no filtra nunca lo que se le comunica a la
+        # familia: que un alimento no tenga base en el catálogo no es motivo
+        # para ocultarle a la madre que su hijo no lo come.
         "rechazos": ficha.get("rechazos") or [],
+        "datos_sin_fuente": ficha.get("datos_sin_fuente") or [],
         "protocolo": protocolo["id"],
         "protocolo_nombre": protocolo["nombre"],
         "semanas": semanas,

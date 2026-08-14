@@ -156,12 +156,8 @@ exclusiones_duras:
 # ---------------------------------------------------------------
 variedad:
   no_repetir_dia_completo: false   # a esta edad la repetición es deseable
-  max_veces_misma_receta_semana: 4
-  # 0 = el recetario no es obligatorio en este protocolo. A los 6 meses la comida
-  # es puré de un alimento, y este mismo archivo limita a 3 los alimentos nuevos
-  # por semana con 3 días de observación cada uno: exigir además 3 recetas
-  # distintas de varios ingredientes por semana contradice esa regla.
-  min_recetas_distintas_semana: 0
+  max_veces_misma_receta_semana: 4   # decidido por Paty (encargo 3, §9)
+  min_recetas_distintas_semana: 2    # decidido por Paty (encargo 3, §9)
 
 # ---------------------------------------------------------------
 # AJUSTES POR DIAGNÓSTICO
@@ -184,20 +180,9 @@ preferencias_clinicas:
     exclusiones_extra: [lacteos]
     nota_qa: verificar trazas en productos procesados
 
-# ---------------------------------------------------------------
-# DECISIONES PENDIENTES
-# Lo que no resuelve ninguna guía pública y sí resuelve Paty. El validador las
-# repite en cada reporte. Se cierran borrando la línea y poniendo el valor.
-# ---------------------------------------------------------------
-decisiones_pendientes:
-  - >
-    Progresión de textura dentro del primer mes: hoy semana 1–2 papilla lisa,
-    semana 3 aplastado con tenedor, semana 4 aplastado con grumos suaves.
-    ¿Se queda así? (sí / no)
-  - >
-    Recetario a los 6 meses: hoy el protocolo no exige ninguna receta del
-    recetario (min_recetas_distintas_semana = 0). ¿Cuántas quieres exigir por
-    semana? (un número; 0 = ninguna)
-  - >
-    Una misma receta puede repetirse hasta 4 veces por semana
-    (max_veces_misma_receta_semana). ¿Cuántas? (un número)
+# Las tres decisiones que este bloque dejaba abiertas —progresión de textura,
+# recetas distintas por semana y repeticiones por semana— las cerró Paty en el
+# encargo 3 (§9). Los valores están arriba, cada uno con su fuente en la línea
+# de al lado, y el bloque `decisiones_pendientes` desaparece: un archivo que
+# sigue preguntando lo que ya se respondió acaba llenando de ruido todos los
+# reportes y enseñando a no leerlos.

@@ -78,6 +78,15 @@ lacteos:
     - leche vegetal
     - leche de almendras
     - leche de avena
+    # Una prohibición no es una presencia. La base de quinua licuada dice
+    # «nunca leche» —es su regla de seguridad, porque el calcio le compite el
+    # hierro al grano— y la comparación literal la leía como que llevaba leche:
+    # la base salía declarando el alérgeno que existe justamente para evitar.
+    - nunca leche
+    - sin leche
+    - nunca queso
+    - sin queso
+    - sin lacteos
 
 huevo:
   terminos:
@@ -87,7 +96,17 @@ huevo:
     - claras
     - yema
     - yemas
-  excepciones: []
+  # «clara» es la clara de huevo y también un adjetivo de color, y en un
+  # recetario donde media biblioteca describe costras y migas pálidas el
+  # adjetivo aparece constantemente. Sin estas excepciones, «pan rallado de
+  # miga clara» declaraba huevo y la base quedaba descartada para un alérgico
+  # que sí podía comerla.
+  excepciones:
+    - costra clara
+    - miga clara
+    - pulpa clara
+    - masa clara
+    - salsa clara
 
 mani:
   terminos:
@@ -129,6 +148,24 @@ pescado:
     - doncella
     - trucha
     - filete de pescado
+    # Especies de pulpa blanca. Faltaban, y la ausencia no era inocua: una
+    # receta instanciada con corbina declaraba `pescado` con razón, y el
+    # comprobador respondía que ningún ingrediente lo delataba. El aviso decía
+    # «declarar de más descarta la receta para pacientes que sí podrían
+    # comerla», o sea invitaba a QUITAR la etiqueta correcta de un plato de
+    # pescado. Un nombre de especie que la tabla no conoce es un alérgeno
+    # invisible.
+    - corbina
+    - corvina
+    - perico
+    - lenguado
+    - cabrilla
+    - merluza
+    - tilapia
+    - caballa
+    - pejerrey
+    - chita
+    - cojinova
   excepciones: []
 
 soya:

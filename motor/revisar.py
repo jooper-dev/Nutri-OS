@@ -70,6 +70,7 @@ from comun import (  # noqa: E402
     DIR_PACIENTES,
     DIR_PROTOCOLOS,
     ErrorNutriOS,
+    alergenos_de_ingredientes,
     cargar_alimentos_base,
     cargar_biblioteca,
     cargar_protocolo,
@@ -275,39 +276,22 @@ print("\n— Alérgenos declarados contra ingredientes —")
 # esto lo comprueba contra la lista de ingredientes.
 RUTA_ALERGENOS = DIR_DATOS / "alergenos_ingredientes.yaml"
 
-
-def _clave(texto: str) -> str:
-    """La línea normalizada y con topes, para buscar palabras completas."""
-    return "_" + normalizar(texto) + "_"
-
-
-def _lineas_ingredientes(cuerpo: str) -> list[str]:
-    m = re.search(
-        r"^##\s+Ingredientes\s*$(.*?)(?=^##\s|\Z)", cuerpo, re.MULTILINE | re.DOTALL | re.IGNORECASE
-    )
-    if not m:
-        return []
-    return [l.strip() for l in m.group(1).splitlines() if l.strip().startswith("•")]
-
-
-def _alergenos_implicados(lineas: list[str], tabla: dict) -> set[str]:
-    hallados: set[str] = set()
-    for linea in lineas:
-        clave = _clave(linea)
-        for etiqueta, regla in tabla.items():
-            if any(_clave(x) in clave for x in (regla.get("excepciones") or [])):
-                continue
-            if any(_clave(t) in clave for t in (regla.get("terminos") or [])):
-                hallados.add(etiqueta)
-    return hallados
-
-
 if "biblioteca" in errores:
     linea(False, "no se puede comprobar: la biblioteca no cargó")
 elif not RUTA_ALERGENOS.exists():
     linea(False, f"falta {RUTA_ALERGENOS.name}, que es la tabla de ingredientes → alérgeno")
     errores.append(RUTA_ALERGENOS.name)
 else:
+    # Una base no lleva lista de ingredientes con cantidades: lleva un esqueleto
+    # de papeles («menestra», «ligante feculento») que la instanciación resuelve.
+    # Lo que se comprueba aquí es que `alergenos_posibles` cubra todo lo que
+    # cualquier candidato del esqueleto pueda traer — si el esqueleto ofrece
+    # mantequilla de maní, la base tiene que declarar `mani`, aunque exista una
+    # versión sin ella.
+    #
+    # La comprobación fina —lo que la receta lleva DE VERDAD— se hace sobre las
+    # recetas instanciadas del paciente, en motor/recetas_paciente.py, y esa sí
+    # bloquea el render.
     tabla = yaml.safe_load(RUTA_ALERGENOS.read_text(encoding="utf-8")) or {}
     desajustes = 0
     for receta in recetas:
@@ -315,33 +299,36 @@ else:
             meta, cuerpo = leer_front_matter(RAIZ / receta.ruta)
         except ErrorNutriOS:
             continue
-        lineas = _lineas_ingredientes(cuerpo)
-        if not lineas:
-            avisos.append(f"{receta.id}: no se encontró la sección '## Ingredientes'")
+        m = re.search(
+            r"^##\s+Esqueleto\s*$(.*?)(?=^##\s|\Z)",
+            cuerpo,
+            re.MULTILINE | re.DOTALL | re.IGNORECASE,
+        )
+        if not m:
+            linea(
+                False,
+                f"{receta.id} — no tiene sección '## Esqueleto'. Una base sin esqueleto "
+                f"no dice qué ingredientes admite, y entonces no se puede comprobar qué "
+                f"alérgenos puede traer.",
+            )
+            errores.append(receta.id)
             continue
-        declarados = {normalizar(a) for a in (meta.get("alergenos_presentes") or [])}
-        implicados = _alergenos_implicados(lineas, tabla)
+        lineas_esq = [l.strip() for l in m.group(1).splitlines() if l.strip().startswith("•")]
+        declarados = {normalizar(a) for a in (meta.get("alergenos_posibles") or [])}
+        implicados = alergenos_de_ingredientes(lineas_esq, tabla)
         faltan = sorted(implicados - declarados)
-        sobran = sorted(declarados - implicados)
         if faltan:
             desajustes += 1
             linea(
                 False,
-                f"{receta.id} — sus ingredientes llevan {', '.join(faltan)} y "
-                f"'alergenos_presentes' no lo declara. Un falso negativo aquí llega al "
-                f"plato de un niño alérgico: añádelo al front-matter, o corrige la "
-                f"tabla de datos/alergenos_ingredientes.yaml si el término no "
-                f"corresponde.",
+                f"{receta.id} — su esqueleto admite ingredientes con {', '.join(faltan)} "
+                f"y 'alergenos_posibles' no lo declara. Un falso negativo aquí ofrece la "
+                f"base a un niño alérgico: añádelo al front-matter, o corrige la tabla "
+                f"de datos/alergenos_ingredientes.yaml si el término no corresponde.",
             )
             errores.append(receta.id)
-        if sobran:
-            avisos.append(
-                f"{receta.id}: declara {', '.join(sobran)} y ningún ingrediente lo delata "
-                f"(declarar de más es seguro, pero descarta la receta para pacientes que "
-                f"sí podrían comerla)"
-            )
     if not desajustes:
-        linea(True, f"{len(recetas)} receta(s) coherentes con sus ingredientes")
+        linea(True, f"{len(recetas)} base(s) coherentes con su esqueleto")
 
 print("\n— Componentes sin receta —")
 # El recetario solo puede crecer si se sabe dónde le falta. Hoy las 17 recetas

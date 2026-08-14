@@ -1,0 +1,259 @@
+id: preescolar_3_5
+nombre: Preescolar 3–5 años
+edad_min_meses: 36
+edad_max_meses: 71
+descripcion: >
+  Plan de 5 tiempos para preescolar que ya come de la olla familiar.
+
+  Copia de escolar_6_11 ajustada a la estructura que Paty tiene escrita para
+  3–5 años en su documento de recomendaciones (horarios, frecuencias de carnes,
+  menestras, huevo, aceite y porciones). No es una interpolación entre la
+  ablactancia y el escolar: las frecuencias de abajo están tomadas una a una de
+  ese documento, y las que se apartan de escolar_6_11 llevan comentada la línea
+  de la que salen.
+
+  Cuatro diferencias con el protocolo de origen:
+
+  1. La cena no lleva fruta —«CENA: no va fruta»—, así que `fruta_vitc` sale de
+     sus componentes.
+  2. La menestra va solo en almuerzo, para poder acompañarla siempre con la
+     fruta rica en vitamina C de la misma comida, que es la regla escrita.
+  3. `fruta_vitc` pasa a ser componente diario del almuerzo —«dar fruta después
+     del almuerzo»— en lugar de aparecer solo los días de menestra.
+  4. El desayuno no tiene componente de grasa propio: en la tabla de 3–5 años la
+     grasa del desayuno viaja dentro del acompañante (palta, mantequilla de
+     frutos secos) y la grasa suelta está en almuerzo y cena.
+
+# ---------------------------------------------------------------
+# ANATOMÍA DEL DÍA
+# Horarios: tabla «HORARIOS DE COMIDAS» del documento de recomendaciones.
+# ---------------------------------------------------------------
+comidas:
+  - id: desayuno
+    nombre: Desayuno
+    hora: "7:30 – 8:30"
+    componentes: [cereal, acompanante, fruta]
+
+  - id: media_manana
+    nombre: Media mañana
+    hora: "10:00 – 10:30"
+    componentes: [base, crujiente]
+
+  - id: almuerzo
+    nombre: Almuerzo
+    hora: "12:30 – 1:00"
+    componentes: [carbohidrato, proteina, menestra, ensalada_grasa, fruta_vitc, bebida]
+
+  - id: media_tarde
+    nombre: Media tarde
+    hora: "3:30 – 4:00"
+    componentes: [base]
+
+  # «CENA: recomendaciones SIMILARES al almuerzo · no va fruta · no res ·
+  # sí menestras · sí verduras · agua». De ahí que falte `fruta_vitc` y que la
+  # regla de res acote su ámbito al almuerzo.
+  - id: cena
+    nombre: Cena
+    hora: "6:00 – 7:00"
+    componentes: [carbohidrato, proteina, ensalada_grasa, bebida]
+
+# ---------------------------------------------------------------
+# FRECUENCIAS SEMANALES
+# ---------------------------------------------------------------
+frecuencias_semanales:
+  # «OFRECER MENESTRAS 3 VECES POR SEMANA (es lo ideal)». Van solo en almuerzo
+  # para que la fruta con vitamina C de esa misma comida cumpla su papel en la
+  # absorción del hierro no hemínico. Moverlas también a la cena es una decisión
+  # clínica de Paty y está en decisiones_pendientes.
+  - componente: menestra
+    en: [almuerzo]
+    veces: 3
+    modo: exacto
+
+  # «Pescado (bonito, jurel, caballa, salmón) 2 a 3 v/semana (a la plancha,
+  # sudado)». Se fija en 2, que es el piso del rango.
+  - componente: proteina
+    familia: pescado
+    en: [almuerzo, cena]
+    veces: 2
+    modo: exacto
+
+  # «Carnes rojas (res, chancho): 1 vez/semanal o QUINCENAL solo en almuerzo,
+  # en hamburguesas». El ámbito es [almuerzo], no [almuerzo, cena].
+  - componente: proteina
+    familia: res
+    en: [almuerzo]
+    veces: 1
+    modo: maximo
+    cada_dias: 15
+
+  # «Pollo, pavo 3 a 4 veces/semana». Entra como relleno, igual que en
+  # escolar_6_11: ocupa las ranuras de proteína que no tomaron pescado ni res.
+  - componente: proteina
+    familia: pollo
+    en: [almuerzo, cena]
+    modo: relleno
+
+  # «EL HUEVO SE OFRECE 3 A 4 VECES/SEMANA AL DÍA, DAR MÁS ALLÁ DE ESA CANTIDAD
+  # PREDISPONE A TENER COLESTEROL EN ARTERIAS A TEMPRANA EDAD». Por eso el huevo
+  # tiene un único punto de entrada en todo el protocolo —el acompañante del
+  # desayuno—: repartirlo entre dos componentes daría dos topes independientes
+  # que sumados pueden pasarse de 4.
+  - componente: acompanante
+    familia: huevo
+    en: [desayuno]
+    veces: 4
+    modo: maximo
+    minimo: 3
+
+  - componente: fruta
+    en: [desayuno]
+    veces: 7
+    modo: exacto
+
+  # «Dar fruta después del almuerzo» + «Incluir frutas ricas en vitamina C en el
+  # desayuno, almuerzo para mejorar la absorción de hierro de cereales y
+  # menestras»: diaria, no solo los días de menestra.
+  - componente: fruta_vitc
+    en: [almuerzo]
+    veces: 7
+    modo: exacto
+
+  # Verdura a diario en las dos comidas principales, con su vehículo de grasa.
+  - componente: ensalada_grasa
+    en: [almuerzo, cena]
+    veces: 14
+    modo: exacto
+
+  # «MEDIA TARDE: fruta + yogurt + kiwicha pop sin azúcar». El yogurt se ancla
+  # en media tarde y no en media mañana —al revés que en escolar_6_11— porque
+  # es donde lo pone la tabla de 3–5 años, y porque así queda lejos de la
+  # menestra del almuerzo: el calcio compite con el hierro.
+  - componente: base
+    familia: yogurt
+    en: [media_tarde]
+    veces: 3
+    modo: exacto
+
+  # «MEDIA MAÑANA: fruta, DAR VARIEDAD DE FRUTAS, DAR SIEMPRE FRUTA CON ALGO».
+  # La fruta ocupa 4 de las 7 ranuras de base; el «algo» es el crujiente, que va
+  # a diario. Las otras 3 quedan para preparaciones del recetario.
+  - componente: base
+    familia: fruta_picada
+    en: [media_manana]
+    veces: 4
+    modo: exacto
+
+# ---------------------------------------------------------------
+# ROTACIONES
+# ---------------------------------------------------------------
+rotaciones:
+  # Tabla «DESAYUNO · BEBIDAS ¾ a 1 taza»: avena, avena con cañihua, quinua,
+  # kiwicha, kiwicha con cañihua, hojuela de avena con maca. De ahí el cupo de
+  # granos andinos por delante de todo lo demás.
+  - componente: cereal
+    en: [desayuno]
+    reparto: {grano_andino: 3, avena: 2, hojuelas: 1, harinas: 1}
+
+  # «Arroz: ½ taza · Papa: puré, papa amarilla · Camote sancochado · Quinua ·
+  # Tallarines». El cajón 'tuberculo' reparte papa y camote; la pasta entra
+  # porque los tallarines están en la tabla de esta edad y no en la de escolar.
+  - componente: carbohidrato
+    en: [almuerzo, cena]
+    reparto: {tuberculo: 6, quinua: 2, pasta: 2, arroz: resto}
+
+  # «ACEITE DE OLIVA extra virgen, 1 cta, acidez < 0,5, interdiario, 3 a 4
+  # v/semana» → 3 almuerzos. El resto del vehículo de grasa es palta.
+  - componente: ensalada_grasa
+    en: [almuerzo]
+    reparto: {palta: 3, aceite_oliva: 3, aceite_ajonjoli: 1}
+
+  - componente: ensalada_grasa
+    en: [cena]
+    reparto: {palta: 4, aceite_oliva: 2, aceite_ajonjoli: 1}
+
+# ---------------------------------------------------------------
+# REGLAS ACOPLADAS
+# ---------------------------------------------------------------
+# No hay regla «menestra → fruta_vitc» como en escolar_6_11, y no es un olvido:
+# aquí la fruta con vitamina C es componente diario del almuerzo, que es la única
+# comida donde va la menestra. El acoplamiento se cumple por construcción los 7
+# días, no solo los 3 de menestra, y declararlo además convertiría a `fruta_vitc`
+# en un componente dependiente —solo se llena cuando lo dispara la menestra— y
+# dejaría los otros 4 almuerzos sin fruta.
+reglas_acopladas:
+  - si: desayuno.cereal
+    entonces: desayuno.fruta
+    ambito: misma_comida
+    razon: fruta fresca obligatoria a diario, 2 colores, media ración de la de media mañana
+
+# ---------------------------------------------------------------
+# PRIORIDADES DE SELECCIÓN
+# ---------------------------------------------------------------
+prioridades:
+  # «(NARANJA, MANDARINA, PAPAYA, KIWI, FRESA) Y MANZANA · OTRAS FRUTAS: guayaba,
+  # piña».
+  fruta_vitc:
+    - naranja
+    - mandarina
+    - papaya
+    - fresa
+    - kiwi
+    - piña golden
+    - lima
+    - aguaymanto
+
+  bebida:
+    - agua
+
+# ---------------------------------------------------------------
+# VARIEDAD
+# ---------------------------------------------------------------
+variedad:
+  no_repetir_dia_completo: true
+  max_veces_misma_receta_semana: 3
+  min_recetas_distintas_semana: 8
+
+# ---------------------------------------------------------------
+# AJUSTES POR DIAGNÓSTICO
+# ---------------------------------------------------------------
+preferencias_clinicas:
+  # A diferencia de escolar_6_11, la anemia NO sube la menestra a 4. Tres veces
+  # por semana ya es el ideal escrito para esta edad, y en un preescolar con
+  # selectividad la cuarta ración no se come: se sirve, se rechaza y desgasta la
+  # mesa. El sesgo va por hierro y vitamina C, que es donde rinde.
+  anemia:
+    priorizar_aporta: [hierro, vitamina_c]
+
+  talla_baja:
+    priorizar_aporta: [proteina, zinc, energia]
+    nota_qa: >
+      Riesgo de talla baja: el aporte de proteína animal y zinc manda sobre el
+      volumen. Verificar que las 50 g de carne salgan en un formato que el niño
+      acepte, y controlar talla cada 2 meses (ganancia esperada 0,5–0,7 cm/mes).
+
+  estrenimiento:
+    priorizar_aporta: [fibra, grasas_saludables]
+    nota_qa: revisar aporte hídrico total del plan
+
+  selectividad:
+    max_recetas_nuevas_semana: 3
+    nota_qa: >
+      Priorizar recetas ya aceptadas. En preescolar con perfil sensorial, la
+      novedad se ofrece al lado de lo seguro y nunca en lugar de lo seguro.
+
+# ---------------------------------------------------------------
+decisiones_pendientes:
+  - >
+    ¿La menestra puede ir también en cena? Hoy va solo en almuerzo, para que la
+    fruta con vitamina C caiga en la misma comida. Tu documento dice «sí
+    menestras» en cena y «2 veces/día», pero también dice «no va fruta» en cena:
+    las dos reglas juntas dejan la menestra de la noche sin su vitamina C.
+  - >
+    Huevo: la regla es 3 a 4 veces por semana y el protocolo lo pone solo en el
+    desayuno. ¿Te sirve así, o quieres que pueda aparecer también como proteína
+    del almuerzo descontando de ese mismo tope?
+  - >
+    Aceite de ajonjolí: aparece en escolar_6_11 y lo mantuve con cupo 1 por
+    comida, pero tu tabla de 3–5 años solo nombra oliva, linaza y chía. ¿Lo dejo,
+    lo cambio por linaza o lo saco?

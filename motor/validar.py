@@ -24,11 +24,15 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+import parada_clinica
+import recetas_paciente
 from comun import (
+    CAMPOS_CLINICOS_CON_PROCEDENCIA,
     CLAVES_PROTOCOLO_SOLO_AVISO,
     COMPONENTES_SIN_FILTRO_TEXTURA,
     DIR_PACIENTES,
     ErrorNutriOS,
+    Opcion,
     ajustes_clinicos,
     cargar_alimentos_base,
     cargar_biblioteca,
@@ -47,12 +51,20 @@ class Reporte:
     def __init__(self) -> None:
         self.errores: list[str] = []
         self.avisos: list[str] = []
+        # Lo que Paty tiene que leer ANTES que ninguna otra cosa. Va aparte
+        # porque el problema del primer caso real no fue que el aviso faltara:
+        # fue que estaba en la línea 40 de una lista de 60, entre notas sobre
+        # claves de protocolo no implementadas.
+        self.destacados: list[str] = []
 
     def error(self, msg: str) -> None:
         self.errores.append(msg)
 
     def aviso(self, msg: str) -> None:
         self.avisos.append(msg)
+
+    def destacado(self, msg: str) -> None:
+        self.destacados.append(msg)
 
     @property
     def ok(self) -> bool:
@@ -83,6 +95,52 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
     r = Reporte()
     for a in avisos_bib:
         r.aviso(f"Biblioteca: {a}")
+
+    # --- 0. ¿Debe este caso tener un plan? ----------------------------------
+    # Va primero porque es la pregunta previa a todas las demás. El validador
+    # comprueba que el plan cumple el protocolo; esto comprueba que el caso no
+    # necesite otra cosa antes que un plan.
+    for h in parada_clinica.revisar(ficha, protocolo):
+        (r.error if h.bloquea else r.destacado)(h.mensaje)
+
+    # --- 0b. Procedencia de los datos clínicos ------------------------------
+    # Ningún dato clínico se imprime sin decir de qué documento y de qué página
+    # salió. No es burocracia: en el primer caso real nadie sabía si el valor de
+    # hemoglobina que se buscaba estaba en un documento que se perdió, en uno
+    # que se duplicó, o en el recuerdo de la consulta.
+    procedencia = ficha.get("procedencia") or {}
+    sin_procedencia = [
+        campo
+        for campo in CAMPOS_CLINICOS_CON_PROCEDENCIA
+        if ficha.get(campo) not in (None, "", [], {})
+        and not str(procedencia.get(campo) or "").strip()
+    ]
+    if sin_procedencia:
+        r.error(
+            "Estos datos clínicos aparecen en la ficha sin decir de dónde salieron: "
+            + ", ".join(sin_procedencia)
+            + ".\n"
+            "    Un dato sin procedencia no se imprime. O se le pone el documento y la "
+            "página de los que sale, o se retira de la ficha y se lista como dato "
+            "faltante — que es información útil, no un hueco.\n"
+            "    Solución: en el front-matter de ficha.md, «procedencia: {peso_kg: "
+            "\"documento.pdf · p. 5\", ...}». Los calculados se marcan como tales: "
+            "«edad_meses: \"derivado: f. nac. 2021-02-14\"»."
+        )
+
+    faltantes = [str(d) for d in (ficha.get("datos_sin_fuente") or []) if str(d).strip()]
+    if faltantes:
+        r.destacado(
+            "DATOS CLÍNICOS QUE NO ESTÁN EN NINGUNA FUENTE: "
+            + ", ".join(faltantes)
+            + ".\n"
+            "    El plan se construyó sin ellos. Lo que haga por esos frentes es "
+            "preventivo, no correctivo, y esto no puede quedarse en una frase enterrada "
+            "en la portada.\n"
+            "    Si alguno lo tienes en otro documento, pásalo y se rehace la ficha; si "
+            "está pedido y pendiente, esto es el recordatorio de que el plan se revisa "
+            "cuando llegue."
+        )
 
     estado_rango, mensaje_rango = comprobar_rango_edad(protocolo, ficha)
     if estado_rango == "fuera_sin_justificar":
@@ -489,6 +547,48 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
             + ".\n    Se llenan con alimentos base, que se preparan sin instrucciones."
         )
 
+    # --- 5c. Las recetas que se van a imprimir ------------------------------
+    # La biblioteca guarda bases y una base no se imprime nunca. Lo que llega al
+    # recetario son las recetas de pacientes/<paciente>/recetas/, ya resueltas
+    # contra este niño. Aquí se comprueba que existan y que ninguna traiga lo
+    # que no puede salir: un ingrediente rechazado, un alérgeno callado, un
+    # ingrediente nuevo sin declarar, o una marca de plantilla sin resolver.
+    errores_recetas, avisos_recetas = recetas_paciente.revisar(plan, ficha, carpeta)
+    for e in errores_recetas:
+        r.error(e)
+    for a in avisos_recetas:
+        # Las exposiciones planificadas suben a destacado: son introducciones
+        # nuevas en el plato de un niño con selectividad, y Paty tiene que
+        # aprobarlas una a una antes de que el plan salga por la puerta.
+        (r.destacado if a.startswith("EXPOSICIÓN PLANIFICADA") else r.aviso)(a)
+
+    # --- 5d. Alimentos base fuera del repertorio aceptado -------------------
+    # La regla de los ingredientes vive en las recetas, y ahí es un error que
+    # bloquea. Un alimento base es otra cosa: una pera servida como pera es una
+    # exposición visible, que la madre ve venir y puede manejar, no algo colado
+    # dentro de una preparación. Por eso avisa y no bloquea.
+    #
+    # Pero se dice. En un repertorio estrecho, saber cuántas cosas del plan son
+    # nuevas es justo lo que decide si el plan es ambicioso o es papel mojado.
+    repertorio = [str(x) for x in (ficha.get("repertorio_aceptado") or [])]
+    if repertorio:
+        nuevos: dict[str, None] = {}
+        for _sem, _dia, _cid, item in _items(plan):
+            if item.get("receta_id"):
+                continue
+            nombre = str(item["nombre"])
+            if not any(coincide_rechazo(x, Opcion(id="", nombre=nombre, componente="",
+                                                  edad_min_meses=0)) for x in repertorio):
+                nuevos[nombre] = None
+        if nuevos:
+            r.aviso(
+                f"{len(nuevos)} alimento(s) base del plan no están en el repertorio "
+                f"aceptado de la ficha: " + ", ".join(sorted(nuevos)) + ".\n"
+                "    No es un error —un alimento servido tal cual es una exposición "
+                "visible, no algo colado dentro de una preparación— pero conviene "
+                "saber cuántas cosas nuevas trae el plan antes de entregarlo."
+            )
+
     # --- 6. Recetas sin validar en cocina -----------------------------------
     sin_probar = [
         rid for rid in plan.get("recetas_usadas", [])
@@ -556,6 +656,15 @@ def escribir_reporte(carpeta: Path, r: Reporte, plan: dict) -> Path:
         else f"**BLOQUEADO** — {len(r.errores)} error(es). El plan no debe renderizarse.",
         "",
     ]
+    if r.destacados:
+        lineas += [
+            "## ⚠ Léelo antes que nada",
+            "",
+            "Lo de esta sección no bloquea el plan, y por eso mismo es lo que más fácil "
+            "se pasa por alto. Va arriba a propósito.",
+            "",
+        ]
+        lineas += [f"- {d}" for d in r.destacados] + [""]
     if r.errores:
         lineas += ["## Errores", ""] + [f"- {e}" for e in r.errores] + [""]
     if r.avisos:
@@ -593,6 +702,8 @@ def main() -> int:
 
     destino = escribir_reporte(DIR_PACIENTES / args.paciente, r, plan)
 
+    for d in r.destacados:
+        print(f"  ‼ {d}")
     for e in r.errores:
         print(f"  ✗ {e}")
     for a in r.avisos:
