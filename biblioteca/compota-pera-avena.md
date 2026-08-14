@@ -1,63 +1,58 @@
 ---
 id: compota-pera-avena
-titulo: Compota de pera
-subtitulo:
+tipo: base
+titulo: Compota de fruta
+subtitulo: Espesada con cereal
 edad_min_meses: 6
-porciones: 2
-unidades_por_porcion: null
-medida_porcion: ½ taza
-tiempo_min: 20
-dificultad: Muy fácil
 momento: [media_manana, media_tarde]
 componente: base
-familia: 
+familia:
 textura: humeda
 aporta: [fibra]
-alergenos_presentes: [gluten]
-etiquetas: [sin-huevo]
-conservacion:
-  ambiente_dias: 0
-  refri_dias: 3
-  congelador_meses: 1
+alergenos_posibles: [gluten]
 origen: creada
 validada_en_cocina: false
+acento: "#CDE3D2"
 variante_foto: H
 props_foto:
-acento: "#CDE3D2"
 ---
 
-# Compota de pera
+# Base · Compota de fruta
 
-+6 m · 2 porc. (½ taza c/u) · 20 min · Muy fácil
+Fruta pelada y cocida hasta deshacerse, espesada con un cereal en hojuela que
+se integra al final.
 
-sin huevo
+## Técnica
 
-## Nota de la Nutricionista
+Se pela la fruta —la piel es fibra perceptible y en aversión textural es lo
+primero que se nota— y se pica en cubos. Se cuece a fuego bajo con poca agua
+hasta que cede sola. Se incorpora el cereal y se cuece unos minutos más, lo
+justo para que hidrate y espese. Se deshace al gusto: con tenedor si se quiere
+textura, con licuadora si tiene que quedar lisa.
 
-Tibia, sedosa y con el dulzor limpio de la pera cocida. La avena la espesa lo justo para que se quede en la cuchara y no en la mesa.
+El espesor final es una decisión de textura, no de receta: lo fija la ficha.
 
-## Ingredientes
+## Esqueleto
 
-• **2** peras maduras
-• **2 cdas** hojuelas de avena · 20 g
-• **½ taza** agua · 120 ml
-• **1 pizca** de canela
+• **Fruta** (fibra, dulzor) — pera, manzana, membrillo, durazno.
+• **Cereal en hojuela** (espesante) — avena, quinua, kiwicha.
+• **Agua** — poca.
+• **Aromática, opcional** — una pizca de canela, o nada.
 
-## Preparación
+## Reglas de seguridad
 
-01  **Pela** y pica las peras en cubos.
-02  **Cocina** con el agua 12 minutos a fuego bajo.
-03  **Integra** la avena y cocina 3 minutos más.
-04  **Aplasta** hasta la textura que corresponda a la edad.
+• Fruta siempre pelada.
+• Sin azúcar añadida: la fruta cocida concentra la suya.
+• Si la ficha excluye la textura húmeda, esta base no se maquilla espesándola:
+  se descarta.
+• Servida tibia o fría, nunca caliente.
 
-## Ideas
+## Qué resuelve la instanciación
 
-• Sin gluten → usa avena certificada sin gluten.
-• Sin pera → usa **2** manzanas maduras.
-
-## Conservación
-
-Dura: 3 días refri · 1 congelador
+• Qué fruta y qué cereal, contra el repertorio y las alergias.
+• **El espesor y el grado de deshecho**, que es lo que decide si se come.
+• Si lleva canela visible o ninguna aromática.
+• Porción.
 
 ## Foto
 
@@ -65,9 +60,10 @@ Compota espesa de pera de color beige dorado, con trozos deshechos apenas recono
 
 --- NOTA PARA PATY ---
 
-RECETA CREADA — sin probar en cocina. Receta semilla, generada para poner en marcha el motor de Nutri-OS. Valídala o reemplázala antes de usarla con una paciente real.
+BASE CREADA — la técnica no está probada en cocina. Parte de la compota de casa.
 
-Correcciones: sin correcciones (no hubo fuente que auditar).
-Etiquetas asignadas: derivadas de la lista final de ingredientes, incluidas las opciones.
-Datos asumidos: conservación y rendimiento con valores estándar.
-Acento de color: #CDE3D2.
+Plausibilidad culinaria: precedente directo.
+
+Alérgenos: `gluten` está en `alergenos_posibles` por la avena, que comparte
+molino con el trigo. Instanciada con quinua o kiwicha, o con avena certificada,
+la receta del paciente no lo declara.

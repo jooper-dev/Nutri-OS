@@ -1,0 +1,61 @@
+# Despensa básica — Nutri-OS
+#
+# Lo que puede aparecer en una receta sin estar en el repertorio aceptado del
+# paciente, y sin tener que declararse como exposición planificada.
+#
+# POR QUÉ EXISTE
+#
+# La regla del sistema es: ningún ingrediente entra en una receta si no está en
+# el repertorio aceptado de la ficha, salvo que se declare de forma expresa como
+# exposición planificada y quede marcado para el visto bueno de Paty.
+#
+# Esa regla es correcta para los alimentos y absurda para el agua. Nadie
+# "acepta" la maicena, ni rechaza el polvo de hornear: no se ven, no se saborean
+# solos y no se sirven en un plato. Sin esta lista, cada receta tendría que
+# declarar la sal como una introducción nueva, y el aviso que protege al niño se
+# ahogaría entre veinte avisos que no protegen a nadie.
+#
+# CRITERIO PARA AÑADIR ALGO AQUÍ
+#
+# Solo entra lo que cumple las tres:
+#
+#   1. No se sirve solo. Es medio de cocción, sazón o ligante.
+#   2. No se ve en el plato terminado, o se ve como parte de la masa.
+#   3. Un niño no puede rechazarlo por sí mismo, porque nunca se le ofrece solo.
+#
+# La papa NO entra, aunque esté en toda cocina: se sirve sola y se rechaza sola.
+# El pan rallado NO entra, aunque vaya escondido en una milanesa: es un alimento
+# con entidad propia y con alérgeno, y si una receta lo usa para un niño que
+# rechaza el pan, eso es exactamente la decisión que Paty tiene que ver escrita.
+#
+# Esto es DATO, no código: se edita aquí sin tocar el motor.
+
+medios_de_coccion:
+  - agua
+  - aceite
+  - aceite de girasol
+  - aceite de oliva
+  - aceite de oliva suave
+  - aceite vegetal
+
+sazon:
+  - sal
+  - azucar
+  - azucar rubia
+  - chancaca
+  - canela
+  - rama de canela
+  - clavo de olor
+  - ajo en polvo
+  - vainilla
+  - esencia de vainilla
+  - limon
+  - jugo de limon
+
+ligantes_y_leudantes:
+  - maicena
+  - harina de arroz
+  - almidon de papa
+  - chuno
+  - polvo de hornear
+  - bicarbonato

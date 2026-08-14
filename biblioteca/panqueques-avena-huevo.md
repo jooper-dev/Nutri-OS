@@ -1,74 +1,76 @@
 ---
 id: panqueques-avena-huevo
-titulo: Panqueques de avena
+tipo: base
+titulo: Panqueques de cereal
 subtitulo:
 edad_min_meses: 12
-porciones: 4
-unidades_por_porcion: 2
-medida_porcion: 
-tiempo_min: 20
-dificultad: Fácil
 momento: [desayuno]
 componente: acompanante
 familia: huevo
 textura: blanda
 aporta: [fibra, proteina]
-alergenos_presentes: [huevo, gluten]
-etiquetas: [sin-azucar-anadida]
-conservacion:
-  ambiente_dias: 0
-  refri_dias: 3
-  congelador_meses: 2
+alergenos_posibles: [huevo, gluten]
 origen: creada
 validada_en_cocina: false
+acento: "#F2C4A0"
 variante_foto: F
 props_foto:
-acento: "#F2C4A0"
 ---
 
-# Panqueques de avena
+# Base · Panqueques de cereal
 
-+12 m · 4 porc. (2 uds. c/u) · 20 min · Fácil
+Masa de harina de cereal, fruta madura aplastada y ligante, cocida en sartén
+seca hasta que la superficie queda mate y esponjosa.
 
-sin azucar anadida
+Es una de las bases que más viaja: aguanta la lonchera, se come con la mano y
+admite casi cualquier harina.
 
-## Nota de la Nutricionista
+## Técnica
 
-Suaves, ligeramente dulces por el plátano y con ese aroma a avena tostada que llena la cocina. Se comen con la mano, que a cierta edad es media batalla ganada.
+Se aplasta la fruta madura hasta que no queda ni un trozo reconocible —un grumo
+de plátano dentro de un panqueque es una mota, y la mota devuelve el plato—. Se
+mezcla con el ligante y el líquido, se incorpora la harina y se deja reposar
+unos minutos para que hidrate. Se cuece a fuego medio en sartén apenas
+engrasada, se voltea cuando la superficie pierde el brillo, y se retira en
+cuanto la segunda cara toma color.
 
-## Ingredientes
+Fuego medio, no alto: a fuego alto la cara se tuesta con el centro crudo.
 
-• **1 taza** harina de avena · 100 g
-• **1** plátano maduro
-• **2** huevos medianos
-• **½ taza** agua · 120 ml
-• **1 cdta** aceite · 5 ml
+## Esqueleto
 
-## Preparación
+• **Harina de cereal** (fibra, energía) — avena, quinua, arroz, trigo.
+• **Fruta madura aplastada** (dulzor, humedad) — plátano de seda, manzana
+  rallada, pera.
+• **Ligante** (estructura) — huevo, o una papilla espesa de almidón cuando el
+  huevo está excluido.
+• **Líquido** — agua, o la bebida vegetal que el paciente tolere.
+• **Leudante, opcional** — polvo de hornear.
+• **Grasa para la sartén** — una gota, apenas.
 
-01  **Aplasta** el plátano hasta que quede sin grumos.
-02  **Mezcla** con los huevos, la harina de avena y el agua.
-03  **Reposa** la masa 5 minutos.
-04  **Cocina** porciones pequeñas a fuego bajo, 2 minutos por lado.
+## Reglas de seguridad
 
-## Ideas
+• Fruta completamente aplastada. Ningún trozo reconocible.
+• Cocción completa por dentro, sobre todo si el ligante es huevo.
+• Sin azúcar añadida: la fruta madura ya la trae.
+• Templado, no caliente, si va a la lonchera.
 
-• Sin huevo → usa **2 cdas** de linaza molida en **6 cdas** de agua.
-• Sin plátano → usa **½ taza** de puré de manzana.
+## Qué resuelve la instanciación
 
-## Conservación
-
-Dura: 3 días refri · 2 congelador
+• Qué harina, y si lleva gluten o no.
+• Si el ligante es huevo o no, según alergias y cupo semanal de huevo.
+• Qué fruta, contra el repertorio de la ficha.
+• Porción, número y diámetro de las piezas.
 
 ## Foto
 
-Cuatro panqueques redondos de unos 8 cm de diámetro y algo más de un centímetro de grosor, apilados en dos torres de dos. Color dorado cálido con motas más oscuras de avena, bordes irregulares y ligeramente esponjosos, superficie mate. Sin sirope ni cobertura.
+Cuatro panqueques redondos de unos 8 cm de diámetro y algo más de un centímetro de grosor, apilados en dos torres de dos. Color dorado cálido y parejo, bordes irregulares y ligeramente esponjosos, superficie mate. Sin sirope ni cobertura.
 
 --- NOTA PARA PATY ---
 
-RECETA CREADA — sin probar en cocina. Receta semilla, generada para poner en marcha el motor de Nutri-OS. Valídala o reemplázala antes de usarla con una paciente real.
+BASE CREADA — la técnica no está probada en cocina. Parte del panqueque de casa.
 
-Correcciones: sin correcciones (no hubo fuente que auditar).
-Etiquetas asignadas: derivadas de la lista final de ingredientes, incluidas las opciones.
-Datos asumidos: conservación y rendimiento con valores estándar.
-Acento de color: #F2C4A0.
+Plausibilidad culinaria: precedente directo, y es de los alimentos que más
+aparece como aceptado en anamnesis de selectividad, sobre todo en lonchera.
+
+Alérgenos: la versión corriente lleva huevo y, si la harina es de avena o trigo,
+también gluten. Los dos están en `alergenos_posibles` por eso.

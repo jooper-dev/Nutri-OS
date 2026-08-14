@@ -1,62 +1,58 @@
 ---
 id: mazamorra-kiwicha
-titulo: Mazamorra de kiwicha
-subtitulo:
+tipo: base
+titulo: Mazamorra de grano andino
+subtitulo: Con puré de fruta
 edad_min_meses: 12
-porciones: 2
-unidades_por_porcion: null
-medida_porcion: ½ taza
-tiempo_min: 20
-dificultad: Muy fácil
 momento: [media_tarde, media_manana]
 componente: base
-familia: 
+familia:
 textura: humeda
 aporta: [hierro, fibra]
-alergenos_presentes: []
-etiquetas: [sin-gluten, sin-huevo]
-conservacion:
-  ambiente_dias: 0
-  refri_dias: 2
-  congelador_meses: 0
+alergenos_posibles: []
 origen: creada
 validada_en_cocina: false
+acento: "#EFC7C2"
 variante_foto: H
 props_foto:
-acento: "#EFC7C2"
 ---
 
-# Mazamorra de kiwicha
+# Base · Mazamorra de grano andino
 
-+12 m · 2 porc. (½ taza c/u) · 20 min · Muy fácil
+Grano andino cocido hasta espesar, integrado fuera del fuego con un puré de
+fruta liso.
 
-sin gluten · sin huevo
+## Técnica
 
-## Nota de la Nutricionista
+Se cuece el grano en agua, removiendo, hasta que espesa y el grano queda
+translúcido. Aparte se licúa la fruta hasta puré completamente liso —sin trozo
+ni hebra— y se integra **fuera del fuego**: la fruta cocida pierde la vitamina C
+que es justo lo que la pone ahí, junto al hierro del grano.
 
-Sedosa, de color cálido y con el punto justo de dulzor de la fruta. La kiwicha aporta hierro sin que nadie tenga que enterarse.
+La mezcla queda de un solo color y una sola textura. Si se distinguen dos
+cosas, no está integrada.
 
-## Ingredientes
+## Esqueleto
 
-• **4 cdas** kiwicha · 50 g
-• **1 taza** agua · 240 ml
-• **½ taza** papaya picada · 70 g
-• **1 pizca** de canela
+• **Grano andino** (hierro) — kiwicha, quinua, cañihua.
+• **Fruta rica en vitamina C** (absorción del hierro) — papaya, mango,
+  mandarina, fresa.
+• **Agua**.
+• **Aromática, opcional** — una pizca de canela.
 
-## Preparación
+## Reglas de seguridad
 
-01  **Cocina** la kiwicha en el agua 15 minutos, removiendo.
-02  **Licúa** la papaya hasta obtener un puré liso.
-03  **Integra** ambas preparaciones fuera del fuego.
+• Puré de fruta liso, sin hebra ni trozo.
+• La fruta entra fuera del fuego.
+• Sin lácteos alrededor de esta toma, por el hierro.
+• Servida tibia.
 
-## Ideas
+## Qué resuelve la instanciación
 
-• Sin kiwicha → usa **4 cdas** de hojuelas de quinua.
-• Sin papaya → usa **½ taza** de mango maduro.
-
-## Conservación
-
-Dura: 2 días refri
+• Qué grano y qué fruta, contra el repertorio de la ficha.
+• Espesor final.
+• Porción.
+• Si lleva aromática visible o ninguna.
 
 ## Foto
 
@@ -64,9 +60,11 @@ Mazamorra sedosa de color anaranjado suave, homogénea y sin grumos, con brillo 
 
 --- NOTA PARA PATY ---
 
-RECETA CREADA — sin probar en cocina. Receta semilla, generada para poner en marcha el motor de Nutri-OS. Valídala o reemplázala antes de usarla con una paciente real.
+BASE CREADA — la técnica no está probada en cocina. Parte de la mazamorra
+peruana, que ya se hace con fruta.
 
-Correcciones: sin correcciones (no hubo fuente que auditar).
-Etiquetas asignadas: derivadas de la lista final de ingredientes, incluidas las opciones.
-Datos asumidos: conservación y rendimiento con valores estándar.
-Acento de color: #EFC7C2.
+Plausibilidad culinaria: precedente directo — la mazamorra de fruta es plato
+corriente. El grano y la fruta no se juntan aquí solo para completar un perfil
+nutricional: se juntan porque la mazamorra de fruta ya existe y se come. Que
+además el hierro y la vitamina C se ayuden es una razón para elegir ESTA fruta
+entre las que ya iban, no la razón de que el plato exista.

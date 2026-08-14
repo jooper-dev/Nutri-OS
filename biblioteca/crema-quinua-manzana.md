@@ -1,73 +1,77 @@
 ---
 id: crema-quinua-manzana
-titulo: Crema de quinua
-subtitulo:
+tipo: base
+titulo: Crema de grano andino
+subtitulo: Con fruta cocida, opcional
 edad_min_meses: 6
-porciones: 2
-unidades_por_porcion: null
-medida_porcion: ½ taza
-tiempo_min: 25
-dificultad: Muy fácil
 momento: [desayuno]
 componente: acompanante
-familia: 
+familia:
 textura: humeda
 aporta: [proteina, fibra]
-alergenos_presentes: []
-etiquetas: [sin-gluten, sin-huevo]
-conservacion:
-  ambiente_dias: 0
-  refri_dias: 2
-  congelador_meses: 1
+alergenos_posibles: []
 origen: creada
 validada_en_cocina: false
+acento: "#F2E3B3"
 variante_foto: H
 props_foto:
-acento: "#F2E3B3"
 ---
 
-# Crema de quinua
+# Base · Crema de grano andino
 
-+6 m · 2 porc. (½ taza c/u) · 25 min · Muy fácil
+Grano andino cocido muy pasado hasta que revienta y espesa solo, con o sin
+fruta cocida integrada.
 
-sin gluten · sin huevo
+**La fruta es opcional y esa opcionalidad es el punto de esta base.** La versión
+con manzana es buena y la come mucha gente; a un niño que pide el grano solo y
+rechaza la mezcla se le sirve sin fruta, y sigue siendo la misma técnica.
 
-## Nota de la Nutricionista
+## Técnica
 
-Espesa, tibia y con el dulzor discreto de la manzana cocida. Es de esas cucharadas que se aceptan sin discusión en las mañanas frías.
+Se lava el grano frotándolo hasta que el agua sale limpia. Se cuece en agua
+abundante, removiendo, hasta que el grano revienta y la mezcla espesa por sí
+sola sin necesidad de almidón añadido. Si lleva fruta, va pelada y cocida
+aparte hasta deshacerse, y se integra fuera del fuego. Se termina con una gota
+de grasa, que redondea la textura en boca.
 
-## Ingredientes
+Si la ficha excluye la mezcla, la fruta no entra: **no se integra igualmente en
+cantidad pequeña «para que no se note»**. Eso es una estrategia de exposición y
+no se decide en una receta.
 
-• **4 cdas** quinua lavada · 60 g
-• **1** manzana pelada
-• **1 taza** agua · 240 ml
-• **1 cdta** aceite de oliva · 5 ml
+## Esqueleto
 
-## Preparación
+• **Grano andino** (proteína vegetal, fibra) — quinua, kiwicha, cañihua.
+• **Agua** — la cocción.
+• **Fruta cocida, opcional** (dulzor y fibra) — manzana, pera, membrillo.
+• **Grasa de acabado** — una cucharadita de aceite de oliva.
+• **Aromática entera, opcional** — canela en rama, retirada antes de servir.
 
-01  **Lava** la quinua frotándola bajo el agua hasta que no salga espuma.
-02  **Cocina** con la manzana en el agua, 20 minutos a fuego bajo.
-03  **Aplasta** hasta la textura que corresponda a la edad.
-04  **Integra** el aceite fuera del fuego.
+## Reglas de seguridad
 
-## Ideas
+• Lavado del grano hasta que el agua salga limpia. La saponina amarga.
+• Si el niño rechaza las mezclas, la base va **sin fruta**, no con menos fruta.
+• Toda aromática sale entera antes de servir.
+• Servida tibia, nunca caliente.
 
-• Sin manzana → usa **1** pera madura.
-• Sin quinua → usa **4 cdas** de hojuelas de kiwicha.
+## Qué resuelve la instanciación
 
-## Conservación
-
-Dura: 2 días refri · 1 congelador
+• **Si lleva fruta o no**, contra el repertorio y los rechazos de la ficha.
+• Qué grano y qué fruta concretos.
+• Porción y espesor final.
+• Si lleva dulzor añadido.
 
 ## Foto
 
-Crema espesa de quinua de color beige claro con puntos translúcidos de grano cocido y trozos deshechos de manzana algo más pálidos. Servida en un cuenco hondo de cerámica mate, superficie lisa con una ligera ondulación en el centro, sin brillo ni decoración.
+Crema espesa de quinua de color beige claro con puntos translúcidos de grano cocido, servida en un cuenco hondo de cerámica mate. Superficie lisa con una ligera ondulación en el centro, sin brillo ni decoración, sin canela espolvoreada.
 
 --- NOTA PARA PATY ---
 
-RECETA CREADA — sin probar en cocina. Receta semilla, generada para poner en marcha el motor de Nutri-OS. Valídala o reemplázala antes de usarla con una paciente real.
+BASE CREADA — la técnica no está probada en cocina. Parte de la crema de quinua
+de desayuno peruana.
 
-Correcciones: sin correcciones (no hubo fuente que auditar).
-Etiquetas asignadas: derivadas de la lista final de ingredientes, incluidas las opciones.
-Datos asumidos: conservación y rendimiento con valores estándar.
-Acento de color: #F2E3B3.
+Plausibilidad culinaria: precedente directo, con y sin fruta.
+
+Por qué sigue en la biblioteca: la versión con manzana **no es una mala receta**
+y es perfectamente válida para otro niño. Lo que estuvo mal fue servírsela sin
+adaptar a uno cuya anamnesis decía «quiere quinua sola». El error no era la
+receta: era que no había instanciación.

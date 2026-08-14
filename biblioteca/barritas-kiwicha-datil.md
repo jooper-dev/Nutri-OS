@@ -1,65 +1,63 @@
 ---
 id: barritas-kiwicha-datil
-titulo: Barritas de kiwicha
+tipo: base
+titulo: Barritas de grano inflado
 subtitulo:
 edad_min_meses: 24
-porciones: 6
-unidades_por_porcion: 1
-medida_porcion: 
-tiempo_min: 25
-dificultad: Fácil
 momento: [media_manana, media_tarde]
 componente: base
-familia: 
+familia:
 textura: seca
 aporta: [hierro, fibra]
-alergenos_presentes: [mani]
-etiquetas: [sin-gluten, sin-huevo, sin-azucar-anadida]
-conservacion:
-  ambiente_dias: 4
-  refri_dias: 5
-  congelador_meses: 2
+alergenos_posibles: [mani, frutos_secos, ajonjoli]
+contraindicado_si: [riesgo_disfagia]   # su propia regla de seguridad, en un campo que el motor sí lee
 origen: creada
 validada_en_cocina: false
+acento: "#F2E3B3"
 variante_foto: E
 props_foto:
-acento: "#F2E3B3"
 ---
 
-# Barritas de kiwicha
+# Base · Barritas de grano inflado
 
-+2 años · 6 porc. (1 uds. c/u) · 25 min · Fácil
+Grano andino inflado ligado con una pasta de fruta seca y una grasa untable,
+prensado en frío y cortado en barras.
 
-sin gluten · sin huevo · sin azucar anadida
+Sin horno: la estructura la da el prensado y el frío, no la cocción.
 
-## Nota de la Nutricionista
+## Técnica
 
-Crujientes, compactas y dulces por el dátil, nada más. Entran enteras en la lonchera y llegan al recreo sin desarmarse, que ya es mucho pedir.
+Se templa la pasta de fruta seca con la grasa untable hasta que se puedan
+mezclar sin esfuerzo, y se retira del fuego antes de que hierva. Se incorpora
+el grano inflado removiendo desde el fondo, hasta que no quede grano seco sin
+mojar. Se vuelca en un molde forrado y **se prensa fuerte** con el dorso de una
+cuchara: una barra poco prensada se deshace al cogerla. Se enfría en refri hasta
+que endurece y se corta con cuchillo grande, de un solo golpe por corte.
 
-## Ingredientes
+## Esqueleto
 
-• **2 tazas** kiwicha pop · 60 g
-• **100 g** pasta de dátiles
-• **3 cdas** mantequilla de maní · 45 g
-• **1 cdta** aceite · 5 ml
+• **Grano andino inflado** (hierro, crujido) — kiwicha pop, quinua pop, cañihua.
+• **Pasta de fruta seca** (dulzor, ligue) — dátil, pasa, higo.
+• **Grasa untable** (ligue, energía) — mantequilla de maní o mantequilla de
+  pecanas o mantequilla de almendras o pasta de ajonjolí.
+• **Aceite neutro** — una cucharadita, para que la mezcla no agarre.
 
-Necesitas también: molde rectangular, papel manteca.
+## Reglas de seguridad
 
-## Preparación
+• Prensado fuerte y corte en frío. Una barra que se desmorona deja trozos
+  sueltos duros, que es riesgo de atragantamiento.
+• Barra pequeña, de un bocado o dos.
+• **La grasa untable es siempre un alérgeno mayor**: maní o fruto seco. La
+  receta del paciente declara cuál lleva, con esas palabras.
+• Con riesgo de disfagia esta base no se usa: es seca, compacta y pegajosa a la
+  vez, que es el peor perfil de bolo posible.
 
-01  **Derrite** la pasta de dátiles con la mantequilla a fuego muy bajo.
-02  **Mezcla** con la kiwicha pop hasta cubrirla toda.
-03  **Presiona** la mezcla en un molde forrado.
-04  **Enfría** 2 horas y corta en barras.
+## Qué resuelve la instanciación
 
-## Ideas
-
-• Sin frutos secos → usa **3 cdas** de pasta de ajonjolí.
-• Sin dátil → usa pasta de pasas remojadas.
-
-## Conservación
-
-Dura: 4 días en frasco · 5 días refri · 2 congelador
+• Qué grano, qué fruta seca y **qué grasa untable** — y por tanto qué alérgeno
+  declara la receta.
+• Porción y tamaño de la barra.
+• Si la base es viable, dado el riesgo de disfagia.
 
 ## Foto
 
@@ -67,9 +65,14 @@ Cinco barras rectangulares de unos 9 por 3 cm y algo más de un centímetro de g
 
 --- NOTA PARA PATY ---
 
-RECETA CREADA — sin probar en cocina. Receta semilla, generada para poner en marcha el motor de Nutri-OS. Valídala o reemplázala antes de usarla con una paciente real.
+BASE CREADA — la técnica no está probada en cocina. Parte de la barra de cereal
+prensada en frío.
 
-Correcciones: sin correcciones (no hubo fuente que auditar).
-Etiquetas asignadas: derivadas de la lista final de ingredientes, incluidas las opciones.
-Datos asumidos: conservación y rendimiento con valores estándar.
-Acento de color: #F2E3B3.
+Plausibilidad culinaria: precedente en la barra de cereal casera corriente.
+
+Alérgenos — esto es lo que estaba mal y por qué la base lo declara así: la
+versión anterior de esta receta se etiquetaba «sin gluten · sin huevo · sin
+azúcar añadida» y llevaba mantequilla de maní **sin decirlo en ninguna parte**.
+Las etiquetas solo hablaban de ausencias. Ahora `alergenos_posibles` recoge maní
+y frutos secos, y la receta instanciada tiene que declarar por escrito el que
+lleve de verdad.

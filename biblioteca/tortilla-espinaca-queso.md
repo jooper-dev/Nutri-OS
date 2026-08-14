@@ -1,73 +1,73 @@
 ---
 id: tortilla-espinaca-queso
-titulo: Tortilla de espinaca
+tipo: base
+titulo: Tortilla de verdura y queso
 subtitulo:
 edad_min_meses: 12
-porciones: 2
-unidades_por_porcion: 1
-medida_porcion: 
-tiempo_min: 15
-dificultad: Muy fácil
 momento: [desayuno]
 componente: acompanante
 familia: huevo
 textura: blanda
 aporta: [proteina, hierro]
-alergenos_presentes: [huevo, lacteos]
-etiquetas: [sin-gluten]
-conservacion:
-  ambiente_dias: 0
-  refri_dias: 2
-  congelador_meses: 0
+alergenos_posibles: [huevo, lacteos]
 origen: creada
 validada_en_cocina: false
+acento: "#CDE3D2"
 variante_foto: A
 props_foto:
-acento: "#CDE3D2"
 ---
 
-# Tortilla de espinaca
+# Base · Tortilla de verdura y queso
 
-+12 m · 2 porc. (1 uds. c/u) · 15 min · Muy fácil
+Huevo batido con verdura muy picada y cocido en sartén hasta cuajar por
+completo, en pieza fina que se corta en porciones.
 
-sin gluten
+## Técnica
 
-## Nota de la Nutricionista
+Se pica la verdura muy fina y se saltea primero hasta que suelta su agua y se
+seca: la verdura cruda dentro del huevo suelta líquido al cuajar y la tortilla
+se rompe. Se bate el huevo, se le incorpora la verdura ya fría y, si lleva, el
+queso. Se cuaja a fuego medio en sartén de fondo grueso, se voltea con la ayuda
+de un plato y se termina por la otra cara.
 
-Dorada por fuera, tierna por dentro, y lista antes de que termine de calentar el agua del desayuno. La espinaca casi no se nota y aporta hierro justo donde hace falta.
+Fina, no gruesa. Una tortilla gruesa queda babosa en el centro.
 
-## Ingredientes
+## Esqueleto
 
-• **2** huevos medianos
-• **1 taza** espinaca picada · 30 g
-• **2 cdas** queso fresco rallado · 30 g
-• **1 cdta** aceite de oliva · 5 ml
+• **Huevo** (proteína) — la estructura entera de la base.
+• **Verdura de hoja o de color** (hierro, betacarotenos) — espinaca, acelga,
+  zapallito, zanahoria, brócoli.
+• **Queso, opcional** (sabor, calcio) — queso fresco rallado.
+• **Grasa** — aceite de oliva.
+• **Sal**.
 
-## Preparación
+## Reglas de seguridad
 
-01  **Saltea** la espinaca en el aceite hasta que reduzca.
-02  **Bate** los huevos y mézclalos con la espinaca y el queso.
-03  **Cocina** a fuego bajo 3 minutos por lado, tapada.
-04  **Corta** en porciones del tamaño de un bocado.
+• La verdura se saltea y se seca antes de entrar en el huevo.
+• Huevo completamente cuajado: nada líquido en el centro.
+• **En un niño con rechazo visual a las partículas, esta base es de las peores
+  candidatas**: la verdura picada dentro de una masa clara es exactamente el
+  patrón que dispara el rechazo. La instanciación tiene que verlo y descartarla,
+  no reducir el picado.
+• Si hay APLV o rechazo al queso, la base va sin queso.
 
-## Ideas
+## Qué resuelve la instanciación
 
-• Sin lácteos → usa **2 cdas** de palta aplastada.
-• Sin espinaca → usa acelga picada muy fina.
-
-## Conservación
-
-Dura: 2 días refri
+• Qué verdura, contra el repertorio de la ficha.
+• Si lleva queso o no.
+• Porción y grosor.
+• **Si la base es viable para este niño**, dado el patrón visual.
 
 ## Foto
 
-Una tortilla redonda de unos 14 cm de diámetro, cortada en cuatro porciones triangulares, con dos de ellas ligeramente separadas del conjunto para dejar ver el interior: masa de huevo cuajada de color amarillo pálido con hebras verdes de espinaca repartidas y motas blancas de queso fresco. Superficie superior levemente dorada y mate, bordes redondeados, sin brillo graso.
+Porción triangular de tortilla de huevo de un dedo de grosor, servida en un plato claro. Color amarillo dorado con la verdura visible en el corte. Superficie mate, bordes cuajados y firmes, sin salsa ni acompañamiento.
 
 --- NOTA PARA PATY ---
 
-RECETA CREADA — sin probar en cocina. Receta semilla, generada para poner en marcha el motor de Nutri-OS. Valídala o reemplázala antes de usarla con una paciente real.
+BASE CREADA — la técnica no está probada en cocina. Parte de la tortilla de
+verduras de casa.
 
-Correcciones: sin correcciones (no hubo fuente que auditar).
-Etiquetas asignadas: derivadas de la lista final de ingredientes, incluidas las opciones.
-Datos asumidos: conservación y rendimiento con valores estándar.
-Acento de color: #CDE3D2.
+Plausibilidad culinaria: precedente directo.
+
+Alérgenos: huevo siempre; lácteos solo si se instancia con queso. Los dos están
+en `alergenos_posibles`.

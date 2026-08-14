@@ -55,6 +55,18 @@ DIR_DATOS = RAIZ / "datos"
 DIR_PACIENTES = RAIZ / "pacientes"
 DIR_SALIDAS = RAIZ / "salidas"
 
+# Las tres carpetas de un paciente, por nombre, en un solo sitio.
+#
+#   fuentes_originales/  lo que Paty pasó, intacto y sin abrir jamás por el
+#                        pipeline. Un PDF de 88 páginas vive aquí y aquí se queda.
+#   fuentes/             el texto extraído por motor/ingesta.py, más el
+#                        inventario. Es LO ÚNICO que el pipeline lee.
+#   recetas/             las recetas ya instanciadas para este niño. Es lo que
+#                        se imprime, y el registro de lo que se entregó de verdad.
+DIR_ORIGINALES = "fuentes_originales"
+DIR_EXTRAIDAS = "fuentes"
+DIR_RECETAS_PACIENTE = "recetas"
+
 DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
 
 # Claves de primer nivel que puede llevar un protocolo.
@@ -142,6 +154,32 @@ COMPONENTES_SIN_FILTRO_TEXTURA = {"bebida", "grasa", "ensalada_grasa"}
 # variedad, incluido lo que no aparezca en ninguna de las dos: si mañana se
 # añade un componente y nadie se acuerda de clasificarlo, el sistema pecará de
 # exigente y lo dirá, que es el lado correcto por el que equivocarse.
+# Datos clínicos que no se imprimen sin decir de dónde salieron.
+#
+# La regla nació del primer caso real. El plan afirmaba en portada que «la
+# hemoglobina de junio no está en ninguna fuente», y era verdad: no estaba. Pero
+# nadie podía saber si eso significaba que el dato nunca existió, que vivía en un
+# archivo que se perdió al adjuntar, o que estaba en una de las 88 páginas que
+# nadie leyó entera. Las tres cosas se parecen mucho desde fuera y ninguna se
+# arregla igual.
+#
+# Con procedencia, cada número del front-matter dice su documento y su página, y
+# la pregunta se responde mirando la ficha. Sin ella, no se imprime: el dato se
+# lista como faltante, que es información y no un hueco.
+#
+# Solo entra aquí lo que es un hallazgo clínico. `semanas_plan` o `porciones` no:
+# el primero lo pide Paty en el chat y el segundo es aritmética sobre los otros.
+CAMPOS_CLINICOS_CON_PROCEDENCIA = (
+    "edad_meses",
+    "peso_kg",
+    "talla_cm",
+    "zscore_pt",
+    "zscore_te",
+    "diagnosticos",
+    "alergias",
+    "requerimiento_kcal",
+)
+
 COMPONENTES_SIN_EXIGENCIA_DE_VARIEDAD = {
     "carbohidrato",
     "base_energetica",
@@ -181,23 +219,47 @@ def leer_front_matter(ruta: Path) -> tuple[dict, str]:
 
 
 def normalizar(s: str) -> str:
-    """Minúsculas, sin tildes, sin espacios. Para comparar ids y familias."""
+    """Minúsculas, sin tildes, y un solo separador de palabra: el guion bajo.
+
+    El guion normal se convierte también, y eso no es cosmético. El sistema
+    compara «palabra completa» poniendo topes de guion bajo alrededor
+    (`coincide_rechazo`), de modo que rechazar `res` no pueda excluir **Fresa**.
+    Pero los ids de la biblioteca se escriben con guiones —`chifles-platano-
+    bellaco`—, y con el guion sin convertir ese id no contenía nunca `_bellaco_`:
+    la comparación fallaba en silencio y **un rechazo escrito en la ficha no
+    excluía la base que lo llevaba en el nombre**.
+
+    Es el mismo bug de los topes, del otro lado. Uno excluía de más y este
+    excluía de menos, que es el lado por el que hace daño: el alimento rechazado
+    llega al plato.
+    """
     s = unicodedata.normalize("NFD", str(s))
     s = "".join(c for c in s if unicodedata.category(c) != "Mn")
-    return s.strip().lower().replace(" ", "_")
+    return s.strip().lower().replace(" ", "_").replace("-", "_")
 
 
 def coincide_rechazo(rechazo: str, opcion: "Opcion") -> bool:
-    """¿El rechazo aparece como palabra o secuencia completa en la opción?"""
-    rechazo_normalizado = normalizar(rechazo)
-    if not rechazo_normalizado:
+    """¿El rechazo aparece como palabra o secuencia completa en la opción?
+
+    Tolera el plural de la última palabra —solo la «s», solo al final—, y hace
+    falta en las dos direcciones: la ficha escribe «frejol» y el catálogo dice
+    «Frejol castilla» y «Frejoles»; escribe «lenteja» y el catálogo dice
+    «Lentejas». Sin la tolerancia, un rechazo escrito en singular no excluía el
+    alimento escrito en plural, que es el lado por el que hace daño.
+
+    Lo que NO se toca es el tope: `res` sigue sin encontrar `Fresa`, porque los
+    guiones bajos siguen puestos alrededor.
+    """
+    r = normalizar_texto(rechazo)
+    if not r:
         return False
-    patron = f"_{rechazo_normalizado}_"
-    return any(
-        f"_{normalizar(valor)}_".find(patron) >= 0
-        for valor in (opcion.id, opcion.familia, opcion.nombre)
-        if valor
-    )
+    for valor in (opcion.id, opcion.familia, opcion.nombre):
+        if not valor:
+            continue
+        plano = f"_{normalizar_texto(valor)}_"
+        if f"_{r}_" in plano or f"_{r}s_" in plano:
+            return True
+    return False
 
 
 def comprobar_rango_edad(protocolo: dict, ficha: dict) -> tuple[str, str]:
@@ -452,6 +514,7 @@ class Opcion:
     aporta: list[str] = field(default_factory=list)
     textura: str = ""
     nunca_recomendar: bool = False
+    contraindicado_si: list[str] = field(default_factory=list)
     es_receta: bool = False
     validada_en_cocina: bool = False
     ruta: str = ""
@@ -491,6 +554,20 @@ class Opcion:
         # escrita en el catálogo para que no dependa de que alguien se acuerde.
         if self.nunca_recomendar:
             return False, "marcado 'nunca_recomendar' en el catálogo"
+        # Una base puede declarar en qué cuadro clínico no se usa. Las reglas de
+        # seguridad de una base son prosa —para quien cocina— y el motor no las
+        # lee: `contraindicado_si` es la parte de esa prosa que sí tiene que
+        # poder leer, porque decide si la base entra o no.
+        #
+        # Sin este campo pasó lo previsible: la base de barritas dice, con esas
+        # palabras, «con riesgo de disfagia esta base no se usa: es seca,
+        # compacta y pegajosa a la vez, que es el peor perfil de bolo posible»,
+        # y el ensamblador se la puso igual a un paciente con riesgo de disfagia
+        # declarado. La advertencia estaba escrita y no servía de nada.
+        for bandera in self.contraindicado_si:
+            if ficha.get(str(bandera)):
+                return False, f"contraindicada si «{bandera}»"
+
         if self.edad_min_meses > ficha["edad_meses"]:
             return False, f"edad mínima {self.edad_min_meses} m"
         alergias = {normalizar(a) for a in ficha.get("alergias") or []}
@@ -564,7 +641,26 @@ def cargar_alimentos_base() -> list[Opcion]:
 
 
 def cargar_biblioteca() -> tuple[list[Opcion], list[str]]:
-    """Lee /biblioteca/*.md. Devuelve (opciones, avisos)."""
+    """Lee /biblioteca/*.md. Devuelve (opciones, avisos).
+
+    Lo que hay en /biblioteca/ son BASES, no recetas terminadas. Una base es una
+    técnica más un esqueleto de ingredientes más sus reglas de seguridad
+    —«lenteja colada sin cáscara», «pescado de pulpa blanca dorado, sin vetas
+    oscuras»—, y **no se imprime nunca**.
+
+    El cambio no es de nomenclatura. Antes, cuando un requerimiento del paciente
+    coincidía con una receta de la biblioteca, el motor la metía tal cual, y así
+    fue como a un niño que en la anamnesis dice literalmente «no pan, ni pan con
+    palta» le salió el pan con palta en el plan. Paty nunca sirve una receta tal
+    cual: adapta porción, textura, ingredientes y presentación a cada niño.
+
+    Lo que se acumula y mejora entre pacientes es la técnica. El plato, no.
+
+    `alergenos_posibles` es lo que la técnica PUEDE traer según cómo se
+    instancie, y se usa para filtrar: una base que puede llevar huevo no se le
+    ofrece a un niño alérgico al huevo aunque exista una versión sin él, porque
+    el margen de error no compensa.
+    """
     opciones: list[Opcion] = []
     avisos: list[str] = []
     obligatorios = ("id", "titulo", "edad_min_meses", "componente")
@@ -583,18 +679,29 @@ def cargar_biblioteca() -> tuple[list[Opcion], list[str]]:
             avisos.append(f"{ruta.name}: faltan campos {', '.join(faltan)} — se omite.")
             continue
 
+        if str(meta.get("tipo") or "") != "base":
+            avisos.append(
+                f"{ruta.name}: no declara «tipo: base». Desde el rediseño de la "
+                f"biblioteca, /biblioteca/ guarda bases —técnica + esqueleto + reglas "
+                f"de seguridad—, no recetas terminadas; una receta terminada aquí "
+                f"volvería a servirse tal cual a un niño al que no se le adaptó. "
+                f"Se omite."
+            )
+            continue
+
         opciones.append(
             Opcion(
                 id=str(meta["id"]),
                 nombre=str(meta["titulo"]),
                 componente=str(meta["componente"]),
                 edad_min_meses=int(meta["edad_min_meses"]),
-                alergenos=meta.get("alergenos_presentes") or [],
+                alergenos=meta.get("alergenos_posibles") or [],
                 familia=str(meta.get("familia") or ""),
                 momento=meta.get("momento") or [],
                 aporta=meta.get("aporta") or [],
                 textura=str(meta.get("textura") or ""),
                 nunca_recomendar=bool(meta.get("nunca_recomendar", False)),
+                contraindicado_si=meta.get("contraindicado_si") or [],
                 es_receta=True,
                 validada_en_cocina=bool(meta.get("validada_en_cocina", False)),
                 ruta=str(ruta.relative_to(RAIZ)),
@@ -624,6 +731,123 @@ def cargar_ficha(carpeta_paciente: Path) -> dict:
 
     meta["_cuerpo"] = cuerpo
     return meta
+
+
+# ---------------------------------------------------------------------------
+# Alérgenos: de la lista de ingredientes a las etiquetas
+# ---------------------------------------------------------------------------
+#
+# Vive aquí, y no en el script que lo usa, porque ahora lo usan tres: revisar.py
+# audita la biblioteca, validar.py bloquea el render de una receta cuyo bloque
+# de alérgenos no cuadre con sus ingredientes, y la instanciación lo usa para
+# escribir el bloque en vez de adivinarlo.
+#
+# Que la misma pregunta —«¿qué alérgenos lleva esta lista de ingredientes?»— se
+# respondiera en dos sitios con dos códigos distintos es exactamente cómo la
+# avena acabó etiquetada de tres formas diferentes en tres recetas.
+
+
+def cargar_tabla_alergenos() -> dict:
+    ruta = DIR_DATOS / "alergenos_ingredientes.yaml"
+    if not ruta.exists():
+        raise ErrorNutriOS(
+            f"Falta {ruta.name}, que es la tabla de ingrediente → alérgeno.\n"
+            f"    Sin ella no se puede comprobar si una receta declara lo que lleva, "
+            f"y eso es lo único que separa a un niño alérgico de su alérgeno."
+        )
+    return yaml.safe_load(ruta.read_text(encoding="utf-8")) or {}
+
+
+def normalizar_texto(s: str) -> str:
+    """Como `normalizar`, pero para prosa: TODA puntuación separa palabras.
+
+    `normalizar` sirve para ids, donde solo hay letras, guiones y guiones bajos.
+    Una línea de ingredientes es otra cosa: lleva comas, paréntesis, asteriscos
+    de negrita y el punto medio de la métrica.
+
+    Sin esto, la coma se comía la comparación. `• **50 g** filete de pechuga de
+    pollo, sin piel` no contenía `_pollo_` —después de «pollo» venía una coma, no
+    un tope— y el sistema concluía que el pollo no estaba en el repertorio de un
+    niño que come pollo. Del mismo modo, `mantequilla de maní, de pecanas` no
+    activaba la excepción de lácteos y la receta salía declarando un alérgeno que
+    no lleva.
+
+    Los dos fallos son el mismo y son la otra cara del bug de `res`/`Fresa`: si
+    los topes son la herramienta, todo lo que separa palabras tiene que ser tope.
+    """
+    s = unicodedata.normalize("NFD", str(s))
+    s = "".join(c for c in s if unicodedata.category(c) != "Mn")
+    s = "".join(c if c.isalnum() else "_" for c in s.lower())
+    return re.sub(r"_+", "_", s).strip("_")
+
+
+def _con_topes(texto: str) -> str:
+    """La línea normalizada y con topes, para buscar palabras completas.
+
+    'mani' no puede encontrar 'manzana' ni 'mandarina', y 'res' no puede
+    encontrar 'fresa'. Por eso se compara con los guiones bajos puestos.
+    """
+    return "_" + normalizar_texto(texto) + "_"
+
+
+def lineas_ingredientes(cuerpo: str) -> list[str]:
+    """Las viñetas de la sección '## Ingredientes' de una receta."""
+    m = re.search(
+        r"^##\s+Ingredientes\s*$(.*?)(?=^##\s|\Z)",
+        cuerpo,
+        re.MULTILINE | re.DOTALL | re.IGNORECASE,
+    )
+    if not m:
+        return []
+    return [l.strip() for l in m.group(1).splitlines() if l.strip().startswith("•")]
+
+
+def alergenos_de_ingredientes(lineas: list[str], tabla: dict) -> set[str]:
+    """Qué alérgenos delatan estas líneas de ingredientes."""
+    hallados: set[str] = set()
+    for linea in lineas:
+        clave = _con_topes(linea)
+        for etiqueta, regla in tabla.items():
+            if any(_con_topes(x) in clave for x in (regla.get("excepciones") or [])):
+                continue
+            if any(_con_topes(t) in clave for t in (regla.get("terminos") or [])):
+                hallados.add(etiqueta)
+    return hallados
+
+
+# ---------------------------------------------------------------------------
+# Recetas instanciadas para un paciente
+# ---------------------------------------------------------------------------
+
+
+def cargar_recetas_instanciadas(carpeta_paciente: Path) -> tuple[dict[str, dict], list[str]]:
+    """Lee pacientes/<paciente>/recetas/*.md. Devuelve ({id_base: receta}, avisos).
+
+    Estas son las recetas que se imprimen. La biblioteca guarda bases —técnica,
+    esqueleto y reglas de seguridad—, y una base no se imprime nunca: lo que
+    llega al recetario es la base ya resuelta contra ESTE niño, con su porción,
+    su textura y sus ingredientes.
+
+    La clave del diccionario es el id de la base, porque es lo que el plan
+    escribe en `receta_id`.
+    """
+    directorio = carpeta_paciente / DIR_RECETAS_PACIENTE
+    recetas: dict[str, dict] = {}
+    avisos: list[str] = []
+    if not directorio.exists():
+        return recetas, avisos
+
+    for ruta in sorted(directorio.glob("*.md")):
+        if ruta.name.startswith("_"):
+            continue
+        try:
+            meta, cuerpo = leer_front_matter(ruta)
+        except ErrorNutriOS as e:
+            avisos.append(str(e))
+            continue
+        base = str(meta.get("base") or meta.get("id") or ruta.stem)
+        recetas[base] = {"meta": meta, "cuerpo": cuerpo, "ruta": ruta}
+    return recetas, avisos
 
 
 def huella_plan(ruta: Path) -> str:

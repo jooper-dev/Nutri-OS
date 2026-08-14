@@ -1,0 +1,24 @@
+Crea una fotografía gastronómica editorial para un recetario contemporáneo premium.
+
+SUJETO
+Un solo vaso de vidrio liso y pequeño, lleno casi hasta el borde, con una bebida opaca y homogénea de color beige claro con un fondo cálido de canela, del espesor de una leche vegetal algo densa. La superficie es lisa y mate, sin espuma, sin grumos y sin partículas ni motas oscuras en suspensión, y el líquido se ve del mismo color de arriba abajo, sin capas, sin sedimento en el fondo y sin nada flotando encima. Visto casi a la altura de la mesa, sobre una superficie clara y neutra. Sin rama de canela, sin clavo de olor, sin canela espolvoreada por encima, sin cañita, sin fruta, sin hojas y sin ningún adorno dentro ni alrededor del vaso. Servido en un vaso de vidrio liso y transparente, lleno hasta cerca del borde, con el color y la textura de la bebida claramente visibles.
+
+FORMATO
+A4 vertical, relación 210:297, full bleed.
+
+CÁMARA
+Ángulo bajo, casi a la altura del vaso, aproximadamente 15-25° sobre la superficie, para que la bebida se lea como un objeto vertical.
+
+COMPOSICIÓN
+El vaso ocupa el centro del encuadre en su mitad inferior, como único protagonista.
+A su alrededor, sobre la superficie, elementos sueltos relacionados con la receta —fruta cortada, hielo, hierbas— repartidos de forma dispersa y natural, algunos cortados por los bordes.
+Tercio superior limpio por encima del vaso.
+vaso de vidrio pequeño y liso, servido casi al borde
+
+FONDO
+Superficie clara y mate de beige durazno cálido #EBD3C0, sin horizonte marcado, tono suave pero perceptible.
+
+ILUMINACIÓN
+Luz difusa lateral que atraviese parcialmente el vaso y revele la transparencia y la condensación. Sombras suaves, sin reflejos duros ni brillos especulares intensos.
+
+Genera exclusivamente la fotografía base. No incluyas texto, iconos, líneas, gráficos, logos ni elementos de maquetación.

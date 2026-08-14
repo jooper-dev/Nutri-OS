@@ -1,63 +1,58 @@
 ---
 id: paletas-mango-papaya
-titulo: Paletas de mango
+tipo: base
+titulo: Paletas de fruta
 subtitulo:
 edad_min_meses: 12
-porciones: 4
-unidades_por_porcion: 1
-medida_porcion: 
-tiempo_min: 15
-dificultad: Muy fácil
 momento: [media_manana, media_tarde]
 componente: base
-familia: 
+familia:
 textura: humeda
 aporta: [vitamina_c, betacarotenos]
-alergenos_presentes: []
-etiquetas: [sin-gluten, sin-huevo, sin-azucar-anadida]
-conservacion:
-  ambiente_dias: 0
-  refri_dias: 0
-  congelador_meses: 2
+alergenos_posibles: []
 origen: creada
 validada_en_cocina: false
-variante_foto: I
-props_foto:
 acento: "#F2C4A0"
+variante_foto: I
+props_foto: moldes de paleta con palito de madera
 ---
 
-# Paletas de mango
+# Base · Paletas de fruta
 
-+12 m · 4 porc. (1 uds. c/u) · 15 min · Muy fácil
+Fruta madura licuada hasta puré liso, con un ácido que le levante el sabor,
+congelada en molde.
 
-sin gluten · sin huevo · sin azucar anadida
+El frío anestesia un poco la boca, y en aversión oral eso a veces abre la puerta
+a una fruta que a temperatura ambiente se rechaza. Ese es el papel de esta base.
 
-## Nota de la Nutricionista
+## Técnica
 
-Frías, intensamente frutales y de ese color naranja que se ve desde la puerta de la cocina. Se hacen en quince minutos y salvan cualquier tarde de calor.
+Se licúa la fruta bien madura, sin agua añadida —el agua da hielo, no paleta—,
+hasta puré completamente liso. Se cuela si la fruta tiene hebra. Se añade el
+ácido, se llena el molde dejando un dedo libre porque al congelar crece, y se
+congela al menos seis horas.
 
-## Ingredientes
+Para desmoldar, agua templada por fuera del molde tres segundos. Nunca tirando.
 
-• **1** mango maduro
-• **1 taza** papaya picada · 140 g
-• **2 cdas** jugo de naranja · 30 ml
+## Esqueleto
 
-Necesitas también: moldes para paletas.
+• **Fruta madura** (vitaminas, dulzor) — mango, papaya, fresa, plátano de seda.
+• **Ácido** (levanta el sabor) — jugo de naranja, mandarina o limón.
+• **Colado, si la fruta tiene hebra** — mango y papaya lo agradecen.
 
-## Preparación
+## Reglas de seguridad
 
-01  **Pela** y pica la fruta en trozos parejos.
-02  **Licúa** hasta obtener un puré sin hilos.
-03  **Reparte** en los moldes y congela 4 horas.
+• Puré liso y colado. Una hebra congelada es dura.
+• Sin azúcar añadida.
+• Palito de madera bien insertado y molde adecuado a la edad: una paleta que se
+  suelta del palito en la boca es un riesgo de atragantamiento.
+• Con riesgo de disfagia, la paleta se ofrece deshecha en cuchara, no entera.
 
-## Ideas
+## Qué resuelve la instanciación
 
-• Sin mango → usa **1 taza** de durazno maduro.
-• Sin papaya → usa **1** plátano maduro.
-
-## Conservación
-
-Dura: 2 congelador
+• Qué frutas, contra el repertorio de la ficha.
+• Porción y tamaño del molde.
+• Si va en paleta o en cuchara.
 
 ## Foto
 
@@ -65,9 +60,7 @@ Cuatro paletas heladas de fruta, de color naranja intenso y opaco, de forma rect
 
 --- NOTA PARA PATY ---
 
-RECETA CREADA — sin probar en cocina. Receta semilla, generada para poner en marcha el motor de Nutri-OS. Valídala o reemplázala antes de usarla con una paciente real.
+BASE CREADA — la técnica no está probada en cocina. Parte de la paleta de fruta
+casera.
 
-Correcciones: sin correcciones (no hubo fuente que auditar).
-Etiquetas asignadas: derivadas de la lista final de ingredientes, incluidas las opciones.
-Datos asumidos: conservación y rendimiento con valores estándar.
-Acento de color: #F2C4A0.
+Plausibilidad culinaria: precedente directo.

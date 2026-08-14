@@ -1,72 +1,80 @@
 ---
 id: trufas-garbanzo-cacao
-titulo: Trufas de garbanzo
+tipo: base
+titulo: Trufas de menestra y cacao
 subtitulo:
 edad_min_meses: 24
-porciones: 6
-unidades_por_porcion: 2
-medida_porcion: 
-tiempo_min: 20
-dificultad: Fácil
 momento: [media_tarde]
 componente: base
-familia: 
+familia:
 textura: blanda
 aporta: [fibra, hierro]
-alergenos_presentes: [mani]
-etiquetas: [sin-gluten, sin-huevo]
-conservacion:
-  ambiente_dias: 0
-  refri_dias: 5
-  congelador_meses: 2
+alergenos_posibles: [mani, frutos_secos, ajonjoli]
 origen: creada
 validada_en_cocina: false
+acento: "#D7D3E0"
 variante_foto: E
 props_foto:
-acento: "#D7D3E0"
 ---
 
-# Trufas de garbanzo
+# Base · Trufas de menestra y cacao
 
-+2 años · 6 porc. (2 uds. c/u) · 20 min · Fácil
+Menestra cocida y bien seca, procesada con cacao, una pasta de fruta seca y una
+grasa untable, hasta masa moldeable. Se forma en bolas y se enfría.
 
-sin gluten · sin huevo
+## Técnica
 
-## Nota de la Nutricionista
+Se escurre la menestra a fondo y se seca con papel: el agua que le quede sale
+después y la masa no toma cuerpo. Se procesa con el resto hasta que la masa es
+completamente homogénea y no se distingue un solo trozo de grano —esta base vive
+o muere en ese punto—. Se forma en bolas del tamaño de una cereza con las manos
+frías y ligeramente aceitadas, y se enfrían al menos una hora antes de servir.
 
-Densas, achocolatadas y con textura de trufa de verdad. Nadie que las prueba adivina que empiezan con un puñado de garbanzos cocidos.
+Si al procesar la masa queda grumosa, se sigue procesando. No se compensa con
+más grasa.
 
-## Ingredientes
+## Esqueleto
 
-• **1 taza** garbanzo cocido · 160 g
-• **3 cdas** mantequilla de maní · 45 g
-• **2 cdas** cacao sin azúcar · 15 g
-• **60 g** pasta de dátiles
+• **Menestra cocida** (fibra, hierro) — garbanzo, frejol blanco, pallar.
+• **Cacao sin azúcar** (sabor) — el que da la identidad de la base.
+• **Pasta de fruta seca** (dulzor, ligue) — dátil, pasa.
+• **Grasa untable** (textura, ligue) — mantequilla de maní o mantequilla de
+  pecanas o mantequilla de almendras o pasta de ajonjolí.
 
-## Preparación
+## Reglas de seguridad
 
-01  **Escurre** los garbanzos y sécalos con papel.
-02  **Procesa** todo hasta obtener una masa homogénea.
-03  **Forma** bolitas del tamaño de una cereza.
+• Masa completamente homogénea. Un trozo de garbanzo reconocible en una trufa
+  es exactamente lo que un niño con rechazo visual busca al inspeccionar.
+• Bola pequeña, blanda, de un bocado.
+• **La grasa untable es siempre un alérgeno mayor**, y la de ajonjolí también.
+  La receta del paciente declara cuál lleva.
+• El cacao lleva algo de cafeína: cantidad pequeña y no cerca de la noche.
 
-## Ideas
+## Qué resuelve la instanciación
 
-• Sin frutos secos → usa **3 cdas** de pasta de ajonjolí.
-• Sin dátil → usa **1** plátano maduro bien aplastado.
-
-## Conservación
-
-Dura: 5 días refri · 2 congelador
+• Qué menestra y **qué grasa untable** — y por tanto qué alérgeno se declara.
+• Porción y número de piezas.
+• Cuánto dulzor.
 
 ## Foto
 
-Seis bolitas de unos 3 cm de diámetro, de color marrón chocolate oscuro y superficie mate y ligeramente rugosa, alineadas en hilera. Una de ellas partida por la mitad, mostrando un interior denso y homogéneo del mismo tono. Sin envoltorio ni cobertura brillante.
+Ocho bolitas de unos 2,5 cm de diámetro, mate y de color marrón oscuro parejo, agrupadas sobre un plato claro sin tocarse. Superficie lisa y sin brillo, sin cobertura ni espolvoreado. Una partida por la mitad deja ver un interior compacto y homogéneo del mismo tono, sin trozos reconocibles.
 
 --- NOTA PARA PATY ---
 
-RECETA CREADA — sin probar en cocina. Receta semilla, generada para poner en marcha el motor de Nutri-OS. Valídala o reemplázala antes de usarla con una paciente real.
+BASE CREADA — la técnica no está probada en cocina. Parte de la trufa de fruta
+seca prensada, sustituyendo parte de la fruta seca por menestra cocida.
 
-Correcciones: sin correcciones (no hubo fuente que auditar).
-Etiquetas asignadas: derivadas de la lista final de ingredientes, incluidas las opciones.
-Datos asumidos: conservación y rendimiento con valores estándar.
-Acento de color: #D7D3E0.
+Plausibilidad culinaria: **es la base más discutible de la biblioteca y la dejo
+con esa advertencia escrita.** La bola de fruta seca y grasa untable tiene
+precedente corriente; la menestra dentro no lo tiene en cocina peruana de casa.
+Funciona —el garbanzo procesado con cacao da una masa de textura correcta— pero
+no es un plato que nadie haga por costumbre. La dejo porque no falla ninguno de
+los tres criterios de plausibilidad de forma clara, y porque el garbanzo aquí no
+está para «completar un perfil»: está haciendo de masa. Si al probarla en cocina
+no convence, esta es la primera que yo quitaría.
+
+Alérgenos: la versión anterior se etiquetaba «sin gluten · sin huevo» y llevaba
+mantequilla de maní sin declararlo. Además sugería «sin frutos secos → usa pasta
+de ajonjolí», que es una sustitución que cambia un alérgeno por otro sin avisar.
+Los tres están ahora en `alergenos_posibles`.
