@@ -2,12 +2,82 @@
 
 *Documento de traspaso. Léelo entero antes de tocar nada. Recoge decisiones ya tomadas y sus razones, para que no haya que rediscutirlas.*
 
-Última actualización: 13 de agosto de 2026, tras el **primer caso real** (Haziel
-S. G. F., 4 a 6 m) y la tanda de correcciones que destapó.
+Última actualización: 15 de agosto de 2026, tras reescribir **la capa que
+compone el plan**. La tanda anterior (13/08) arregló la capa de recetas.
 
 ---
 
-## 0. Lo que cambió tras el primer caso real
+## 0. Lo que cambió al reescribir la estructura del plan (15/08/2026)
+
+El Encargo 3 arregló las recetas y no tocó el generador, y ahí estaba la mayoría
+de los errores. Auditado el plan real de Haziel contra las fuentes salieron 21
+hallazgos, y ninguno era culpa de una receta: eran de composición de la comida,
+tipado de los slots, reglas de hierro y capa sensorial.
+
+**Siete cambios de fondo:**
+
+1. **Los componentes del protocolo pasan a ser slots tipados.** Cada uno declara
+   un PAPEL y un conjunto cerrado de **roles** aceptados; cada alimento y cada
+   base declaran los suyos. Un alimento llena un slot solo si tiene uno de esos
+   roles, y en una comida ocupa exactamente uno. Esta sola regla —R-0— habría
+   bloqueado tres de los siete desayunos auditados: la crema de quinua es cereal
+   y ocupó el sitio de la proteína; los bastones de papa son tubérculo y ocuparon
+   el mismo. El plan salía con dos cereales y ninguna proteína.
+
+2. **Capa de datos sensorial.** Cada alimento lleva `demanda_oral` (N0–N5),
+   `carga_visual` (V0–V3), `textura_mixta`, `grano_base`, `base_botanica`,
+   `unidad_natural`, `requiere_preparacion_segura`, `rasgos_visuales` y los
+   marcadores de hierro, vitamina C y calcio. Sin esos campos ninguna regla se
+   puede evaluar, así que fueron lo primero.
+
+3. **`motor/reglas.py`: el catálogo de reglas por ID.** R-0 a R-12, R-Fe1 a
+   R-Fe5, T-1 a T-10, V-1 a V-6, O-1, O-3, O-5 e I-1. El validador rechaza por
+   ID y no por una frase. El criterio de cada una vive en `prompts/P2_PLAN.md`,
+   con la misma numeración: **el generador piensa, el validador verifica**.
+
+4. **Prohibido lo genérico (R-11).** «Fruta picada», «Ensalada», «Pescado, 50 g
+   en crudo» y todo lo que se sirviera como «1 porción» quedan fuera: no dicen
+   qué alimento son, no se pueden contrastar contra una lista de exclusiones que
+   nombra especies, y la madre no los puede ejecutar sin preguntar. El catálogo
+   nombra ahora corbina, perico y lenguado en vez de «pescado», tallarín verde y
+   rojo en vez de «fideos», y la ensalada mezclada se partió en verdura de un
+   color más la grasa nombrada aparte.
+
+5. **La unidad la define el alimento, nunca la plantilla del slot (R-12).** De
+   ahí salieron «Uva cortada a lo largo, ½ unidad mediana» —media uva no existe
+   como porción— y «Granola de kiwicha, ¾ taza (180 ml)», que rinde cinco
+   cucharadas de sólido seco. Y el formato de preparación segura se imprime en la
+   grilla (O-5): la madre lee la grilla, no el recetario, a las siete.
+
+6. **La generalización aversiva filtra por rasgo, no por lista (T-6).** La ficha
+   declara «puntos negros» y el sistema retira el kiwi, la fresa entera, la uva
+   con pepa, la granola y los granos reventados **aunque nadie los haya nombrado
+   nunca**. Un sistema que filtra por lista siempre va un paso atrás del niño: la
+   lista se escribe con lo que ya rechazó, y el siguiente rechazo nunca está.
+
+7. **La imagen deja de pertenecer a la receta y pasa a pertenecer al aspecto.**
+   Con las recetas instanciadas por paciente, la misma base produce platos
+   distintos: la foto se busca por **firma visual** —base, formato final,
+   ingredientes que se ven, carga visual— y nunca se muestra una que no coincida.
+   El render ya no genera ninguna imagen: las pide.
+
+**Y tres cosas que el plan hacía y ahora no puede hacer:**
+
+- **Quitar el alimento seguro.** El ancla ocupa su propio slot, se sirve todos
+  los días y está exenta de toda regla de variedad (T-10, V-5). En el plan
+  auditado la quinua desapareció 8 de 14 días, sustituida por yogurt, paletas,
+  trufas y galletas.
+- **Modificar un tratamiento en curso.** `intervenciones_activas` en la ficha, e
+  I-1 en el validador. El plan bajó el yogurt diario a tres veces por semana **y**
+  le cambió el producto, porque no había dónde registrar que era una
+  intervención.
+- **Emitir un recetario que no corresponde al plan.** El render se niega a
+  escribir si la grilla y el recetario no coinciden pieza por pieza. Antes el
+  plan decía «Trufas de pecana» y el recetario imprimía una receta con maní.
+
+---
+
+## 0b. Lo que cambió tras el primer caso real (13/08/2026)
 
 El caso salió con un 7 sobre 10 de la nutricionista. Cinco cambios de fondo:
 
@@ -87,18 +157,29 @@ CLAUDE.md          orquestador: las fases y dónde pararse
 GUIA_PATY.md       manual de uso, sin nada técnico
 ESTADO.md          este archivo
 
-prompts/           PC_CLINICO (F1) · P1_RECETAS v4.3 (F3)
-protocolos/        un .yaml por tipo de plan — estructura y frecuencias
+prompts/           PC_CLINICO (F1) · P1_RECETAS (F3/F4b) · P2_PLAN (criterio)
+protocolos/        un .yaml por tipo de plan — comidas, gramática de slots,
+                   presupuesto sensorial, frecuencias y rotaciones
 reglas_exclusion/  restricciones por edad, con evidencia
-biblioteca/        una receta por archivo; crece con el uso
-  prompts_imagen/  prompt de foto por receta (generado)
-  imagenes/        la foto de cada receta (una vez y para siempre)
-datos/             alimentos base · biblioteca de fotografía · consultas.csv
-motor/             revisar · ensamblar · validar · fotos · generar_imagenes
-                   render · registrar · metricas · migrar_textura · correr
+biblioteca/        una BASE por archivo; crece con el uso
+  prompts_imagen/  prompt de foto por receta (desalineado, ver 7.3c)
+  imagenes/        fotos indexadas por firma visual + _manifiesto.yaml
+datos/             alimentos base · conceptos aversivos · despensa ·
+                   alérgenos · biblioteca de fotografía · consultas.csv
+motor/             revisar · ensamblar · reglas · firma_visual · validar
+                   render · recetas_paciente · parada_clinica · ingesta
+                   registrar · metricas · respaldar · correr
 pacientes/         casos reales — FUERA de git
 salidas/           metricas.html
 ```
+
+**Las tres piezas que hay que entender antes de tocar el motor:**
+
+- `datos/alimentos_base.yaml` — los tags. Sin ellos ninguna regla se evalúa.
+- `protocolos/*.yaml` · bloque `gramatica` — qué roles acepta cada slot. Es lo
+  que decide si un alimento cabe en una comida.
+- `motor/reglas.py` — el catálogo por ID. Su criterio está en `prompts/P2_PLAN.md`,
+  con la misma numeración.
 
 **Fases:** F0 entrada por chat (el sistema crea la carpeta y guarda el material) → F1 lectura clínica (modelo) → F2 ensamblaje (código) → F3 recetas nuevas (modelo, contexto limpio por receta) → F4 validación (código) → F5 render, **fotografía incluida** (código) → **F6 Puerta de Paty (humano, sobre los PDF)** → F7 registro.
 
@@ -148,8 +229,15 @@ Esto es un MVP y va a cambiar en cuanto Paty lo use de verdad. Casi todos sus pe
 | Lo que pide | Dónde se toca |
 |---|---|
 | Porciones y reparto calórico por comida | la ficha del paciente y `prompts/PC_CLINICO.md` |
+| Un alimento que el niño no come | `rechazos` de la ficha |
+| Un alimento nuevo que quiere probar | `exposiciones_planificadas` de la ficha, con su semana |
+| Que el niño ya tolera algo más duro | `perfil_sensorial.nivel_oral_actual` de la ficha |
+| Que un tratamiento en curso no se toque | `intervenciones_activas` de la ficha |
 | Estructura del día, frecuencias, rotaciones | el `.yaml` del protocolo |
+| Qué roles acepta un slot | bloque `gramatica` del protocolo |
+| Cuánto puede exigir una comida | bloque `presupuesto_sensorial` del protocolo |
 | Alimentos nuevos | `datos/alimentos_base.yaml` |
+| Un rasgo aversivo que no existe todavía | `datos/conceptos_aversivos.yaml` |
 | Recetas nuevas | P1, y aterrizan en `biblioteca/` |
 | Un entregable nuevo (p. ej. una guía de implementación para la familia) | plantilla HTML + CSS nuevos en `motor/plantillas/`, llamados desde `render.py` |
 | Estilo visual de los PDF | `motor/plantillas/*.css` |
@@ -213,8 +301,50 @@ Ensambla, valida sin errores y tiene sus dos PDF (`--caras`), ya **con las seis 
 
 El motor las ignora y el validador solo avisa:
 
-- `max_recetas_nuevas_semana` (selectividad) — relevante clínicamente: en selectividad severa la novedad es el riesgo.
+- `max_recetas_nuevas_semana` (selectividad) — relevante clínicamente: en selectividad severa la novedad es el riesgo. Lo que sí está implementado es el otro lado: T-8 limita a **una** exposición de alimento nuevo por semana.
 - `introduccion_progresiva`, `progresion_textura`, `exclusiones_duras` (protocolo de ablactancia).
+
+### 7.3b Reglas de la Capa v2 que se quedaron en criterio, y por qué
+
+No están en `motor/reglas.py` a propósito. Las tres primeras no son comprobables
+sobre un plan terminado; la cuarta se construye en vez de verificarse:
+
+- **R-6 (objetivo calórico declarado)** y **R-8 (techo de fibra)** exigen estimar
+  el aporte de cada comida, y el sistema no tiene tabla de composición: hoy las
+  kcal se reparten en la ficha, por componente y a mano. Meterlas como regla sin
+  esa tabla sería un número inventado con aspecto de comprobación.
+- **R-7 (densidad sobre volumen)** es un criterio de desempate entre dos opciones
+  equivalentes, no una propiedad del plan. Vive en el prompt y en el puntaje del
+  ensamblador, que prefiere la de mayor `densidad_kcal` a igualdad de todo.
+- **T-9 (progresión por evidencia)** es una decisión de Paty entre controles: los
+  techos suben cuando el nivel actual se acepta ≥80 % durante dos semanas, y eso
+  el motor no lo puede saber. Está documentada en la ficha y en P2_PLAN.
+- **V-4 (redistribución proporcional)** no se verifica: se construye, en el
+  reparto de rotaciones de `ensamblar.py`.
+- **V-7 (cinco colores de vegetal y fruta por semana)** está en el prompt y no en
+  el código: hoy el catálogo no tiene campo de color, y añadirlo para una sola
+  regla cuando el repertorio de este perfil son dos verduras sería rigor puesto
+  donde no protege a nadie.
+
+### 7.3c Fotografía: los dos scripts sueltos están desalineados
+
+`motor/fotos.py` y `motor/generar_imagenes.py` indexan por identificador de
+receta, y el recetario busca por **firma visual**. Una imagen guardada como
+`biblioteca/imagenes/<id>.png` ya no la usa ningún recetario. Está avisado en la
+cabecera de los dos archivos.
+
+Alinearlos es trabajo pendiente y no urgente, porque hoy el flujo de fotografía
+es manual por decisión: el sistema pide las fotos y Paty decide cuáles se hacen.
+Lo que haría falta es que el prompt de imagen se construya desde la receta
+instanciada y se guarde con el nombre de su firma.
+
+### 7.3d Los casos que ya no ensamblan, y que tampoco ensamblaban antes
+
+`_EJEMPLO_Bebe` y `_BENCHMARK_Thiago` fallan con «Biblioteca insuficiente».
+**Comprobado con `git stash`: fallaban igual antes de esta tanda**, así que no es
+una regresión — es que la biblioteca no cubre la ablactancia y el repertorio de
+Thiago es de ocho alimentos con cuatro eliminados. Los dos mensajes dicen
+exactamente qué receta falta y dónde.
 
 ### 7.4 Hoja para el cuidador secundario
 

@@ -15,6 +15,18 @@ CLAVE DE API
         export GEMINI_API_KEY="..."          (macOS / Linux)
         setx GEMINI_API_KEY "..."            (Windows, reabrir la terminal)
 
+!!! DESALINEADO CON LA FIRMA VISUAL — LÉELO ANTES DE EJECUTARLO !!!
+
+Este script sigue indexando por identificador de receta, y desde el Encargo 4 el
+recetario busca las fotos por **firma visual** en biblioteca/imagenes/_manifiesto.yaml.
+Una imagen guardada aquí como `<id>.png` **no la va a usar ningún recetario**:
+el render solo muestra la foto cuya firma coincide con el aspecto del plato.
+
+Se conserva porque la biblioteca de prompts y la tabla de variantes siguen siendo
+útiles para preparar una sesión de fotos. Alinearlo con la firma visual está
+pendiente y anotado en ESTADO.md.
+
+
 Uso:
     python motor/generar_imagenes.py --todas
     python motor/generar_imagenes.py <carpeta_paciente>

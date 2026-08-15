@@ -68,12 +68,17 @@ Después de tu mensaje, y sin preguntarte nada más:
 4. **Revisa si faltan técnicas** para armar el plan y crea las que falten.
 5. **Arma el plan**, y después **adapta cada receta a este niño en concreto**:
    su porción, su textura, sus ingredientes. Ese paso es nuevo y es el importante.
-6. **Valida**, genera las fotos que falten y **saca los dos PDF**. Ahí se detiene
-   para que los revises.
+6. **Valida** y **saca los dos PDF**. Ahí se detiene para que los revises.
 
 Si la validación encuentra un error de verdad —una alergia en el plato, un
 alimento que ese niño rechaza, una cuenta que no cuadra—, **no genera nada** y te
 dice qué pasó. No hay PDF malo que se te pueda escapar.
+
+Hay una cosa que verás a veces en el informe y que **no es un error**: un
+**hueco declarado**. Significa que en ese sitio del día no había ningún alimento
+que cumpliera a la vez todo lo que este niño necesita, y el sistema prefirió
+dejarlo escrito antes que rellenarlo con cualquier cosa. Te dice qué falta y qué
+receta lo resolvería. Es información para el próximo control, no un fallo.
 
 ---
 
@@ -154,24 +159,27 @@ por eso la última palabra es tuya: el sistema nunca entrega nada a nadie.
 
 ## Las fotos de las recetas
 
-Las recetas del recetario llevan fotografía, y **no tienes que pedirla**. Al
-generar los PDF, el sistema mira qué recetas del plan no tienen foto todavía y
-las consigue en ese momento. Es parte de hacer el recetario, no un paso aparte.
+**El sistema ya no inventa fotografías. Las pide.**
 
-La imagen queda guardada junto a la receta **para siempre**. La siguiente
-paciente que lleve esa misma receta la recibe con foto sin volver a generar nada,
-así que cada plan tarda menos que el anterior.
+Cada receta del recetario ocupa dos páginas: una portada y las instrucciones. Si
+hay una foto que corresponda a ese plato, la portada es la foto a página
+completa, con el nombre encima. Si no la hay —que hoy es lo normal—, la portada
+lleva el nombre del plato y tu nota en grande, y queda bien igual: no verás
+huecos ni recuadros vacíos.
 
-Si por lo que sea una foto no se puede generar —se cayó el servicio, se acabó la
-cuota—, **el recetario sale igual**: esa receta lleva una banda del color que le
-toca en vez de la fotografía, y te lo dice en una línea. Nunca vas a quedarte sin
-plan por una foto.
+Al generar los PDF, el sistema te dice **qué platos no tienen foto y cómo se ven**
+—«en bolitas, se ve la papa, un solo color»— y lo apunta en una lista. Esa lista
+es la que usaríamos si algún día decides hacer una sesión de fotos: tú eliges qué
+se retrata y cuándo.
 
-Si una foto no te convence, dilo y se rehace solo esa.
+**Por qué cambió.** Antes cada receta tenía su foto para siempre. Pero ahora cada
+receta se adapta a cada niño, y si cambian los ingredientes cambia el aspecto: la
+crema de quinua sola y la crema de quinua con manzana en trozos no se ven igual.
+Enseñarle a una madre la foto de un plato que no es el suyo es peor que no
+enseñarle ninguna. Ahora una foto solo se usa si el plato de esta receta se ve de
+verdad como el de la foto.
 
-Para que se generen hace falta una clave de la API de Google. Danny la configura
-una vez en la computadora y ya no se vuelve a tocar. **Nunca la escribas en un
-archivo ni la pegues en el chat**: si eso pasa, hay que cambiarla.
+Si algún día quieres una fotografía concreta, dilo y se prepara aparte.
 
 Esto es aparte de los recetarios que vendes. Aquellos siguen pasando por tu
 plantilla de Canva como siempre; esto es solo el anexo de cada paciente.

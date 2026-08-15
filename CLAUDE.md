@@ -68,13 +68,21 @@ Este sistema divide el trabajo así, y la división no es negociable:
 | Va a un modelo | Va a código |
 |---|---|
 | Leer el caso clínico | Contar frecuencias |
-| Escribir y auditar recetas | Filtrar por alergias y edad |
+| Escribir y auditar recetas | Filtrar por alergias, edad y rasgo aversivo |
+| Decidir el ancla, el reto y la exposición | Comprobar las reglas y rechazar por ID |
 | Redactar la voz de la marca | Validar el plan |
-| Describir el plato para la foto | Armar el prompt de imagen |
+| Describir el plato terminado | Calcular la firma visual |
 | — | Maquetar los PDF |
 
 **Nunca cuentes tú.** Si te descubres verificando "¿hay 3 menestras esta semana?",
 estás haciendo el trabajo del validador y lo vas a hacer peor. Ejecuta el script.
+
+**El generador piensa; el validador verifica.** Las reglas de composición y
+sensoriales —R-xx, T-xx, V-xx, O-xx— son criterio clínico y viven en
+`prompts/P2_PLAN.md`. Lo que vive en `motor/reglas.py` es la aritmética que dice
+si un plan las cumple, y rechaza por ID. Son la misma numeración a propósito:
+así una conversación sobre un plan se puede tener con una palabra —«tumba la T-4
+de este niño»— en vez de describiendo el párrafo entero.
 
 ---
 
@@ -149,8 +157,12 @@ Por **cada** base que use el plan:
 1. Conversación limpia, `prompts/P1_RECETAS.md` completo.
 2. Pasa el bloque `CONTEXTO:` con los datos de la ficha —edad, alergias,
    **rechazos**, **repertorio_aceptado**, porción del componente, diagnóstico,
-   momento, texturas y `riesgo_disfagia`— y la base de partida.
+   momento, texturas, `riesgo_disfagia` y el **perfil sensorial** (ancla,
+   concepto aversivo, techo oral y techo visual)— y la base de partida.
 3. Guarda la salida en `pacientes/[carpeta]/recetas/[id_de_la_base].md`.
+4. La receta instanciada declara su **firma visual** —`formato_final`,
+   `carga_visual` y el `aporte_visual` de cada ingrediente—. Sin ella no se le
+   puede asignar ninguna fotografía, y el render lo dirá.
 
 Esa carpeta es el registro de lo que se entregó de verdad, y es donde hay que
 mirar cuando el niño vuelva a consulta. Lo que se acumula entre pacientes son las
@@ -165,10 +177,21 @@ de plantilla sin resolver.
 
 ```bash
 python motor/validar.py [carpeta]
+python motor/validar.py [carpeta] --plan <otro_plan.json>   # auditar uno anterior
 ```
 
 Genera `reporte_qa.md`. Si sale **BLOQUEADO**, no continúes: los errores son
 aritméticos y siempre reales. Corrige la causa y vuelve a ensamblar.
+
+Los rechazos vienen **con su ID de regla** —`[R-2]`, `[T-6]`, `[V-1]`, `[O-3]`—.
+Cada uno significa algo concreto y está explicado en `prompts/P2_PLAN.md`; el
+mensaje del reporte dice además dónde y por qué. Cuando Paty diga «esta regla no
+aplica a este niño», lo que se toca es su ficha o el protocolo, nunca el plan.
+
+**Los huecos declarados no son errores.** Un slot que se quedó sin candidatos
+válidos sale como `[HUECO DECLARADO]` arriba del reporte, con qué reglas lo
+vaciaron y qué receta lo cerraría. Es una receta que hay que encargar, no un
+fallo que haya que tapar: un cereal ocupando el sitio de la proteína sí lo sería.
 
 ### F7 · Render
 
@@ -190,22 +213,32 @@ componente de ese protocolo.
 Usa `--caras` cuando Paty lo pida o cuando la semana venga muy cargada: es lo
 que ella hace a mano cuando la letra no se lee impresa.
 
-**Las fotos van dentro de este paso; no hay comando que recordar.** Antes de
-maquetar el recetario, el render mira qué recetas del plan no tienen imagen,
-escribe el prompt que falte y llama al generador. Nunca regenera una que ya
-exista: una imagen se hace **una sola vez en la vida de la receta** y la
-siguiente paciente que la lleve la recibe gratis.
+**Cada receta ocupa dos páginas: portada e instrucciones.** La portada es la foto
+a sangre con el nombre, la edad mínima y los alérgenos encima; y cuando no hay
+foto —que hoy es el caso normal— es una portada tipográfica con el nombre y la
+nota de la nutricionista en grande. Nunca se deja en blanco ni se rellena con un
+marcador.
 
-Si no hay clave o la API falla, el render **no se detiene**: avisa en una línea
-y esas recetas salen con su banda de color. Una fotografía no cuesta un plan.
-Los dos comandos sueltos siguen existiendo para trabajar la biblioteca entera
-—`motor/fotos.py --todas`, `motor/generar_imagenes.py --todas`— y
-`--sin-fotos` salta la generación en un render concreto.
+**El render no genera ninguna imagen. El sistema las pide, no las fabrica.**
+Cada receta instanciada tiene una **firma visual** —la base, el formato final,
+los ingredientes que se ven y la carga visual— y solo se usa la foto cuya firma
+coincide. Si no la hay, el render lo dice en una línea, describe qué habría que
+fotografiar y lo anota en `biblioteca/imagenes/_manifiesto.yaml`.
 
-**La clave de API vive en `.env` o en la variable de entorno `GEMINI_API_KEY`.**
-Si Paty te la escribe en el chat, no la guardes en ningún archivo, no la repitas
-en tus mensajes y dile que hay que rotarla: una clave que pasó por un chat ya
-está quemada.
+La razón es que las recetas se instancian por paciente: la misma base produce
+platos distintos para niños distintos, y una foto que no corresponde al plato es
+peor que ninguna foto. La crema de quinua sin fruta se ve igual para cualquier
+niño y comparte foto; la crema con manzana en trozos tiene otra firma y no puede
+heredarla.
+
+Qué se fotografía y cuándo lo decidís Paty y tú, aparte. `motor/fotos.py` y
+`motor/generar_imagenes.py` siguen ahí para preparar una sesión, pero **indexan
+por identificador de receta y no por firma**, así que lo que generen no lo va a
+usar ningún recetario hasta que se alineen. Está avisado en su cabecera.
+
+**Si Paty te escribe una clave de API en el chat**, no la guardes en ningún
+archivo, no la repitas en tus mensajes y dile que hay que rotarla: una clave que
+pasó por un chat ya está quemada.
 
 ### F6 · Puerta de Paty ⛔ — va después de F7
 
@@ -218,9 +251,11 @@ Preséntale, en el chat y en lenguaje llano:
 
 - **Lo que el reporte trae en «Léelo antes que nada», y va primero.** Ahí caen la
   parada clínica que no bloquea —selectividad extrema y su derivación—, los datos
-  clínicos que no están en ninguna fuente, y las **exposiciones planificadas**:
-  ingredientes nuevos que el plan introduce a propósito y que están pendientes de
-  su visto bueno, uno a uno. Si tumba uno, se vuelve a instanciar esa receta.
+  clínicos que no están en ninguna fuente, los **huecos declarados** con la receta
+  que haría falta para cerrarlos, y las **exposiciones planificadas**: alimentos
+  nuevos que el plan introduce a propósito, uno por semana como mucho, pendientes
+  de su visto bueno uno a uno. Si tumba uno, se retira de la ficha y se vuelve a
+  ensamblar.
 - Dónde están los dos PDF y qué trae cada uno.
 - El resumen del plan (paciente, semanas, protocolo, bases nuevas).
 - Los avisos del reporte traducidos, en particular las **sustituciones
