@@ -13,7 +13,7 @@ base_botanica: pollo
 grano_base: trigo
 demanda_oral: 3
 carga_visual: 1
-unidad_natural: "2 cuadraditos"
+unidad_natural: "4 cuadraditos"
 requiere_preparacion_segura: "cortada en cuadraditos de un bocado"
 hierro_hemo: true
 densidad_kcal: alta

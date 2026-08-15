@@ -12,7 +12,7 @@ roles: [tuberculo]
 base_botanica: yuca
 demanda_oral: 3
 carga_visual: 2
-unidad_natural: "3 bastones"
+unidad_natural: "6 bastones"
 densidad_kcal: alta
 tiempo_min: 30
 aporta: [energia, grasas_saludables]

@@ -10,16 +10,19 @@ Sin Canva, sin Google Slides, sin etiquetas {{ }} que reemplazar una por una.
 La "Leyenda de énfasis" de P1 la aplica la hoja de estilo: las cantidades y
 los verbos salen en negrita solos.
 
-Antes de maquetar el recetario, las recetas de este plan que no tengan foto la
-consiguen solas: prompt de imagen si falta y llamada al generador. No es un paso
-aparte que haya que recordar. Si no hay clave o la API falla, se avisa en una
-línea y esas recetas salen con su banda de color; el render no se detiene nunca
-por una fotografía.
+Cada receta ocupa DOS páginas: portada e instrucciones. La portada es la foto a
+sangre con el nombre, la edad mínima y los alérgenos encima; y cuando no hay
+foto —que hoy es el caso normal— es una portada tipográfica con el nombre y la
+nota de la nutricionista en grande. Nunca se deja en blanco ni se rellena con un
+marcador.
+
+**El render no genera ninguna imagen.** Usa la que corresponda a la firma visual
+de la receta, y si no hay, lo dice y sigue. El sistema pide fotos; no las
+fabrica.
 
 Uso:
     python motor/render.py <nombre_carpeta_paciente>
     python motor/render.py <carpeta> --caras       dos hojas por semana
-    python motor/render.py <carpeta> --sin-fotos   no genera imágenes
 """
 
 from __future__ import annotations
@@ -34,9 +37,9 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from weasyprint import CSS, HTML
 
+import firma_visual
 from comun import (
     DIAS,
-    DIR_BIBLIOTECA,
     DIR_PACIENTES,
     DIR_RECETAS_PACIENTE,
     ErrorNutriOS,
@@ -171,15 +174,17 @@ def _encabezado(cuerpo: str) -> tuple[str, str]:
     return stats, alergenos
 
 
-def leer_receta(rid: str, carpeta: Path) -> dict | None:
+def leer_receta(rid: str, carpeta: Path, paciente: str = "") -> dict | None:
     """La receta instanciada de este paciente. Nunca la base.
 
     Lo que se imprime vive en `pacientes/<paciente>/recetas/`, resuelto contra
     este niño. `/biblioteca/` guarda bases, y una base no se imprime jamás.
 
-    La fotografía sí se comparte: la técnica se ve igual instanciada para un
-    niño o para otro, así que la imagen sigue siendo del `base` y se genera una
-    sola vez en la vida de la técnica.
+    La fotografía ya NO se comparte por identificador de receta: se comparte por
+    **firma visual**. La misma base produce platos distintos para niños
+    distintos, y si cambian los ingredientes cambia el aspecto: la crema de
+    quinua sin fruta se ve igual para cualquier niño y puede heredar la foto,
+    pero la crema con manzana en trozos tiene otra firma y no puede.
     """
     ruta = carpeta / DIR_RECETAS_PACIENTE / f"{rid}.md"
     if not ruta.exists():
@@ -204,9 +209,36 @@ def leer_receta(rid: str, carpeta: Path) -> dict | None:
         if re.match(r"^\d{2}\s", l.strip())
     ]
 
-    imagen = DIR_BIBLIOTECA / "imagenes" / f"{base}.png"
+    # --- La foto, por firma visual y nunca por identificador ---------------
+    # Cuatro puertas, y las cuatro pueden decir que no: la receta no declara su
+    # firma, no hay foto para esa firma, el archivo no está, o la resolución no
+    # da para una página A4. En los cuatro casos la receta sale con portada
+    # tipográfica, que es el caso normal hoy y no la excepción.
+    imagen = None
+    firma = ""
+    motivo_sin_foto = ""
+    detalle: dict = {}
+    if firma_visual.completa(meta):
+        firma, detalle = firma_visual.calcular(meta)
+        ruta_img, motivo_sin_foto = firma_visual.imagen_de(firma)
+        if ruta_img is not None:
+            imagen = ruta_img.resolve().as_uri()
+        else:
+            firma_visual.registrar_pendiente(firma, detalle, meta, paciente)
+    else:
+        motivo_sin_foto = (
+            "la receta no declara `formato_final` ni `aporte_visual`, así que su "
+            "firma visual no se puede calcular y ninguna foto le corresponde"
+        )
+
+    foco_x, foco_y = firma_visual.punto_focal(firma) if firma else (0.5, 0.5)
+
     return {
-        "imagen": imagen.resolve().as_uri() if imagen.exists() else None,
+        "imagen": imagen,
+        "firma": firma,
+        "detalle_firma": detalle,
+        "motivo_sin_foto": motivo_sin_foto,
+        "foco": f"{foco_x * 100:.0f}% {foco_y * 100:.0f}%",
         "meta": meta,
         "stats": stats,
         # Nunca vacío: si la receta no declara alérgenos, se dice con todas las
@@ -226,52 +258,51 @@ def leer_receta(rid: str, carpeta: Path) -> dict | None:
 # ---------------------------------------------------------------------------
 
 
-def asegurar_fotos(plan: dict) -> None:
-    """Consigue la foto de las recetas de este plan que todavía no la tengan.
+def informe_de_fotos(recetas: list[dict]) -> None:
+    """Qué falta fotografiar, descrito para que alguien pueda hacerlo.
 
-    Vive aquí dentro y no en un comando suelto por una razón medida: un paso
-    opcional que hay que acordarse de ejecutar es un paso que no se ejecuta.
-    `generar_imagenes.py` existía, funcionaba y estaba documentado como
-    opcional — y en todo el MVP no se generó ni una sola imagen. Ahora el
-    recetario pide sus fotos solo, justo antes de maquetarse.
+    **El render ya no genera ninguna imagen.** El sistema las pide; no las
+    fabrica. Antes el recetario llamaba solo a la API justo antes de maquetarse
+    —lo que resolvía el problema de un paso opcional que nadie ejecutaba—, pero
+    con las recetas instanciadas por paciente eso significaba generar una foto
+    nueva por cada niño y por cada variante, y decidir sin criterio humano qué
+    plato se retrata.
 
-    Blindado de punta a punta: sin clave, sin red, con la API caída o con una
-    receta sin sección «Foto», se avisa en una línea y esa receta sale con su
-    banda de color. **Ninguna fotografía detiene un plan.** Por eso el `except`
-    es tan ancho: aquí un fallo inesperado tiene que costar una foto, nunca los
-    dos PDF que Paty está esperando.
+    Lo que hace ahora es dejar la lista escrita: qué firma visual no tiene foto,
+    de qué plato es y qué se ve en él. Los comandos sueltos siguen existiendo
+    para trabajar la biblioteca aparte.
     """
-    ids = list(plan.get("recetas_usadas") or [])
-    if not ids:
+    faltan = [r for r in recetas if not r["imagen"]]
+    if not faltan:
+        print(f"  ✓ fotos: las {len(recetas)} recetas tienen imagen para su firma visual")
         return
 
-    try:
-        from fotos import asegurar_prompts
-        from generar_imagenes import asegurar_imagenes
-
-        listos, avisos = asegurar_prompts(ids)
-        for a in avisos:
-            print(f"  ⚠ foto: {a}")
-        r = asegurar_imagenes(listos)
-    except Exception as e:  # noqa: BLE001 — ver el docstring
-        print(f"  ⚠ fotos: no se pudieron generar ({e}). El recetario sale con la banda de color.")
-        return
-
-    pendientes = len(ids) - len(r["saltadas"]) - len(r["hechas"])
-
-    if r["motivo"]:
+    print(
+        f"  · fotos: {len(faltan)} de {len(recetas)} receta(s) salen con portada "
+        f"tipográfica. No es un fallo: es que nadie ha fotografiado todavía ese "
+        f"plato con ese aspecto."
+    )
+    anotadas = 0
+    for r in faltan:
+        titulo = r["meta"].get("titulo", "?")
+        d = r.get("detalle_firma") or {}
+        if not r["firma"]:
+            # Sin firma no hay nada que encargar: la receta ni siquiera dice
+            # cómo se ve. Se pide el dato, no la foto.
+            print(f"      {titulo} · {r['motivo_sin_foto']}")
+            continue
+        anotadas += 1
+        se_ve = ", ".join(d.get("visibles") or []) or "nada distinguible"
         print(
-            f"  ⚠ fotos: no hay clave de API — {pendientes} receta(s) salen con la banda de "
-            "color. Pon GEMINI_API_KEY en .env y vuelve a renderizar."
+            f"      {titulo} · firma {r['firma']} · {r['motivo_sin_foto']}\n"
+            f"        qué fotografiar: {d.get('formato', '?')}, se ve {se_ve}, "
+            f"carga visual V{d.get('carga_visual', '?')}"
         )
-        return
-
-    if r["hechas"]:
-        print(f"  ✓ fotos: {len(r['hechas'])} nueva(s) · {len(r['saltadas'])} ya existían")
-    if r["fallidas"]:
-        print(f"  ⚠ fotos: {len(r['fallidas'])} fallaron y salen con la banda de color (error arriba)")
-    if r["sin_prompt"]:
-        print(f"  ⚠ fotos: sin prompt de imagen — {', '.join(r['sin_prompt'])}")
+    if anotadas:
+        print(
+            f"      {anotadas} firma(s) anotadas en "
+            f"{firma_visual.RUTA_MANIFIESTO.name} para fotografiar."
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -418,7 +449,7 @@ def _escribir_pdf(doc: str, destino: Path, hojas: list[CSS], base: str) -> None:
         ) from e
 
 
-def renderizar(nombre_carpeta: str, caras: bool = False, fotos: bool = True) -> list[Path]:
+def renderizar(nombre_carpeta: str, caras: bool = False) -> list[Path]:
     carpeta = DIR_PACIENTES / nombre_carpeta
     ruta_plan = carpeta / "plan.json"
     if not ruta_plan.exists():
@@ -516,14 +547,9 @@ def renderizar(nombre_carpeta: str, caras: bool = False, fotos: bool = True) -> 
     salidas.append(destino)
 
     # --- Recetario ----------------------------------------------------------
-    # Las fotos, antes de leer las recetas: `leer_receta` mira si el PNG existe,
-    # así que una imagen generada después no entraría en el PDF de esta corrida.
-    if fotos:
-        asegurar_fotos(plan)
-
     recetas, faltantes = [], []
     for rid in plan.get("recetas_usadas", []):
-        r = leer_receta(rid, carpeta)
+        r = leer_receta(rid, carpeta, plan.get("paciente", ""))
         (recetas.append(r) if r else faltantes.append(rid))
     if faltantes:
         print(
@@ -533,6 +559,7 @@ def renderizar(nombre_carpeta: str, caras: bool = False, fotos: bool = True) -> 
         )
 
     if recetas:
+        informe_de_fotos(recetas)
         recetas.sort(key=lambda r: r["meta"].get("titulo", ""))
         doc = env.get_template("recetario.html").render(p=plan, recetas=recetas)
         destino = carpeta / f"Recetario_{slug}.pdf"
@@ -561,15 +588,10 @@ def main() -> int:
         action="store_true",
         help="parte cada semana en dos hojas (Cara A: lun–jue · Cara B: vie–dom), con letra más grande",
     )
-    ap.add_argument(
-        "--sin-fotos",
-        action="store_true",
-        help="no genera las fotos que falten; las recetas sin imagen salen con su banda de color",
-    )
     args = ap.parse_args()
 
     try:
-        salidas = renderizar(args.paciente, caras=args.caras, fotos=not args.sin_fotos)
+        salidas = renderizar(args.paciente, caras=args.caras)
     except ErrorNutriOS as e:
         print(f"\n✗ {e}\n", file=sys.stderr)
         return 1

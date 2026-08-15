@@ -1,0 +1,138 @@
+# Manifiesto de imágenes — Nutri-OS
+#
+# Indexado por FIRMA VISUAL, no por receta: dos instancias que se ven
+# igual comparten foto, y dos que se ven distinto no pueden compartirla
+# aunque salgan de la misma base.
+#
+# Cada entrada registra qué receta y qué paciente originaron la foto, la
+# fecha, y el punto focal —en fracción de ancho y alto— para que el
+# recorte a página completa no parta el plato. Sin punto focal, recorte
+# centrado.
+#
+# Este archivo lo escribe motor/firma_visual.py y lo lee motor/render.py.
+# Las fotos se añaden a mano: el sistema las PIDE, no las fabrica.
+firmas:
+  1768f096a117:
+    archivo: null
+    base: compota-pera-avena
+    carga_visual: 0
+    formato: colado
+    paciente: Haziel S. G. F.
+    pedida_el: '2026-08-15'
+    receta: compota-pera-avena
+    se_ve:
+    - manzana
+    titulo: Compota de manzana
+  42697fd45568:
+    archivo: null
+    base: bocaditos-pescado-blanco
+    carga_visual: 1
+    formato: rebozado y horneado
+    paciente: Haziel S. G. F.
+    pedida_el: '2026-08-15'
+    receta: bocaditos-pescado-blanco
+    se_ve:
+    - corbina
+    titulo: Bocaditos dorados
+  51bb80f0e5bb:
+    archivo: null
+    base: panqueques-avena-huevo
+    carga_visual: 1
+    formato: en discos
+    paciente: Haziel S. G. F.
+    pedida_el: '2026-08-15'
+    receta: panqueques-avena-huevo
+    se_ve:
+    - harina de avena
+    titulo: Panqueques de avena
+  710d543dcf33:
+    archivo: null
+    base: quinua-licuada-manana
+    carga_visual: 0
+    formato: licuado y colado
+    paciente: Haziel S. G. F.
+    pedida_el: '2026-08-15'
+    receta: quinua-licuada-manana
+    se_ve:
+    - quinua
+    titulo: Quinua licuada
+  923bbfe21ca4:
+    archivo: null
+    base: mazamorra-kiwicha
+    carga_visual: 0
+    formato: colado
+    paciente: Haziel S. G. F.
+    pedida_el: '2026-08-15'
+    receta: mazamorra-kiwicha
+    se_ve:
+    - kiwicha
+    - fresa
+    titulo: Mazamorra de kiwicha
+  9ec6f563e81f:
+    archivo: null
+    base: hamburguesitas-lenteja
+    carga_visual: 1
+    formato: en discos
+    paciente: Haziel S. G. F.
+    pedida_el: '2026-08-15'
+    receta: hamburguesitas-lenteja
+    se_ve:
+    - lenteja
+    - camote
+    titulo: Hamburguesitas
+  d376a0cdefe4:
+    archivo: null
+    base: milanesa-pollo-horno
+    carga_visual: 1
+    formato: empanado y horneado
+    paciente: Haziel S. G. F.
+    pedida_el: '2026-08-15'
+    receta: milanesa-pollo-horno
+    se_ve:
+    - hojuelas de quinua molidas
+    titulo: Milanesa de pollo
+  de2eceb22ccb:
+    archivo: null
+    base: paletas-mango-papaya
+    carga_visual: 0
+    formato: congelado en molde
+    paciente: Haziel S. G. F.
+    pedida_el: '2026-08-15'
+    receta: paletas-mango-papaya
+    se_ve:
+    - fresa
+    titulo: Paletas de fresa
+  ed6f52d7b8a5:
+    archivo: null
+    base: muffins-zanahoria-avena
+    carga_visual: 1
+    formato: horneado en molde
+    paciente: Haziel S. G. F.
+    pedida_el: '2026-08-15'
+    receta: muffins-zanahoria-avena
+    se_ve:
+    - harina de avena
+    - zanahoria
+    titulo: Muffins de zanahoria
+  f41ad6a14ca5:
+    archivo: null
+    base: huevo-revuelto-liso
+    carga_visual: 0
+    formato: revuelto
+    paciente: Haziel S. G. F.
+    pedida_el: '2026-08-15'
+    receta: huevo-revuelto-liso
+    se_ve:
+    - huevo
+    titulo: Huevo revuelto liso
+  f5669deae0fe:
+    archivo: null
+    base: bolitas-tuberculo-carne
+    carga_visual: 1
+    formato: en bolitas
+    paciente: Haziel S. G. F.
+    pedida_el: '2026-08-15'
+    receta: bolitas-tuberculo-carne
+    se_ve:
+    - papa amarilla
+    titulo: Bolitas de papa y pollo

@@ -193,52 +193,148 @@ td.detalle .ref  { color: var(--cobre); font-size: 7.5pt; }
 
 /* --------------------------------------------------------- Recetario ---- */
 
-/* Página propia sin márgenes para que la fotografía sangre hasta el borde;
-   el aire lo pone el padding interno. */
-@page receta { size: A4 portrait; margin: 0; }
+/* Cada receta ocupa DOS páginas: portada e instrucciones.
+   La portada va sin márgenes para que la fotografía sangre hasta los cuatro
+   bordes; el aire lo pone el padding interno del rótulo. */
+@page cubierta { size: A4 portrait; margin: 0; }
+@page receta   { size: A4 portrait; margin: 16mm 14mm 18mm 14mm; }
+
+/* ---- Página 1 · portada ---- */
+
+.cubierta {
+  page: cubierta;
+  page-break-before: always;
+  page-break-after: always;
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  overflow: hidden;
+  background: var(--crema);
+}
+
+/* La foto a sangre, ocupando la cara entera. `object-fit: cover` recorta, no
+   estira, y `object-position` lo fija el punto focal declarado en el manifiesto:
+   la proporción de la página no coincide con la de una foto normal, así que va a
+   haber recorte, y el punto focal es lo que impide que ese recorte parta el
+   plato por la mitad. Sin punto focal, 50% 50%. */
+.cubierta .fondo {
+  position: absolute; top: 0; left: 0;
+  width: 210mm; height: 297mm;
+  object-fit: cover;
+}
+
+/* El degradado que garantiza contraste legible sobre cualquier fotografía.
+   Sin él, un nombre claro sobre un plato claro es un nombre que no se lee, y
+   eso convierte la portada en decoración. */
+.cubierta .velo {
+  position: absolute; left: 0; bottom: 0;
+  width: 210mm; height: 150mm;
+  background: linear-gradient(to bottom, rgba(36,55,78,0) 0%, rgba(36,55,78,.55) 45%, rgba(36,55,78,.88) 100%);
+}
+
+.cubierta .rotulo {
+  position: absolute; left: 0; bottom: 0;
+  width: 210mm;
+  padding: 0 24mm 26mm 24mm;
+}
+
+.cubierta.con-foto .rotulo { color: var(--crema); }
+
+.cubierta.con-foto h2 {
+  font-family: "Montserrat", "Carlito", sans-serif;
+  font-size: 34pt; font-weight: 600; line-height: 1.08;
+  color: var(--crema); margin: 0 0 2mm 0;
+}
+.cubierta.con-foto .subtitulo {
+  font-size: 13pt; color: rgba(251,248,243,.82); margin-bottom: 6mm;
+}
+.cubierta.con-foto .edad {
+  display: inline-block;
+  font-family: "Montserrat", "Carlito", sans-serif;
+  font-size: 9pt; font-weight: 600; letter-spacing: .16em;
+  padding: 1.6mm 4mm; margin-bottom: 4mm;
+  border: 1px solid rgba(251,248,243,.65); border-radius: 1mm;
+  color: var(--crema);
+}
+.cubierta.con-foto .alergenos {
+  font-size: 10pt; color: var(--crema);
+  padding: 2.5mm 4mm;
+  background: rgba(0,0,0,.34);
+  border-left: 3px solid var(--cobre-claro);
+}
+
+/* ---- Página 1 sin foto · portada tipográfica ----
+   Hoy este es el caso NORMAL, no la excepción: el sistema pide fotografías y no
+   las fabrica, así que la mayoría de las recetas llegan sin una. No se deja en
+   blanco ni se rellena con un marcador: se le da la página a lo único que ahí sí
+   tiene valor, que es el nombre del plato y la voz de la nutricionista. */
+.cubierta.tipografica { background: var(--crema); }
+.cubierta.tipografica .banda {
+  position: absolute; top: 0; left: 0;
+  width: 210mm; height: 46mm;
+}
+.cubierta.tipografica .rotulo {
+  position: absolute; top: 74mm; bottom: auto;
+  padding: 0 26mm;
+}
+.cubierta.tipografica .kicker {
+  font-size: 8.5pt; letter-spacing: .26em; text-transform: uppercase;
+  color: var(--cobre); margin-bottom: 6mm;
+}
+.cubierta.tipografica h2 {
+  font-family: "Montserrat", "Carlito", sans-serif;
+  font-size: 40pt; font-weight: 600; line-height: 1.06;
+  color: var(--azul); margin: 0 0 3mm 0;
+}
+.cubierta.tipografica .subtitulo {
+  font-size: 14pt; color: var(--tenue); margin-bottom: 12mm;
+}
+.cubierta.tipografica .nota-grande {
+  font-size: 15pt; line-height: 1.55; color: var(--tinta);
+  padding-left: 7mm; border-left: 2px solid var(--cobre-claro);
+  max-width: 140mm;
+}
+.cubierta.tipografica .pie {
+  position: absolute; left: 26mm; right: 26mm; top: 168mm;
+  padding-top: 4mm; border-top: 1px solid var(--linea);
+  font-size: 9.5pt; color: var(--tinta);
+}
+.cubierta.tipografica .pie .edad {
+  font-family: "Montserrat", "Carlito", sans-serif;
+  font-weight: 600; color: var(--cobre); letter-spacing: .1em;
+  margin-right: 5mm;
+}
+
+/* ---- Página 2 · instrucciones ---- */
 
 .receta {
   page: receta;
   page-break-before: always;
-  padding: 16mm 14mm 18mm 14mm;
+  /* Si la receta no cabe en una cara se reduce el interlineado antes que
+     partirla. Estos valores son el punto donde una receta de siete pasos con
+     nota, diez ingredientes e ideas entra entera. */
+  line-height: 1.38;
 }
-.receta.con-foto { padding-top: 0; }
 
-.receta .acento { height: 3mm; width: 100%; margin-bottom: 8mm; }
+.receta .cabecera { margin-bottom: 4mm; }
 
-/* La foto ocupa la banda superior de la página: la misma zona que la
-   biblioteca de prompts reserva limpia en la imagen generada.
-   Bajó de 82 a 68 mm por una razón medida, no estética: con 82 mm, una receta
-   con foto y siete pasos desbordaba la página por dos líneas, y lo que se iba a
-   la página siguiente era la última idea y el pie «Dura: …», solos. Recortar
-   14 mm de foto es lo que hace que la receta quepa entera, que es el objetivo
-   —si algo no cabe se reorganiza, nunca se corta—. El encuadre no se deforma:
-   `object-fit: cover` recorta, no estira. */
-.receta .foto {
-  height: 68mm; overflow: hidden;
-  margin: 0 -14mm 6mm -14mm;
-  width: calc(100% + 28mm);
-}
-.receta .foto img { width: 100%; height: 68mm; object-fit: cover; display: block; }
-
-.receta h2 {
+.receta h3.titulo {
   font-family: "Montserrat", "Carlito", sans-serif;
   font-size: 20pt; font-weight: 600; color: var(--azul);
-  margin: 0 0 1mm 0;
+  margin: 0 0 1.5mm 0;
 }
-.receta .subtitulo { font-size: 11pt; color: var(--tenue); margin-bottom: 3mm; }
 
 .receta .stats {
   font-size: 9pt; color: var(--azul); letter-spacing: .04em;
   padding: 2mm 0; border-top: 1px solid var(--linea); border-bottom: 1px solid var(--linea);
-  margin-bottom: 2mm;
 }
 
-.receta h3 {
+.receta h4 {
   font-family: "Montserrat", "Carlito", sans-serif;
   font-size: 8pt; font-weight: 600; letter-spacing: .18em;
   text-transform: uppercase; color: var(--cobre);
   margin: 4.5mm 0 2mm 0;
+  break-after: avoid; page-break-after: avoid;
 }
 
 .receta .nota-nutri {
@@ -284,38 +380,33 @@ td.detalle .ref  { color: var(--cobre); font-size: 7.5pt; }
   page-break-inside: avoid;
 }
 
-/* La cabecera de la receta —foto, título, stats y alérgenos— viaja junta.
-   Una receta no empieza si no caben su cabecera y sus primeras líneas. */
-.receta .foto,
-.receta .acento { break-after: avoid; page-break-after: avoid; }
-
-.receta h2,
-.receta .subtitulo,
-.receta .stats,
-.receta .alergenos {
+/* La cabecera viaja junta: una receta no empieza si no caben su título, sus
+   stats y sus primeras líneas. */
+.receta .cabecera,
+.receta h3.titulo,
+.receta .stats {
   break-after: avoid;
   page-break-after: avoid;
   break-inside: avoid;
 }
 
+/* Si la receta no cupiera en una cara pese al interlineado reducido, el corte
+   va por un límite natural: después de los ingredientes, y nunca a mitad de un
+   paso. Por eso el bloque de ingredientes es indivisible y la lista de pasos
+   puede fluir. */
+.receta .bloque-ingredientes { break-inside: avoid; page-break-inside: avoid; }
+
 /* El bloque de alérgenos. Ya no es una línea tenue de 7,5 pt al mismo nivel
    que un adorno: declara lo que la receta CONTIENE, y una madre tiene que
-   poder encontrarlo de un vistazo. */
-.receta .alergenos {
-  font-size: 8.5pt;
-  color: var(--tinta);
-  background: var(--crema-alt);
-  border-left: 3px solid var(--cobre);
-  padding: 2mm 3mm;
-  margin-bottom: 5mm;
-}
+   poder encontrarlo de un vistazo. En la maqueta nueva vive en la portada,
+   encima de la fotografía, que es donde primero se mira. */
+.cubierta .alergenos strong { font-weight: 600; }
 
 /* El cierre de la receta —Ideas y el pie «Dura: …»— viaja como un bloque.
    La red de seguridad por si una receta futura vuelve a desbordar: lo que se
    iría a la página siguiente sería el cierre entero y no el pie solo, que es
    como se quedó huérfano ocupando una página él solo. */
 .receta .cierre { break-inside: avoid; page-break-inside: avoid; }
-.receta .alergenos strong { color: var(--azul); font-weight: 600; }
 
 .receta .nota-nutri { break-inside: avoid; page-break-inside: avoid; }
 

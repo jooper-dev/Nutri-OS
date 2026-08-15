@@ -98,9 +98,17 @@ def _items(plan: dict, con_huecos: bool = False):
                     yield s["semana"], dia, cid, item
 
 
-def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
+def validar(nombre_carpeta: str, ruta_alterna: str = "") -> tuple[Reporte, dict]:
+    """Comprueba el plan de ese paciente contra el protocolo y la ficha.
+
+    `ruta_alterna` permite pasar por el validador un plan que no es el vigente
+    —el de un control anterior, o uno guardado antes de un cambio de reglas—.
+    Sirve para lo que suena: comprobar si las reglas nuevas habrían cazado lo que
+    salió impreso la vez pasada. Un validador que no muerde sobre el plan que
+    produjo los errores no sirve de nada, y esta es la forma de comprobarlo.
+    """
     carpeta = DIR_PACIENTES / nombre_carpeta
-    ruta_plan = carpeta / "plan.json"
+    ruta_plan = Path(ruta_alterna) if ruta_alterna else carpeta / "plan.json"
     if not ruta_plan.exists():
         raise ErrorNutriOS(f"No existe {ruta_plan}. Ejecuta antes motor/ensamblar.py")
 
@@ -794,15 +802,26 @@ def escribir_reporte(carpeta: Path, r: Reporte, plan: dict) -> Path:
 def main() -> int:
     ap = argparse.ArgumentParser(description="Valida el plan ensamblado de un paciente.")
     ap.add_argument("paciente")
+    ap.add_argument(
+        "--plan",
+        default="",
+        help="ruta a otro plan.json del mismo paciente; útil para pasar por las "
+             "reglas de hoy un plan de un control anterior. No escribe reporte.",
+    )
     args = ap.parse_args()
 
     try:
-        r, plan = validar(args.paciente)
+        r, plan = validar(args.paciente, args.plan)
     except ErrorNutriOS as e:
         print(f"\n✗ {e}\n", file=sys.stderr)
         return 2
 
-    destino = escribir_reporte(DIR_PACIENTES / args.paciente, r, plan)
+    # Un plan alterno no sobrescribe el reporte del vigente: se está auditando
+    # otra cosa, y dejar su veredicto en reporte_qa.md haría que el renderizador
+    # maquetara un plan con el visto bueno de otro.
+    destino = (
+        None if args.plan else escribir_reporte(DIR_PACIENTES / args.paciente, r, plan)
+    )
 
     for d in r.destacados:
         print(f"  ‼ {d}")
@@ -815,7 +834,8 @@ def main() -> int:
         print(f"✓ Plan válido. {len(r.avisos)} aviso(s) para revisar.")
     else:
         print(f"✗ Plan BLOQUEADO: {len(r.errores)} error(es).")
-    print(f"  → {destino}")
+    if destino:
+        print(f"  → {destino}")
     return 0 if r.ok else 1
 
 

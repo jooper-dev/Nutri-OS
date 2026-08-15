@@ -13,7 +13,7 @@ base_botanica: quinua
 grano_base: quinua
 demanda_oral: 5
 carga_visual: 1
-unidad_natural: "2 galletas"
+unidad_natural: "3 galletas"
 hierro_no_hemo: true
 densidad_kcal: media
 tiempo_min: 80

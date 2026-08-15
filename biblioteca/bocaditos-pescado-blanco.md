@@ -12,7 +12,7 @@ roles: [proteina_animal]
 base_botanica: pescado_blanco
 demanda_oral: 3
 carga_visual: 1
-unidad_natural: "3 bocaditos"
+unidad_natural: "6 bocaditos"
 requiere_preparacion_segura: "sin espinas y sin vetas oscuras"
 hierro_hemo: true
 densidad_kcal: media

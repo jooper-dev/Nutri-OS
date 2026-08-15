@@ -14,6 +14,8 @@
     <tr><td class="k">Recetas</td><td class="v">{{ recetas|length }}</td></tr>
   </table>
 
+  {# Esta frase era falsa y ahora la garantiza el código: el render se niega a
+     emitir si la grilla y el recetario no coinciden pieza por pieza. #}
   <div class="aviso">
     Estas son las preparaciones que aparecen en el plan de {{ p.paciente }},
     ajustadas a su edad y a sus restricciones. Las cantidades del plan mandan
@@ -34,28 +36,63 @@
 </section>
 
 {% for r in recetas %}
-<section class="receta{{ ' con-foto' if r.imagen else '' }}">
+{# ---------------------------------------------------------------------------
+   PÁGINA 1 · PORTADA
+   Con foto: a sangre, ocupando la cara entera, y encima solo el nombre, la edad
+   mínima y las etiquetas de alérgeno sobre un degradado que garantiza contraste.
+   Sin foto: portada TIPOGRÁFICA con el nombre y la nota de la nutricionista en
+   grande. Ni en blanco ni con un marcador — mantiene el ritmo del documento y le
+   da sitio a lo único que ahí sí tiene valor. Hoy este es el caso normal.
+   --------------------------------------------------------------------------- #}
+<section class="cubierta{{ ' con-foto' if r.imagen else ' tipografica' }}">
   {% if r.imagen %}
-  <div class="foto"><img src="{{ r.imagen }}" alt=""></div>
+  <img class="fondo" src="{{ r.imagen }}" alt="" style="object-position: {{ r.foco }}">
+  <div class="velo"></div>
+  <div class="rotulo">
+    <h2>{{ r.meta.titulo }}</h2>
+    {% if r.meta.subtitulo %}<div class="subtitulo">{{ r.meta.subtitulo }}</div>{% endif %}
+    <div class="edad">+{{ r.meta.edad_min_meses }} m</div>
+    <div class="alergenos">{{ r.alergenos }}</div>
+  </div>
   {% else %}
-  <div class="acento" style="background: {{ r.meta.acento or '#D9A87E' }}"></div>
+  <div class="banda" style="background: {{ r.meta.acento or '#D9A87E' }}"></div>
+  <div class="rotulo">
+    <div class="kicker">Receta</div>
+    <h2>{{ r.meta.titulo }}</h2>
+    {% if r.meta.subtitulo %}<div class="subtitulo">{{ r.meta.subtitulo }}</div>{% endif %}
+    {% if r.nota %}<div class="nota-grande">{{ r.nota }}</div>{% endif %}
+    <div class="pie">
+      <span class="edad">+{{ r.meta.edad_min_meses }} m</span>
+      <span class="alergenos">{{ r.alergenos }}</span>
+    </div>
+  </div>
   {% endif %}
-  <h2>{{ r.meta.titulo }}</h2>
-  {% if r.meta.subtitulo %}<div class="subtitulo">{{ r.meta.subtitulo }}</div>{% endif %}
-  <div class="stats">{{ r.stats }}</div>
-  {# Siempre presente. Una receta sin bloque de alérgenos deja que el silencio
-     signifique dos cosas: «no lleva» y «nadie lo miró». #}
-  <div class="alergenos">{{ r.alergenos }}</div>
+</section>
 
-  {% if r.nota %}
-  <h3>Nota de la nutricionista</h3>
+{# ---------------------------------------------------------------------------
+   PÁGINA 2 · INSTRUCCIONES
+   La nota, los ingredientes, la preparación, las ideas y la conservación. Todo
+   en una cara. Si no cabe, el CSS reduce el interlineado antes que partir la
+   receta; y si aun así no cabe, se parte después de los ingredientes y nunca a
+   mitad de un paso.
+   --------------------------------------------------------------------------- #}
+<section class="receta">
+  <div class="cabecera">
+    <h3 class="titulo">{{ r.meta.titulo }}</h3>
+    <div class="stats">{{ r.stats }}</div>
+  </div>
+
+  {% if r.nota and r.imagen %}
+  <h4>Nota de la nutricionista</h4>
   <div class="nota-nutri">{{ r.nota }}</div>
   {% endif %}
 
-  <h3>Ingredientes</h3>
-  <ul>{% for i in r.ingredientes %}<li>{{ i|safe }}</li>{% endfor %}</ul>
+  <div class="bloque-ingredientes">
+    <h4>Ingredientes</h4>
+    <ul>{% for i in r.ingredientes %}<li>{{ i|safe }}</li>{% endfor %}</ul>
+  </div>
 
-  <h3>Preparación</h3>
+  <h4>Preparación</h4>
   <ol class="pasos">{% for s in r.pasos %}<li>{{ s|safe }}</li>{% endfor %}</ol>
 
   {# Ideas y el pie de conservación van dentro del mismo bloque para que no
@@ -63,7 +100,7 @@
      página él solo. #}
   <div class="cierre">
     {% if r.ideas %}
-    <h3>Ideas</h3>
+    <h4>Ideas</h4>
     <ul>{% for i in r.ideas %}<li>{{ i|safe }}</li>{% endfor %}</ul>
     {% endif %}
 

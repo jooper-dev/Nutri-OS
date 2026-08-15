@@ -12,7 +12,7 @@ roles: [proteina_animal]
 base_botanica: pollo
 demanda_oral: 4
 carga_visual: 2
-unidad_natural: "3 tiras"
+unidad_natural: "5 tiras"
 requiere_preparacion_segura: "cortado a través de la fibra, en tiras cortas"
 rasgos_visuales: [fibra_visible]
 hierro_hemo: true
