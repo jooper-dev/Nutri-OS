@@ -86,6 +86,34 @@ texturas_excluidas: []         # seca | crujiente | blanda | humeda | liquida | 
 riesgo_disfagia: false         # true si el paso del bolo por el esófago es un riesgo
 favoritos: [pollo, palta]
 
+perfil_sensorial:              # ver «El perfil sensorial» más abajo
+  hipersensibilidad: [visual, tactil_oral]
+  tono_oral: bajo              # bajo | tipico | alto
+  alimentos_ancla: [quinua-licuada-manana, papa]
+  concepto_aversivo: "puntos negros"
+  nivel_oral_actual: 3         # techo de HOY, N0–N5
+  nivel_visual_actual: 1       # techo de HOY, V0–V3
+
+intervenciones_activas:        # lo que ya está funcionando y NO se toca
+  - que: "yogurt de fresa diario"
+    alimento: yogurt_fresa     # el id exacto del catálogo
+    para: "estreñimiento normalizado"
+    frecuencia: diaria
+    franja: media_tarde
+    accion: NO_MODIFICAR
+
+suplementos:                   # van como fila de la grilla, con hora
+  - {nombre: "Kid Cal", dosis: "7.5 ml", horario: "en ayunas, 7:00",
+     separar_de: [lacteos], horas_separacion: 2}
+
+exposiciones_planificadas:     # alimentos nuevos, UNO por semana
+  naranja: {desde_semana: 1, porque: "…"}
+
+contexto_hogar:
+  cuidador_principal: madre
+  minutos_cocina_dia: 60
+  equipamiento: [horno, licuadora]
+
 antropometria_previa:          # controles anteriores, para juzgar la tendencia
   - {fecha: 2025-11-10, peso_kg: 21.8, talla_cm: 118}
 
@@ -148,6 +176,56 @@ bloqueantes: []                # lista de datos vitales ausentes; si NO está va
 
 - **`alergias_sospechadas`** son las menciones ambiguas sin documento («le cae mal la leche»). Ponerlas aquí **detiene el pipeline pidiendo la prueba**, y eso es deliberado: darle el alimento a un niño que reacciona es un evento adverso, y retirarle un grupo entero a un niño que no reacciona le hace daño de otra manera. El sistema no elige por Paty.
 
+---
+
+### El perfil sensorial — cinco campos que deciden si el plan se come
+
+Comer es una **tarea motora y sensorial**, no solo una entrega de nutrientes. Un plato puede tener el hierro perfecto y ser imposible de ejecutar para esa boca. Estos cinco campos son los que permiten que el motor diseñe la tarea y no solo el contenido; sin ellos, todas las reglas sensoriales quedan apagadas y el plan vuelve a salir correcto en el papel e incomible en la mesa.
+
+- **`alimentos_ancla`** es el alimento seguro: el piso sobre el que se sostiene toda la ingesta. Se sirve **todos los días**, ocupa su propio slot y no cuenta para ninguna regla de variedad.
+
+  **Escríbelo con el identificador exacto con que el sistema conoce el alimento** —`quinua-licuada-manana`, `papa`—, no con una categoría. Un ancla escrita como «quinua» marca media biblioteca: la quinua pop, la granola de quinua y las galletas de quinua pasarían a ser todas alimento seguro, que es justo lo contrario de lo que este campo significa.
+
+  Si la ficha declara un ancla que no existe en el catálogo, el pipeline **se detiene**: el slot quedaría vacío todos los días, y eso es exactamente lo que pasó cuando el alimento seguro desapareció 8 de 14 días de un plan real.
+
+- **`concepto_aversivo`** es **el rasgo, no la lista**. La selectividad sensorial no rechaza alimentos: rechaza rasgos, y un sistema que filtra por lista de alimentos siempre va un paso atrás del niño, porque la lista se escribe con lo que ya rechazó y el siguiente rechazo nunca está en ella.
+
+  Escrito «puntos negros», el sistema retira solo el kiwi, la fresa entera, la uva con pepa, la granola, los granos reventados y cualquier cosa moteada, espolvoreada o con vetas visibles, **aunque nadie las haya nombrado jamás en la anamnesis**.
+
+  La frase tiene que existir en `datos/conceptos_aversivos.yaml`, que es donde se traduce a rasgos. Si escribes una que no está, el validador se detiene: un concepto que no filtra nada es peor que no declararlo, porque hace creer que la aversión está contemplada.
+
+- **`nivel_oral_actual`** (N0–N5) y **`nivel_visual_actual`** (V0–V3) son **techos de hoy, no objetivos**. Suben por evidencia y no por calendario: un nivel sube cuando el actual se acepta en ≥80 % de las ocasiones durante dos semanas, y eso lo decide Paty en el control. Ante la duda, el más bajo: un techo bajo de más produce un plan aburrido, y uno alto de más produce un plan que no se come.
+
+  Las escalas completas están en `prompts/P2_PLAN.md`. En resumen: N0 líquido colado · N1 puré liso · N2 blando aplastable · N3 blando masticable · N4 firme o fibroso · N5 duro o crujiente. Y V0 monocromo · V1 un color con relieve · V2 piezas identificables separadas · V3 piezas de distinto color mezcladas.
+
+- **`tono_oral`** e **`hipersensibilidad`** encienden reglas concretas: `tactil_oral` es lo que hace que el sistema rechace las texturas mixtas —dos consistencias en el mismo bocado—, que es la categoría más rechazada en ese perfil y la más subestimada.
+
+### `intervenciones_activas` — el campo que más plan malo evita
+
+Cuando la historia dice que **el estreñimiento se normalizó desde que recibe yogurt a diario**, el yogurt dejó de ser un alimento de rotación y pasó a ser **un tratamiento en curso**. Ninguna regla de variedad puede bajarlo, y su modificación es rechazo del plan.
+
+Esto ya pasó y salió caro: el plan bajó el yogurt de diario a tres veces por semana **y** le cambió el producto —de «el que ya toma» a «yogurt natural»—, porque no había dónde registrar que aquello era una intervención. Se modificó un tratamiento que estaba funcionando, en frecuencia y en producto, sin que nadie lo decidiera.
+
+Escribe una entrada por cada cosa que ya esté funcionando: **qué** es, **para qué** —el efecto que se está consiguiendo—, con qué **frecuencia**, en qué **franja**, y el `alimento` con el id exacto del catálogo cuando el producto concreto importa. Si el producto importa y no lo escribes, el motor elegirá cualquiera de su familia.
+
+### `suplementos` — van a la grilla, no a una nota al pie
+
+Cada suplemento con su dosis, su hora y su separación de lácteos. **Lo que no está en la grilla, la madre no lo lee a las siete de la mañana:** en el primer caso real el «Kid Cal 7.5 ml en ayunas» vivía en el texto del enfoque y no aparecía en ninguna fila del horario.
+
+### `exposiciones_planificadas` — uno por semana, y los aprueba Paty
+
+Un alimento que no está en `repertorio_aceptado` **no entra en el plan** salvo que esté declarado aquí, con su porqué y con la semana en la que entra. Cada uno sale destacado en el reporte, pendiente del visto bueno de Paty.
+
+Es lo que impide que vuelva a aparecer una pavita ocho veces en catorce días sin que nadie la haya nombrado en la anamnesis. Y el límite de **uno por semana** no es burocracia: introducir un alimento nuevo ocho veces en dos semanas a un niño con selectividad no es exposición graduada, es saturación, y garantiza el rechazo.
+
+Una exposición se declara desde su semana y **se mantiene en el plan aunque se rechace**: la exposición sin presión es la intervención, no el consumo.
+
+### `contexto_hogar` — porque un plan que no se puede cocinar no es un plan
+
+`minutos_cocina_dia` acota el tiempo total de recetas nuevas de la semana. Si no lo sabes, **escríbelo como asunción y dilo en la Nota para Paty**: es preferible un número declarado y discutible a que la regla quede apagada y la semana pida 365 minutos de cocina sin que nadie lo vea.
+
+---
+
 - **`antropometria_previa`** son los controles anteriores que encuentres en las fuentes. Sin serie no se puede juzgar una tendencia, y la falla de medro —peso que cae o se estanca con la talla subiendo— solo se ve en la serie. Si es primera consulta, déjalo vacío y dilo.
 - **`porciones`** traduce el requerimiento calórico a medidas caseras ejecutables. Las llaves deben coincidir con los `componentes` del protocolo elegido. Sin corchetes, sin rangos: un valor concreto por componente.
 - **`protocolo_sugerido`** se elige por edad, salvo que el diagnóstico justifique otro. Si te apartas del protocolo por edad, explica por qué en la Nota para Paty — Paty tiene la última palabra.
@@ -208,6 +286,8 @@ Cierra con `--- NOTA PARA PATY ---` y, en este orden:
 3. **Discrepancias:** datos que aparecían con más de un valor, y cuál elegiste.
 4. **Dudas de alergia:** cualquier mención ambigua que hayas incluido por precaución, para que la confirmes o la retires.
 5. **Elección de protocolo:** por qué ese, y si te apartaste del criterio de edad.
+6. **Perfil sensorial:** de dónde sacaste el ancla, el concepto aversivo y los dos techos, y con qué frase de la anamnesis. Son cuatro decisiones que gobiernan el plan entero y Paty tiene que poder discutirlas una a una.
+7. **Exposiciones que propones**, si propones alguna: qué alimento, en qué semana y por qué ahora. Van marcadas como propuesta; las aprueba ella.
 
 ---
 

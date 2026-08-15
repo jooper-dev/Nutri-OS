@@ -196,6 +196,34 @@ textura: blanda                       # seca | crujiente | blanda | humeda | liq
 componente: acompanante               # qué ranura del protocolo llena (ver lista abajo)
 familia: huevo                        # subgrupo para reglas de frecuencia; vacío si no aplica
 aporta: [fibra, betacarotenos]        # nutrientes reales y defendibles
+
+# --- Capa 1 · los tags sobre los que operan las reglas del plan -----------
+# Sin ellos, ninguna regla se puede evaluar y la receta entra en el plan sin que
+# nadie haya podido comprobar si cabe en esa comida.
+roles: [proteina_animal, cereal]      # cereal | tuberculo | menestra | proteina_animal |
+                                      # proteina_vegetal | grasa | fruta | verdura |
+                                      # lacteo | bebida. En una comida ocupa UNO.
+base_botanica: huevo                  # de qué alimento sale, para la anti-redundancia
+grano_base: avena                     # si lleva cereal: avena | quinua | kiwicha |
+                                      # canihua | arroz | trigo | algarrobo. Vacío si no
+demanda_oral: 3                       # N0–N5, el trabajo que la boca tiene que hacer
+carga_visual: 1                       # V0–V3, cuánta información visual llega de golpe
+textura_mixta: false                  # true = dos consistencias en el mismo bocado
+unidad_natural: "2 unidades"          # la porción que rinde ESTA técnica. Es lo que se
+                                      # imprime en la grilla del plan, y por eso nunca
+                                      # puede ser «1 porción»
+requiere_preparacion_segura:          # el formato sin el cual no es segura. Si existe,
+                                      # LA GRILLA LO IMPRIME junto al nombre
+rasgos_visuales: []                   # qué VE el niño: semillas_visibles | moteado |
+                                      # grano_reventado | espolvoreado | vetas_visibles |
+                                      # cascara_visible | mezcla_heterogenea | fibra_visible
+hierro_no_hemo: false                 # marcadores para las reglas del hierro
+hierro_hemo: true
+vitamina_c: false
+calcio_alto: false
+fibra_alta: false
+densidad_kcal: media                  # baja | media | alta
+tiempo_min_base: 20                   # solo BASE: minutos de cocina, para el presupuesto
 alergenos_presentes: [gluten]         # gluten | lacteos | huevo | mani | frutos_secos | pescado | soya | ajonjoli | carne_mamifero
                                       # OBLIGATORIO y nunca ausente. Si no lleva ninguno: []
 exposicion_planificada:               # solo INSTANCIA; {ingrediente: justificación}
@@ -212,10 +240,28 @@ props_foto:                           # opcional: props concretos que pida el pl
 ---
 ```
 
+**En modo INSTANCIA se añade además el bloque de firma visual**, que es lo que decide qué fotografía le corresponde a este plato. Ver «La firma visual» más abajo.
+
+```yaml
+formato_final: en discos              # licuado | colado | en discos | en bastones |
+                                      # en bolitas | horneado en molde | revuelto | entero…
+carga_visual: 1                       # V0–V3 del plato terminado
+aporte_visual:                        # ingrediente → ninguno | color | pieza
+  harina de avena: color
+  plátano: ninguno
+  huevo: ninguno
+```
+
 Reglas del front-matter:
 - `momento` puede llevar varios valores; incluye todos los momentos donde la receta encaja de verdad. Este campo decide dónde puede colocarla el ensamblador del plan: si mientes aquí, el plan sale mal.
-- `componente` es la ranura exacta que la receta ocupa dentro del protocolo. Valores válidos: `cereal` · `acompanante` · `carbohidrato` · `proteina` · `proteina_hierro` · `menestra` · `base_energetica` · `verdura` · `ensalada_grasa` · `base` · `crujiente` · `fruta` · `fruta_vitc` · `grasa` · `bebida`. Un solo valor: si dudas entre dos, elige el papel principal que cumple en el plato.
-- `familia` agrupa recetas para las reglas de frecuencia del protocolo (`pescado`, `pollo`, `res`, `huevo`, `higado`, `menestra`, `yogurt`). Déjalo vacío si la receta no cae en ninguna familia regulada.
+- `componente` es la ranura exacta que la receta ocupa dentro del protocolo. Valores válidos: `cereal` · `acompanante` · `carbohidrato` · `proteina` · `proteina_hierro` · `menestra` · `base_energetica` · `verdura` · `base` · `crujiente` · `fruta` · `fruta_vitc` · `grasa` · `bebida`. Un solo valor: si dudas entre dos, elige el papel principal que cumple en el plato.
+- **`roles` es lo que decide si la receta cabe en un slot**, y no es lo mismo que `componente`. El componente dice de qué cajón del catálogo sale; el rol, qué papel cumple en la comida. Una crema de quinua tiene componente `cereal` y rol `cereal`: **no** es proteína aunque la quinua tenga proteína, y por escribirlo mal ocupó el sitio del acompañante proteico en tres desayunos seguidos, que salieron con dos cereales y nada más.
+
+  Escribe todos los roles que la receta pueda cubrir de verdad, pero recuerda que en una comida dada solo ocupa uno. Ante la duda, el papel principal: si el plato es un queque de harina de avena con zanahoria, es `cereal`, por mucho huevo que lleve la masa.
+- **`demanda_oral` y `carga_visual` no son decorativos: son el filtro que decide si este niño puede comerse el plato hoy.** Un componente por encima del techo del paciente no entra, salvo como reto declarado. Escribe lo que el bocado exige de verdad, no lo que convendría: una galleta es N5 aunque sea casera, y una granola es V3 aunque el color sea bonito.
+- **`rasgos_visuales` es lo que hace que la generalización aversiva funcione.** Declara lo que se VE, no lo que lleva: si el plato terminado tiene motas, pepitas, vetas o piezas mezcladas, se dice. Un plato bien etiquetado aquí queda fuera solo para los niños cuyo concepto aversivo lo alcanza, y disponible para todos los demás. Uno mal etiquetado llega al plato de quien no lo puede ni mirar.
+- **`unidad_natural` es lo que se imprime en la grilla del plan.** Nunca «1 porción», nunca una unidad copiada del slot. Es la porción que rinde la técnica —«2 unidades», «½ taza», «180 ml», «4 cuadraditos»— y tiene que cuadrar con lo que la receta produce de verdad: si la grilla dice «2 cuadraditos» y la receta rinde cuatro, el recetario y el plan están diciendo cosas distintas.
+- `familia` agrupa recetas para las reglas de frecuencia y las rotaciones del protocolo (`pescado`, `pollo`, `res`, `huevo`, `higado`, `menestra`, `yogurt`, `grano_andino`, `hojuelas`, `harinas`, `tuberculo`, `pasta`…). **Ya no sirve solo para las frecuencias: es también el cajón de las rotaciones**, así que una receta de `cereal` con el campo vacío solo puede entrar por degradación. Déjalo vacío únicamente cuando la receta no caiga en ningún cajón que algún protocolo nombre.
 - `aporta` alimenta la priorización clínica (anemia → hierro, estreñimiento → fibra). Solo nutrientes que los ingredientes sostienen de verdad.
 - `alergenos_presentes` se deriva de la lista final completa, incluidas opciones y Evolución. Es lo que usa el filtro de seguridad: **ante duda, incluye el alérgeno.** Un falso positivo descarta una receta; un falso negativo llega al plato de un niño alérgico. Dos precisiones que el sistema comprueba con `datos/alergenos_ingredientes.yaml`:
   - **`mani` va aparte de `frutos_secos`.** El maní es una leguminosa y en alergia pediátrica es otro alérgeno: la mantequilla de maní declara `mani`, la de almendras o anacardos declara `frutos_secos`.
@@ -337,9 +383,30 @@ Línea final, discreta — se consulta después de cocinar.
 
 Usa la casilla que corresponda al alimento real: si se guarda a temperatura ambiente (galletas secas, granolas), escribe `Dura: [X] días en frasco · [X] congelador`. Nunca mandes a la refrigeradora algo que se guarda en la mesa. Si no debe guardarse: `Dura: consumir el mismo día`.
 
-### 6) Foto *(sección interna — alimenta el prompt de imagen, no se imprime)*
+### 6) La firma visual *(front-matter — decide qué fotografía le corresponde)*
 
-Cierra el cuerpo con `## Foto` y **un solo párrafo** que describa el plato terminado, para que un generador de imágenes pueda fotografiarlo sin haberlo visto nunca.
+**La imagen no pertenece a la receta: pertenece al aspecto.** Antes cada receta tenía su foto enlazada por su identificador, pero desde que las recetas se instancian por paciente la misma base produce platos distintos para niños distintos: si cambian los ingredientes cambia el aspecto, y reutilizar la foto de la base sería enseñar una foto que no corresponde al plato.
+
+Dos instancias que **se ven igual** pueden compartir foto. Dos que se ven distinto, no. Y lo que determina el aspecto es exactamente esto, y nada más:
+
+    la base + el formato final + los ingredientes que se ven + la carga visual
+
+Por eso el front-matter de una instancia lleva tres campos que tienes que rellenar con cuidado:
+
+- **`formato_final`** — cómo queda el plato: `licuado`, `colado`, `en discos`, `en bastones`, `en bolitas`, `horneado en molde`, `revuelto`, `entero`… Descríbelo con las palabras que usarías al mirarlo, no con la técnica.
+- **`carga_visual`** — V0 a V3 del plato terminado.
+- **`aporte_visual`** — cada ingrediente con uno de estos tres valores:
+  - **`ninguno`** — desaparece en la preparación: agua, aceite, sal, una pizca de canela disuelta.
+  - **`color`** — tiñe el conjunto sin añadir piezas distinguibles: cacao, puré de zanahoria, quinua licuada.
+  - **`pieza`** — aporta algo identificable a la vista: fruta en trozos, semillas, hojuelas.
+
+Añadir una cucharadita de aceite no cambia la firma; añadir manzana en trozos, sí. **Piénsalo mirando el plato terminado**, no la lista de la compra: la manzana de una compota colada aporta `color`, y la misma manzana en cubos aporta `pieza`, y son dos fotos distintas.
+
+Si no declaras estos campos, la receta sale sin foto y el reporte lo dice. Es preferible eso a que herede una imagen que no le corresponde.
+
+### 7) Foto *(sección interna — describe el plato, no se imprime)*
+
+Cierra el cuerpo con `## Foto` y **un solo párrafo** que describa el plato terminado, para que quien vaya a fotografiarlo sepa qué tiene delante sin haberlo visto nunca.
 
 Debe sostenerse solo. Incluye, en este orden y en prosa continua: qué es, forma y tamaño aproximado, número de piezas visibles, color, acabado de la superficie y, si lo hay, el corte o el interior a la vista.
 
