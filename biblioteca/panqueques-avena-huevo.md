@@ -8,6 +8,15 @@ momento: [desayuno]
 componente: acompanante
 familia: huevo
 textura: blanda
+roles: [proteina_animal, cereal]
+base_botanica: huevo
+grano_base: avena
+demanda_oral: 3
+carga_visual: 1
+unidad_natural: "2 unidades"
+hierro_hemo: true
+densidad_kcal: media
+tiempo_min: 20
 aporta: [fibra, proteina]
 alergenos_posibles: [huevo, gluten]
 origen: creada

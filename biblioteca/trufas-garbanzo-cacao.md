@@ -8,6 +8,16 @@ momento: [media_tarde]
 componente: base
 familia:
 textura: blanda
+roles: [menestra, proteina_vegetal]
+base_botanica: garbanzo
+demanda_oral: 3
+carga_visual: 1
+unidad_natural: "3 unidades"
+requiere_preparacion_segura: "garbanzo colado, sin cáscara"
+hierro_no_hemo: true
+fibra_alta: true
+densidad_kcal: alta
+tiempo_min: 80
 aporta: [fibra, hierro]
 alergenos_posibles: [mani, frutos_secos, ajonjoli]
 origen: creada

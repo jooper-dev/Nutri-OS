@@ -8,6 +8,16 @@ momento: [almuerzo]
 componente: menestra
 familia: menestra
 textura: blanda
+roles: [menestra, proteina_vegetal]
+base_botanica: lenteja
+demanda_oral: 3
+carga_visual: 1
+unidad_natural: "2 unidades"
+requiere_preparacion_segura: "lenteja colada, sin una sola cáscara"
+hierro_no_hemo: true
+fibra_alta: true
+densidad_kcal: media
+tiempo_min: 140
 aporta: [hierro, proteina, energia]
 alergenos_posibles: [gluten]
 origen: creada

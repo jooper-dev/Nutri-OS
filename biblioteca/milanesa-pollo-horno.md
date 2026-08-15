@@ -4,10 +4,20 @@ tipo: base
 titulo: Milanesa de pollo
 subtitulo: Al horno, en bocaditos
 edad_min_meses: 24
-momento: [almuerzo, cena]
+momento: [desayuno, almuerzo, cena]
 componente: proteina
 familia: pollo
 textura: mixta
+roles: [proteina_animal]
+base_botanica: pollo
+grano_base: trigo
+demanda_oral: 3
+carga_visual: 1
+unidad_natural: "2 cuadraditos"
+requiere_preparacion_segura: "cortada en cuadraditos de un bocado"
+hierro_hemo: true
+densidad_kcal: alta
+tiempo_min: 40
 aporta: [proteina, zinc, energia]
 alergenos_posibles: [gluten, huevo]
 origen: creada

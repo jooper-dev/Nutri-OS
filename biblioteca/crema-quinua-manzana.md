@@ -5,9 +5,18 @@ titulo: Crema de grano andino
 subtitulo: Con fruta cocida, opcional
 edad_min_meses: 6
 momento: [desayuno]
-componente: acompanante
+componente: cereal
 familia:
 textura: humeda
+roles: [cereal]
+base_botanica: quinua
+grano_base: quinua
+demanda_oral: 1
+carga_visual: 0
+unidad_natural: "½ taza"
+hierro_no_hemo: true
+densidad_kcal: media
+tiempo_min: 25
 aporta: [proteina, fibra]
 alergenos_posibles: []
 origen: creada

@@ -39,15 +39,14 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-import yaml
-
 from comun import (
-    DIR_DATOS,
     DIR_RECETAS_PACIENTE,
-    ErrorNutriOS,
     alergenos_de_ingredientes,
+    cargar_despensa_basica,
     cargar_recetas_instanciadas,
     cargar_tabla_alergenos,
+    es_despensa,
+    exclusiones_del_nino,
     lineas_ingredientes,
     normalizar,
     normalizar_texto,
@@ -69,24 +68,6 @@ MARCADORES_PLANTILLA = [
     "por definir",
     "a completar",
 ]
-
-
-def cargar_despensa_basica() -> set[str]:
-    """Lo que puede aparecer sin estar en el repertorio del paciente."""
-    ruta = DIR_DATOS / "despensa_basica.yaml"
-    if not ruta.exists():
-        raise ErrorNutriOS(
-            f"Falta {ruta.name}. Sin esa lista, cada receta tendría que declarar la "
-            f"sal y el agua como introducciones nuevas, y el aviso que de verdad "
-            f"protege al niño se ahogaría entre avisos que no protegen a nadie."
-        )
-    datos = yaml.safe_load(ruta.read_text(encoding="utf-8")) or {}
-    return {
-        normalizar(x)
-        for grupo in datos.values()
-        for x in (grupo or [])
-        if str(x).strip()
-    }
 
 
 def _nombre_ingrediente(linea: str) -> str:
@@ -124,32 +105,6 @@ def _menciona(termino: str, texto: str) -> bool:
         return False
     plano = f"_{normalizar_texto(texto)}_"
     return f"_{t}_" in plano or f"_{t}s_" in plano
-
-
-def _es_despensa(nombre: str, despensa: set[str]) -> bool:
-    """¿Este ingrediente es despensa básica?
-
-    Se compara por el PRINCIPIO del nombre, no buscando la palabra en cualquier
-    posición, y la diferencia importa: «cacao sin azúcar» contiene la palabra
-    «azúcar», que sí es despensa, y con una comparación por contención el cacao
-    entero quedaba exento. Un ingrediente con entidad propia se colaba en el
-    plato de un niño con selectividad **por llevar la palabra "azúcar" en el
-    nombre**, sin declararse como introducción nueva.
-
-    Por el principio funciona: «aceite de oliva suave» empieza por «aceite»,
-    «de sal» es «sal», y «cacao sin azúcar» no empieza por ningún básico.
-
-    El repertorio aceptado sí se compara por contención, y es correcto que sean
-    distintos: ahí la pregunta es «¿este alimento está en su lista?» —y «filete
-    de pechuga de pollo» es pollo—, mientras que aquí la pregunta es «¿esto es
-    un ingrediente o es un condimento?».
-    """
-    n = normalizar_texto(nombre)
-    for prefijo in ("de_", "del_", "la_", "el_"):
-        if n.startswith(prefijo):
-            n = n[len(prefijo):]
-            break
-    return any(n == b or n.startswith(b + "_") for b in (normalizar_texto(x) for x in despensa))
 
 
 def revisar_receta(
@@ -195,7 +150,7 @@ def revisar_receta(
     ingredientes = [_nombre_ingrediente(l) for l in lineas]
 
     # --- 1. Rechazos: bloqueo duro, sin excepción --------------------------
-    for rechazo in ficha.get("rechazos") or []:
+    for rechazo in exclusiones_del_nino(ficha):
         golpes = [i for i in ingredientes if _menciona(rechazo, i)]
         if golpes:
             errores.append(
@@ -218,7 +173,7 @@ def revisar_receta(
         for crudo, nombre in zip(lineas, ingredientes):
             if not nombre:
                 continue
-            if _es_despensa(nombre, despensa):
+            if es_despensa(nombre, despensa):
                 continue
             if any(_menciona(r, nombre) for r in repertorio):
                 continue

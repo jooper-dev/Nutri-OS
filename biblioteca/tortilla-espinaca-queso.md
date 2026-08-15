@@ -8,6 +8,16 @@ momento: [desayuno]
 componente: acompanante
 familia: huevo
 textura: blanda
+roles: [proteina_animal]
+base_botanica: huevo
+demanda_oral: 2
+carga_visual: 2
+unidad_natural: "1 tortilla"
+rasgos_visuales: [moteado]
+calcio_alto: true
+hierro_hemo: true
+densidad_kcal: media
+tiempo_min: 15
 aporta: [proteina, hierro]
 alergenos_posibles: [huevo, lacteos]
 origen: creada

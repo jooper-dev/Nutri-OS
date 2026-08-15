@@ -85,12 +85,14 @@ CLAVES_PROTOCOLO_CONSUMIDAS = {
     "edad_max_meses",
     "marco_diario",
     "comidas",
+    "gramatica",
     "frecuencias_semanales",
     "rotaciones",
     "reglas_acopladas",
     "prioridades",
     "variedad",
     "preferencias_clinicas",
+    "presupuesto_sensorial",
     "decisiones_pendientes",
 }
 
@@ -123,7 +125,42 @@ CLAVES_PROTOCOLO_DOCUMENTALES = {"descripcion"}
 # Va como lista explícita y no como excepción dentro del filtro para que se vea
 # al abrir el archivo: exonerar un componente del filtro de textura es una
 # decisión clínica, y tiene que poder discutirse leyendo esta línea.
-COMPONENTES_SIN_FILTRO_TEXTURA = {"bebida", "grasa", "ensalada_grasa"}
+COMPONENTES_SIN_FILTRO_TEXTURA = {"bebida", "grasa", "ensalada_grasa", "suplemento"}
+
+# El vocabulario cerrado de roles de la Capa 1. Un alimento puede PODER cubrir
+# varios, pero en una comida dada ocupa exactamente uno: si «Crema de quinua» se
+# usa como cereal, no cuenta como proteína de esa comida.
+#
+# `ancla` no se escribe en el catálogo. Lo concede la ficha del niño, en
+# `perfil_sensorial.alimentos_ancla`, porque el alimento seguro es de ESE niño y
+# no una propiedad del alimento.
+ROLES_VALIDOS = {
+    "cereal",
+    "tuberculo",
+    "menestra",
+    "proteina_animal",
+    "proteina_vegetal",
+    "grasa",
+    "fruta",
+    "verdura",
+    "lacteo",
+    "bebida",
+    "suplemento",
+    "ancla",
+}
+
+# Los cuatro roles que cuentan como proteína para R-2.
+ROLES_PROTEICOS = {"proteina_animal", "proteina_vegetal", "menestra", "lacteo"}
+
+# Los dos roles que cuentan como carbohidrato para R-5.
+ROLES_CARBOHIDRATO = {"cereal", "tuberculo"}
+
+# Cómo se llama en la grilla un slot que se quedó sin ningún candidato válido.
+#
+# Un hueco declarado es un resultado profesional: dice qué falta, por qué reglas
+# se vació el conjunto y qué receta lo cerraría. Un cereal ocupando el slot de la
+# proteína es un error que la nutricionista ve en tres segundos.
+HUECO = "[HUECO DECLARADO]"
 
 # Componentes que NO exigen variedad: pueden repetirse sin límite y no cuentan
 # para la comprobación de suficiencia de la biblioteca.
@@ -187,6 +224,12 @@ COMPONENTES_SIN_EXIGENCIA_DE_VARIEDAD = {
     "ensalada_grasa",
     "crujiente",
     "bebida",
+    # El ancla y el suplemento se añadieron con la capa sensorial, y por la razón
+    # contraria a la de los demás: no es que la variedad ahí no importe, es que
+    # ahí la variedad está prohibida. El alimento seguro se sirve todos los días
+    # y es el mismo; el suplemento es una indicación médica, no una rotación.
+    "ancla",
+    "suplemento",
 }
 
 
@@ -258,6 +301,204 @@ def coincide_rechazo(rechazo: str, opcion: "Opcion") -> bool:
             continue
         plano = f"_{normalizar_texto(valor)}_"
         if f"_{r}_" in plano or f"_{r}s_" in plano:
+            return True
+    return False
+
+
+def exclusiones_del_nino(ficha: dict) -> list[str]:
+    """Todo lo que este niño no puede comer, por el motivo que sea.
+
+    La v2 separa las exclusiones en dos clases porque no se manejan igual:
+
+      exclusiones_absolutas    alergia, intolerancia o indicación médica. No
+                               cambian con el tiempo ni con la exposición.
+      exclusiones_de_aversion  rechazo del niño. Reversible con exposición
+                               planificada, pero **hoy es bloqueo duro**: «no
+                               pan, ni pan con palta» significa que no hay
+                               ninguna versión de ese plato aceptable hoy.
+
+    El campo histórico `rechazos` es el nombre viejo del segundo, y se sigue
+    leyendo: hay fichas escritas con él y ninguna razón para reescribirlas. Las
+    tres listas se unen aquí, en un solo sitio, para que ningún filtro del motor
+    mire una y se olvide de otra — que es exactamente cómo un rechazo escrito en
+    la ficha llegaba al plato.
+    """
+    terminos: list[str] = []
+    for clave in ("rechazos", "exclusiones_de_aversion", "exclusiones_absolutas"):
+        for x in ficha.get(clave) or []:
+            texto = str(x).strip()
+            if texto and texto not in terminos:
+                terminos.append(texto)
+    return terminos
+
+
+def exposiciones_declaradas(ficha: dict) -> dict[str, dict]:
+    """Los alimentos nuevos que el plan introduce a propósito, normalizados.
+
+    Admite las dos formas de escribirlo en la ficha, porque las dos se leen bien
+    y obligar a la larga cuando basta la corta solo produce fichas más difíciles
+    de revisar:
+
+        exposiciones_planificadas:
+          zanahoria: se introduce porque…                   # entra la semana 1
+          naranja: {desde_semana: 2, porque: se introduce…}
+
+    `desde_semana` existe por T-8: se introduce **un** alimento nuevo por
+    semana, junto al ancla y en la franja de mejor disposición. Ocho pavitas en
+    catorce días no son exposición graduada; son saturación.
+    """
+    salida: dict[str, dict] = {}
+    for clave, valor in (ficha.get("exposiciones_planificadas") or {}).items():
+        if isinstance(valor, dict):
+            salida[str(clave)] = {
+                "desde_semana": int(valor.get("desde_semana") or 1),
+                "porque": str(valor.get("porque") or "").strip(),
+            }
+        else:
+            salida[str(clave)] = {"desde_semana": 1, "porque": str(valor or "").strip()}
+    return salida
+
+
+def cargar_despensa_basica() -> set[str]:
+    """Lo que puede aparecer sin estar en el repertorio aceptado del paciente.
+
+    Vive aquí y no en el módulo de recetas porque ahora la usan dos: la
+    comprobación de ingredientes de una receta instanciada y el filtro de
+    repertorio del ensamblador. Nadie «acepta» la maicena ni rechaza el agua.
+    """
+    ruta = DIR_DATOS / "despensa_basica.yaml"
+    if not ruta.exists():
+        raise ErrorNutriOS(
+            f"Falta {ruta.name}. Sin esa lista, cada receta tendría que declarar la "
+            f"sal y el agua como introducciones nuevas, y el aviso que de verdad "
+            f"protege al niño se ahogaría entre avisos que no protegen a nadie."
+        )
+    datos = yaml.safe_load(ruta.read_text(encoding="utf-8")) or {}
+    return {
+        normalizar(x)
+        for grupo in datos.values()
+        for x in (grupo or [])
+        if str(x).strip()
+    }
+
+
+def es_despensa(nombre: str, despensa: set[str]) -> bool:
+    """¿Este ingrediente es despensa básica?
+
+    Se compara por el PRINCIPIO del nombre, no buscando la palabra en cualquier
+    posición, y la diferencia importa: «cacao sin azúcar» contiene la palabra
+    «azúcar», que sí es despensa, y con una comparación por contención el cacao
+    entero quedaba exento. Un ingrediente con entidad propia se colaba en el
+    plato de un niño con selectividad **por llevar la palabra "azúcar" en el
+    nombre**, sin declararse como introducción nueva.
+
+    Por el principio funciona: «aceite de oliva suave» empieza por «aceite»,
+    «de sal» es «sal», y «cacao sin azúcar» no empieza por ningún básico.
+    """
+    n = normalizar_texto(nombre)
+    for prefijo in ("de_", "del_", "la_", "el_"):
+        if n.startswith(prefijo):
+            n = n[len(prefijo):]
+            break
+    return any(
+        n == b or n.startswith(b + "_")
+        for b in (normalizar_texto(x) for x in despensa)
+    )
+
+
+def cargar_conceptos_aversivos() -> dict:
+    ruta = DIR_DATOS / "conceptos_aversivos.yaml"
+    if not ruta.exists():
+        raise ErrorNutriOS(
+            f"Falta {ruta.name}, que traduce el concepto aversivo del niño a los "
+            f"rasgos visuales que hay que excluir.\n"
+            f"    Sin él, «puntos negros» no filtra nada y el kiwi vuelve al plato."
+        )
+    return yaml.safe_load(ruta.read_text(encoding="utf-8")) or {}
+
+
+def rasgos_aversivos(ficha: dict) -> tuple[set[str], list[str]]:
+    """Los rasgos visuales que hay que excluir para este niño. (rasgos, problemas).
+
+    Devuelve el conjunto ya normalizado y la lista de problemas: un concepto
+    declarado en la ficha que no existe en el catálogo de conceptos no filtra
+    nada, y eso es peor que no declararlo, porque hace creer que la aversión
+    está contemplada. Quien llama decide si eso bloquea (el validador) o
+    detiene (el ensamblador).
+    """
+    perfil = ficha.get("perfil_sensorial") or {}
+    declarado = str(perfil.get("concepto_aversivo") or "").strip()
+    if not declarado:
+        return set(), []
+
+    catalogo = (cargar_conceptos_aversivos().get("conceptos") or {})
+    indice = {normalizar(k): v for k, v in catalogo.items()}
+    entrada = indice.get(normalizar(declarado))
+    if not entrada:
+        return set(), [
+            f"La ficha declara el concepto aversivo «{declarado}» y no existe en "
+            f"datos/conceptos_aversivos.yaml, así que NO está excluyendo ningún rasgo.\n"
+            f"    Conceptos reconocidos: {', '.join(sorted(catalogo)) or '(ninguno)'}.\n"
+            f"    Un concepto que no filtra nada es peor que no declararlo: hace creer "
+            f"que la aversión está contemplada. Añádelo al archivo con sus rasgos, o "
+            f"corrige la frase en la ficha."
+        ]
+    return {normalizar(r) for r in (entrada.get("rasgos") or [])}, []
+
+
+def conceder_ancla(opciones: list["Opcion"], ficha: dict) -> list[str]:
+    """Marca como ancla las opciones que la ficha nombra alimento seguro.
+
+    El ancla no es una propiedad del alimento sino de este niño, así que no
+    puede vivir en el catálogo. Se concede aquí, sobre las opciones ya cargadas,
+    y a partir de ese momento el alimento tiene el rol `ancla` disponible.
+
+    Devuelve los términos de `alimentos_ancla` que no encontraron a nadie: un
+    ancla que no existe en el catálogo deja el slot ANCLA vacío todos los días,
+    que es exactamente lo que pasó cuando el alimento seguro desapareció 8 de
+    14 días del plan.
+    """
+    declarados = [
+        str(x).strip()
+        for x in ((ficha.get("perfil_sensorial") or {}).get("alimentos_ancla") or [])
+        if str(x).strip()
+    ]
+    huerfanos: list[str] = []
+    for termino in declarados:
+        golpes = [o for o in opciones if coincide_alimento(termino, o)]
+        if not golpes:
+            huerfanos.append(termino)
+        for o in golpes:
+            o.es_ancla = True
+    return huerfanos
+
+
+def coincide_alimento(termino: str, opcion: "Opcion") -> bool:
+    """¿El término nombra a ESTE alimento? Solo id y nombre, nunca familia.
+
+    Es la comparación que usan el repertorio aceptado, las exposiciones
+    planificadas y el ancla, y se separa de `coincide_rechazo` a propósito.
+
+    Un rechazo sí tiene que mirar la familia: «menestra» retira todas las
+    menestras, y ese es su sentido. El repertorio es lo contrario: la familia
+    es un cajón del protocolo, no un alimento, y usarla ensancha la lista sin
+    que nadie lo escriba. Con la familia dentro pasaron dos cosas a la vez, y
+    las dos malas: «pollo» en el repertorio dejaba entrar la **pavita**, que no
+    aparece ni una vez en la anamnesis y salió ocho veces en catorce días; y
+    declarar la **naranja** como exposición abría la puerta a la zanahoria y al
+    zapallo, que comparten el cajón `verdura_naranja`.
+
+    Lo que sí se conserva son los topes y la tolerancia de plural: «corbina»
+    encuentra «Corbina en cubos», y «pecana» encuentra «Mantequilla de pecanas».
+    """
+    t = normalizar_texto(termino)
+    if not t:
+        return False
+    for valor in (opcion.id, opcion.nombre):
+        if not valor:
+            continue
+        plano = f"_{normalizar_texto(valor)}_"
+        if f"_{t}_" in plano or f"_{t}s_" in plano:
             return True
     return False
 
@@ -519,6 +760,80 @@ class Opcion:
     validada_en_cocina: bool = False
     ruta: str = ""
 
+    # --- Capa 1 · los tags sobre los que operan las reglas -----------------
+    # Sin ellos ninguna regla se puede evaluar, así que van aquí y no en un
+    # diccionario suelto: el día que falte uno, el validador lo dice por su
+    # nombre en vez de fallar con un KeyError a mitad de una comprobación.
+    roles: list[str] = field(default_factory=list)
+    base_botanica: str = ""
+    grano_base: str = ""
+    demanda_oral: int | None = None
+    carga_visual: int | None = None
+    textura_mixta: bool = False
+    unidad_natural: str = ""
+    requiere_preparacion_segura: str = ""
+    rasgos_visuales: list[str] = field(default_factory=list)
+    hierro_no_hemo: bool = False
+    hierro_hemo: bool = False
+    vitamina_c: bool = False
+    calcio_alto: bool = False
+    fibra_alta: bool = False
+    densidad_kcal: str = ""
+    generico: bool = False
+    forma_bocado: bool = True
+    tiempo_min: int = 0
+    refri_dias: int = 0
+    # Se rellena en tiempo de ejecución, no viene del catálogo: el alimento
+    # seguro es de ESTE niño. Ver `conceder_ancla`.
+    es_ancla: bool = False
+
+    def porcion_impresa(self, respaldo: str = "") -> str:
+        """Lo que se escribe en la grilla al lado del nombre.
+
+        Dos reglas juntas, y las dos salieron de un plan impreso:
+
+        · **R-12 — la unidad la define el alimento, nunca el slot.** «Uva
+          cortada a lo largo, ½ unidad mediana» y «Granola de kiwicha, ¾ taza
+          (180 ml)» son el mismo error: la plantilla del componente imponiendo
+          su unidad a lo que cayera dentro. Media uva no existe como porción, y
+          la granola rinde cinco cucharadas de sólido seco.
+
+        · **O-5 — el formato seguro se imprime en la grilla, no solo en la
+          receta.** La madre lee la grilla, no el recetario, a las siete de la
+          mañana. «Naranja, 3 gajos, sin hollejo ni pepa», no «Naranja, 1
+          unidad».
+
+        `respaldo` es la porción del slot, que solo se usa cuando el alimento no
+        declara la suya. Es el camino de compatibilidad con los alimentos que
+        todavía no tienen `unidad_natural`, y el validador lo marca.
+        """
+        base = (self.unidad_natural or respaldo or "").strip()
+        formato = (self.requiere_preparacion_segura or "").strip()
+        if base and formato:
+            return f"{base}, {formato}"
+        return base or formato
+
+    def rol_para(self, roles_del_slot: list[str] | set[str]) -> str:
+        """El rol con el que esta opción llenaría ese slot, o "" si no encaja.
+
+        Es R-0. Un alimento solo puede ocupar un slot cuyo conjunto de roles
+        aceptados contenga uno de los suyos, y el generador **no puede** cubrir
+        un slot con un alimento de rol distinto aunque «se parezca». Esta sola
+        regla habría bloqueado tres de los siete desayunos auditados: la crema
+        de quinua es cereal y ocupó el slot de la proteína; el bastón de papa es
+        tubérculo y ocupó el mismo.
+        """
+        aceptados = set(roles_del_slot or [])
+        if not aceptados:
+            return self.roles[0] if self.roles else ""
+        mios = list(self.roles)
+        if self.es_ancla and "ancla" not in mios:
+            mios.append("ancla")
+        for rol in mios:
+            if rol in aceptados:
+                return rol
+        return ""
+
     def responde_a(self, clave: str) -> bool:
         """¿Este alimento responde a una clave del protocolo? Familia o id.
 
@@ -539,7 +854,10 @@ class Opcion:
         return c == normalizar(self.familia) or c == normalizar(self.id)
 
     def apta_para(
-        self, ficha: dict, exclusiones_extra: set[str] | None = None
+        self,
+        ficha: dict,
+        exclusiones_extra: set[str] | None = None,
+        rasgos_excluidos: set[str] | None = None,
     ) -> tuple[bool, str]:
         """¿Puede esta opción entrar en el plan de este paciente?
 
@@ -578,8 +896,21 @@ class Opcion:
         choque_dx = (exclusiones_extra or set()) & etiquetas
         if choque_dx:
             return False, f"excluido por diagnóstico: {', '.join(sorted(choque_dx))}"
-        if any(coincide_rechazo(r, self) for r in ficha.get("rechazos") or []):
-            return False, "rechazo declarado"
+        for termino in exclusiones_del_nino(ficha):
+            if coincide_rechazo(termino, self):
+                return False, "rechazo declarado"
+
+        # T-6 · Generalización aversiva. Se filtra por el RASGO, no por el
+        # alimento. Declarado «puntos negros», quedan fuera el kiwi, la fresa
+        # entera, la uva con pepa, la granola y los granos reventados aunque
+        # nadie los haya nombrado nunca. Un sistema que filtra por lista de
+        # alimentos siempre va un paso atrás del niño: la lista se escribe con
+        # lo que ya rechazó, y el siguiente rechazo nunca está en ella.
+        choque_rasgo = set(rasgos_excluidos or set()) & {
+            normalizar(r) for r in self.rasgos_visuales
+        }
+        if choque_rasgo:
+            return False, f"T-6 rasgo aversivo: {', '.join(sorted(choque_rasgo))}"
 
         # La aversión a una textura no es una manía: en selectividad severa y en
         # disfagia decide si el plato se come o si termina en arcada. Se filtra
@@ -616,6 +947,49 @@ def cargar_protocolo(id_protocolo: str) -> dict:
         ) from e
 
 
+def _entero_o_none(valor: Any) -> int | None:
+    """N0–N5 y V0–V3 admiten el cero, así que `or None` no sirve aquí."""
+    if valor is None or str(valor).strip() == "":
+        return None
+    try:
+        return int(valor)
+    except (TypeError, ValueError):
+        return None
+
+
+def _tags_sensoriales(d: dict) -> dict:
+    """Los campos de la Capa 1, leídos igual desde el catálogo y desde una base.
+
+    Vive en una sola función porque el alimento y la receta se etiquetan con el
+    mismo vocabulario y las reglas no distinguen entre los dos: R-1 compara
+    `grano_base` de una avena con el `grano_base` de unos panqueques de avena, y
+    si cada lado lo leyera a su manera volveríamos a tener «avena + panqueques
+    de avena» en el mismo desayuno.
+    """
+    conservacion = d.get("conservacion") or {}
+    return {
+        "roles": [str(r) for r in (d.get("roles") or [])],
+        "base_botanica": str(d.get("base_botanica") or ""),
+        "grano_base": str(d.get("grano_base") or ""),
+        "demanda_oral": _entero_o_none(d.get("demanda_oral")),
+        "carga_visual": _entero_o_none(d.get("carga_visual")),
+        "textura_mixta": bool(d.get("textura_mixta", False)),
+        "unidad_natural": str(d.get("unidad_natural") or ""),
+        "requiere_preparacion_segura": str(d.get("requiere_preparacion_segura") or ""),
+        "rasgos_visuales": [str(r) for r in (d.get("rasgos_visuales") or [])],
+        "hierro_no_hemo": bool(d.get("hierro_no_hemo", False)),
+        "hierro_hemo": bool(d.get("hierro_hemo", False)),
+        "vitamina_c": bool(d.get("vitamina_c", False)),
+        "calcio_alto": bool(d.get("calcio_alto", False)),
+        "fibra_alta": bool(d.get("fibra_alta", False)),
+        "densidad_kcal": str(d.get("densidad_kcal") or ""),
+        "generico": bool(d.get("generico", False)),
+        "forma_bocado": bool(d.get("forma_bocado", True)),
+        "tiempo_min": int(d.get("tiempo_min") or 0),
+        "refri_dias": int(conservacion.get("refri_dias") or 0),
+    }
+
+
 def cargar_alimentos_base() -> list[Opcion]:
     ruta = DIR_DATOS / "alimentos_base.yaml"
     datos = yaml.safe_load(ruta.read_text(encoding="utf-8")) or {}
@@ -635,6 +1009,7 @@ def cargar_alimentos_base() -> list[Opcion]:
                     nunca_recomendar=bool(a.get("nunca_recomendar", False)),
                     es_receta=False,
                     ruta=str(ruta.relative_to(RAIZ)),
+                    **_tags_sensoriales(a),
                 )
             )
     return opciones
@@ -705,6 +1080,7 @@ def cargar_biblioteca() -> tuple[list[Opcion], list[str]]:
                 es_receta=True,
                 validada_en_cocina=bool(meta.get("validada_en_cocina", False)),
                 ruta=str(ruta.relative_to(RAIZ)),
+                **_tags_sensoriales(meta),
             )
         )
     return opciones, avisos

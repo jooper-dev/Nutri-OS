@@ -3,83 +3,175 @@ nombre: Preescolar 3–5 años
 edad_min_meses: 36
 edad_max_meses: 71
 descripcion: >
-  Plan de 5 tiempos para preescolar que ya come de la olla familiar.
+  Plan de 5 tiempos más suplemento para preescolar que ya come de la olla
+  familiar, con capa de integración sensorial.
 
-  Copia de escolar_6_11 ajustada a la estructura que Paty tiene escrita para
-  3–5 años en su documento de recomendaciones (horarios, frecuencias de carnes,
-  menestras, huevo, aceite y porciones). No es una interpolación entre la
-  ablactancia y el escolar: las frecuencias de abajo están tomadas una a una de
-  ese documento, y las que se apartan de escolar_6_11 llevan comentada la línea
-  de la que salen.
+  Las frecuencias salen una a una del documento de recomendaciones que Paty
+  tiene escrito para 3–5 años (horarios, carnes, menestras, huevo, aceite y
+  porciones). La estructura de la comida, en cambio, ya no es una lista de
+  componentes: es una gramática de slots tipados, y cada slot declara qué ROLES
+  acepta. Un alimento llena un slot solo si tiene uno de esos roles.
 
-  Cuatro diferencias con el protocolo de origen:
+  Cinco cosas cambiaron respecto de la versión anterior, y todas salieron de
+  auditar un plan real impreso:
 
-  1. La cena no lleva fruta —«CENA: no va fruta»—, así que `fruta_vitc` sale de
-     sus componentes.
-  2. La menestra va solo en almuerzo, para poder acompañarla siempre con la
-     fruta rica en vitamina C de la misma comida, que es la regla escrita.
-  3. `fruta_vitc` pasa a ser componente diario del almuerzo —«dar fruta después
-     del almuerzo»— en lugar de aparecer solo los días de menestra.
-  4. El desayuno no tiene componente de grasa propio: en la tabla de 3–5 años la
-     grasa del desayuno viaja dentro del acompañante (palta, mantequilla de
-     frutos secos) y la grasa suelta está en almuerzo y cena.
+  1. **El suplemento es una fila del plan**, con su hora y con la separación de
+     lácteos escrita. Antes vivía en el texto del enfoque, y lo que no está en
+     la grilla la madre no lo lee a las siete de la mañana.
+  2. **El desayuno tiene ANCLA, PROTEÍNA, GRASA y FRUTA CON VITAMINA C.** Antes
+     era cereal + acompañante + fruta, y salía con dos cereales, sin proteína,
+     sin grasa nombrada y sin vitamina C ni una sola vez en catorce días.
+  3. **La ensalada mezclada se parte en verdura + grasa.** «Ensalada con palta»
+     ocupaba 28 de 28 comidas principales y es el ítem visualmente más
+     heterogéneo posible. Ahora la verdura va sola, de un color y en formato
+     parejo, y la grasa se nombra y se cuantifica en su propio slot.
+  4. **La media mañana es la lonchera y se trata como tal**: proteína, fruta y
+     grasa. Antes eran dos cucharadas de grano reventado y fruta picada, cero
+     densidad calórica en la franja más larga del día.
+  5. **La media tarde vuelve a llevar el alimento seguro**, además del lácteo.
+
+  Cuatro diferencias con escolar_6_11 que se conservan tal cual: la cena no
+  lleva fruta —«CENA: no va fruta»—, la menestra va solo en almuerzo para poder
+  acompañarla con la vitamina C de la misma comida, la fruta con vitamina C es
+  componente diario del almuerzo, y la carne roja solo aparece en almuerzo.
 
 # ---------------------------------------------------------------
 # ANATOMÍA DEL DÍA
 # Horarios: tabla «HORARIOS DE COMIDAS» del documento de recomendaciones.
 # ---------------------------------------------------------------
 comidas:
+  # R-Fe3. El suplemento con su hora y su separación de lácteos, como una fila
+  # más. No es una comida: es lo primero del día y tiene que verse.
+  - id: suplemento
+    nombre: En ayunas
+    hora: "7:00"
+    componentes: [suplemento]
+
   - id: desayuno
     nombre: Desayuno
     hora: "7:30 – 8:30"
-    componentes: [cereal, acompanante, fruta]
+    componentes: [ancla, acompanante, grasa, fruta_vitc]
 
+  # La lonchera. El niño está en el colegio de 8:00 a 13:30 con un recreo: es la
+  # franja más larga del día y la que más densidad calórica necesita. Lleva el
+  # ancla porque es lo que la anamnesis describe —«a veces le manda su quinua»—
+  # y porque a las 10:00 está a tres horas del suplemento de hierro y a dos y
+  # media de la menestra del almuerzo: el único hueco del día donde el grano
+  # andino no compite con nada.
   - id: media_manana
     nombre: Media mañana
     hora: "10:00 – 10:30"
-    componentes: [base, crujiente]
+    componentes: [ancla, base, fruta, grasa]
 
   - id: almuerzo
     nombre: Almuerzo
     hora: "12:30 – 1:00"
-    componentes: [carbohidrato, proteina, menestra, ensalada_grasa, fruta_vitc, bebida]
+    componentes: [carbohidrato, proteina, menestra, verdura, grasa, fruta_vitc, bebida]
 
+  # Solo el lácteo. La segunda toma de quinua se fue a media mañana por el
+  # hierro: el calcio del yogurt le pelea el hierro al grano andino, y juntarlos
+  # a las 15:30 anulaba la mitad del aporte de la toma. La franja del yogurt no
+  # se mueve —es donde la pone la tabla de 3–5 años y donde queda lejos del
+  # suplemento matinal y de la menestra del almuerzo—; lo que se mueve es el
+  # ancla.
   - id: media_tarde
     nombre: Media tarde
     hora: "3:30 – 4:00"
     componentes: [base]
 
   # «CENA: recomendaciones SIMILARES al almuerzo · no va fruta · no res ·
-  # sí menestras · sí verduras · agua». De ahí que falte `fruta_vitc` y que la
-  # regla de res acote su ámbito al almuerzo.
+  # sí verduras · agua». Similar en estructura, no en exigencia: T-5 la obliga a
+  # pesar menos que el almuerzo, porque a las 18:00 la fatiga oral es máxima.
   - id: cena
     nombre: Cena
     hora: "6:00 – 7:00"
-    componentes: [carbohidrato, proteina, ensalada_grasa, bebida]
+    componentes: [carbohidrato, proteina, verdura, grasa, bebida]
+
+# ---------------------------------------------------------------
+# GRAMÁTICA DE SLOTS · Capa 2
+# ---------------------------------------------------------------
+# Cada componente es un slot tipado: declara su PAPEL en la comida y el conjunto
+# cerrado de roles que acepta. R-0 comprueba que quien lo llena tenga uno de
+# ellos, y esa sola regla habría bloqueado tres de los siete desayunos
+# auditados: la crema de quinua es cereal y ocupó el sitio de la proteína, los
+# bastones de papa son tubérculo y ocuparon el mismo.
+#
+# `opcional: true` es el slot que puede quedar vacío sin invalidar la comida
+# —la menestra solo va tres días—. Todos los demás, o se llenan con un candidato
+# válido, o se marcan como hueco declarado. Nunca se rellenan con otro rol.
+#
+# `fuentes` dice de qué cajones del catálogo puede sacar candidatos ese slot. Es
+# una lista explícita y no «cualquier cosa con el rol correcto» a propósito: la
+# harina de algarrobo tiene rol `cereal` y sería un fondo de plato absurdo para
+# el almuerzo. El rol dice si CABE; la fuente, de dónde se saca.
+gramatica:
+  suplemento:   {papel: SUPLEMENTO, roles: [suplemento], fuentes: [suplemento]}
+  ancla:        {papel: ANCLA,      roles: [ancla],      fuentes: []}
+  cereal:       {papel: ENERGIA,    roles: [cereal, tuberculo], fuentes: [cereal]}
+  carbohidrato: {papel: ENERGIA,    roles: [cereal, tuberculo], fuentes: [carbohidrato]}
+  acompanante:  {papel: PROTEINA,   roles: [proteina_animal, proteina_vegetal, menestra],
+                 fuentes: [acompanante, proteina]}
+  proteina:     {papel: PROTEINA,   roles: [proteina_animal, proteina_vegetal, menestra],
+                 fuentes: [proteina, acompanante]}
+  menestra:     {papel: PROTEINA,   roles: [menestra], opcional: true,
+                 fuentes: [menestra]}
+  grasa:        {papel: GRASA,      roles: [grasa],    fuentes: [grasa]}
+  verdura:      {papel: VEGETAL,    roles: [verdura],  fuentes: [verdura]}
+  fruta:        {papel: FRUTA,      roles: [fruta],    fuentes: [fruta, fruta_vitc]}
+  fruta_vitc:   {papel: FRUTA,      roles: [fruta],    fuentes: [fruta_vitc]}
+  base:         {papel: BASE,       roles: [fruta, lacteo, cereal, tuberculo,
+                                            proteina_vegetal, proteina_animal, menestra],
+                 fuentes: [base, acompanante]}
+  bebida:       {papel: BEBIDA,     roles: [bebida],   fuentes: [bebida]}
+
+# ---------------------------------------------------------------
+# PRESUPUESTO SENSORIAL · Capa 4
+# ---------------------------------------------------------------
+# Perfil de tono oral bajo. `suma_n` es la suma de demanda oral de todos los
+# componentes de esa comida; `max_n3` y `max_n4`, cuántos pueden llegar a ese
+# nivel. Los números están calibrados a ESTA gramática, que tiene más slots que
+# la tabla genérica de la especificación: lo que se conserva es la proporción
+# —el desayuno pesa poco, el almuerzo es la comida de trabajo, la cena baja—.
+presupuesto_sensorial:
+  comidas_principales: [desayuno, almuerzo, cena]
+  comidas_sin_reto: [cena, media_tarde, suplemento]
+  retos_dia: 2
+  # T-5: la cena tiene que quedar al menos este margen por debajo del almuerzo.
+  margen_cena: 2
+  desayuno:  {suma_n: 8,  max_n3: 2, max_n4: 0}
+  almuerzo:  {suma_n: 12, max_n3: 3, max_n4: 1}
+  cena:      {suma_n: 9,  max_n3: 2, max_n4: 0}
+
+# ---------------------------------------------------------------
+# MARCO DIARIO
+# ---------------------------------------------------------------
+marco_diario:
+  nota_plan: >
+    El vaso de quinua abre el desayuno y la media tarde: se sirve primero y no
+    se negocia. El agua va al final de cada comida, nunca al principio. Cada
+    cosa en su propio plato, sin nada encima de nada y sin nada espolvoreado.
 
 # ---------------------------------------------------------------
 # FRECUENCIAS SEMANALES
 # ---------------------------------------------------------------
 frecuencias_semanales:
-  # «OFRECER MENESTRAS 3 VECES POR SEMANA (es lo ideal)». Van solo en almuerzo
-  # para que la fruta con vitamina C de esa misma comida cumpla su papel en la
-  # absorción del hierro no hemínico. Moverlas también a la cena es una decisión
-  # clínica de Paty y está en decisiones_pendientes.
+  # «OFRECER MENESTRAS 3 VECES POR SEMANA (es lo ideal)». Solo en almuerzo, para
+  # que la fruta con vitamina C de esa misma comida cumpla su papel en la
+  # absorción del hierro no hemínico (R-Fe5).
   - componente: menestra
     en: [almuerzo]
     veces: 3
     modo: exacto
 
-  # «Pescado (bonito, jurel, caballa, salmón) 2 a 3 v/semana (a la plancha,
-  # sudado)». Se fija en 2, que es el piso del rango.
+  # «Pescado 2 a 3 v/semana». Se fija en 2, que es el piso del rango.
   - componente: proteina
     familia: pescado
     en: [almuerzo, cena]
     veces: 2
     modo: exacto
 
-  # «Carnes rojas (res, chancho): 1 vez/semanal o QUINCENAL solo en almuerzo,
-  # en hamburguesas». El ámbito es [almuerzo], no [almuerzo, cena].
+  # «Carnes rojas: 1 vez/semanal o QUINCENAL solo en almuerzo». El ámbito es
+  # [almuerzo], no [almuerzo, cena].
   - componente: proteina
     familia: res
     en: [almuerzo]
@@ -87,18 +179,16 @@ frecuencias_semanales:
     modo: maximo
     cada_dias: 15
 
-  # «Pollo, pavo 3 a 4 veces/semana». Entra como relleno, igual que en
-  # escolar_6_11: ocupa las ranuras de proteína que no tomaron pescado ni res.
+  # «Pollo, pavo 3 a 4 veces/semana». Entra como relleno: ocupa las ranuras de
+  # proteína que no tomaron pescado ni res.
   - componente: proteina
     familia: pollo
     en: [almuerzo, cena]
     modo: relleno
 
-  # «EL HUEVO SE OFRECE 3 A 4 VECES/SEMANA AL DÍA, DAR MÁS ALLÁ DE ESA CANTIDAD
-  # PREDISPONE A TENER COLESTEROL EN ARTERIAS A TEMPRANA EDAD». Por eso el huevo
-  # tiene un único punto de entrada en todo el protocolo —el acompañante del
-  # desayuno—: repartirlo entre dos componentes daría dos topes independientes
-  # que sumados pueden pasarse de 4.
+  # «EL HUEVO SE OFRECE 3 A 4 VECES/SEMANA». Un único punto de entrada —el
+  # acompañante del desayuno— porque repartirlo entre dos componentes daría dos
+  # topes independientes que sumados pueden pasarse de 4.
   - componente: acompanante
     familia: huevo
     en: [desayuno]
@@ -106,113 +196,159 @@ frecuencias_semanales:
     modo: maximo
     minimo: 3
 
-  - componente: fruta
+  # R-Fe4: con déficit de hierro, la vitamina C del desayuno es obligatoria en
+  # ≥5 de 7 días. Aquí va a diario, que es más simple de ejecutar y más fácil de
+  # comprobar. En el plan auditado salió 0 de 14.
+  - componente: fruta_vitc
     en: [desayuno]
     veces: 7
     modo: exacto
 
   # «Dar fruta después del almuerzo» + «Incluir frutas ricas en vitamina C en el
-  # desayuno, almuerzo para mejorar la absorción de hierro de cereales y
-  # menestras»: diaria, no solo los días de menestra.
+  # desayuno, almuerzo para mejorar la absorción de hierro».
   - componente: fruta_vitc
     en: [almuerzo]
     veces: 7
     modo: exacto
 
-  # Verdura a diario en las dos comidas principales, con su vehículo de grasa.
-  - componente: ensalada_grasa
+  # «MEDIA MAÑANA: fruta, DAR VARIEDAD DE FRUTAS, DAR SIEMPRE FRUTA CON ALGO».
+  # El «algo» ya no son dos cucharadas de grano reventado: es la proteína y la
+  # grasa que la lonchera necesita.
+  - componente: fruta
+    en: [media_manana]
+    veces: 7
+    modo: exacto
+
+  # Verdura a diario en las dos comidas principales, sola y de un color.
+  - componente: verdura
     en: [almuerzo, cena]
     veces: 14
     modo: exacto
 
-  # «MEDIA TARDE: fruta + yogurt + kiwicha pop sin azúcar». El yogurt se ancla
-  # en media tarde y no en media mañana —al revés que en escolar_6_11— porque
-  # es donde lo pone la tabla de 3–5 años, y porque así queda lejos de la
-  # menestra del almuerzo: el calcio compite con el hierro.
+  # «MEDIA TARDE: fruta + yogurt». El yogurt se ancla en media tarde y no en
+  # media mañana porque es donde lo pone la tabla de 3–5 años, y porque así
+  # queda lejos de la menestra del almuerzo: el calcio compite con el hierro.
+  #
+  # Va DIARIO y no tres veces por semana. Cuando la historia dice que el
+  # estreñimiento se normalizó desde que recibe yogurt a diario, el yogurt dejó
+  # de ser un alimento de rotación y pasó a ser tratamiento en curso.
   - componente: base
     familia: yogurt
     en: [media_tarde]
-    veces: 3
-    modo: exacto
-
-  # «MEDIA MAÑANA: fruta, DAR VARIEDAD DE FRUTAS, DAR SIEMPRE FRUTA CON ALGO».
-  # La fruta ocupa 4 de las 7 ranuras de base; el «algo» es el crujiente, que va
-  # a diario. Las otras 3 quedan para preparaciones del recetario.
-  - componente: base
-    familia: fruta_picada
-    en: [media_manana]
-    veces: 4
+    veces: 7
     modo: exacto
 
 # ---------------------------------------------------------------
 # ROTACIONES
 # ---------------------------------------------------------------
 rotaciones:
-  # Tabla «DESAYUNO · BEBIDAS ¾ a 1 taza»: avena, avena con cañihua, quinua,
-  # kiwicha, kiwicha con cañihua, hojuela de avena con maca. De ahí el cupo de
-  # granos andinos por delante de todo lo demás.
-  - componente: cereal
-    en: [desayuno]
-    reparto: {grano_andino: 3, avena: 2, hojuelas: 1, harinas: 1}
-
   # «Arroz: ½ taza · Papa: puré, papa amarilla · Camote sancochado · Quinua ·
-  # Tallarines». El cajón 'tuberculo' reparte papa y camote; la pasta entra
-  # porque los tallarines están en la tabla de esta edad y no en la de escolar.
+  # Tallarines». El cajón 'tuberculo' reparte papa, camote y olluco; la pasta
+  # entra porque los tallarines están en la tabla de esta edad.
   - componente: carbohidrato
-    en: [almuerzo, cena]
-    reparto: {tuberculo: 6, quinua: 2, pasta: 2, arroz: resto}
+    en: [almuerzo]
+    reparto: {tuberculo: 3, quinua: 2, pasta: 1, arroz: resto}
+
+  # Sin quinua en la cena, y no es una preferencia: la cena no lleva fruta
+  # —«CENA: no va fruta»—, así que el hierro no hemínico del grano andino se
+  # quedaría ahí sin la vitamina C que lo hace absorberse. La regla del hierro y
+  # la estructura de la cena se contradicen, y la que cede es la rotación.
+  - componente: carbohidrato
+    en: [cena]
+    reparto: {tuberculo: 3, pasta: 1, arroz: resto}
 
   # «ACEITE DE OLIVA extra virgen, 1 cta, acidez < 0,5, interdiario, 3 a 4
-  # v/semana» → 3 almuerzos. El resto del vehículo de grasa es palta.
-  - componente: ensalada_grasa
-    en: [almuerzo]
-    reparto: {palta: 3, aceite_oliva: 3, aceite_ajonjoli: 1}
+  # v/semana». El resto del vehículo de grasa es fruto graso o mantequilla de
+  # frutos secos, que es densidad calórica pura para el desayuno y la lonchera.
+  - componente: grasa
+    en: [desayuno]
+    reparto: {fruto_graso: 3, mantequilla_pecanas: 2, mantequilla_anacardos: 1, mantequilla_mani: 1}
 
-  - componente: ensalada_grasa
+  - componente: grasa
+    en: [media_manana]
+    reparto: {mantequilla_pecanas: 3, fruto_graso: 3, mantequilla_anacardos: 1}
+
+  # La palta al almuerzo y el aceite a la cena, y no al revés. La palta es un
+  # bocado más (N1) y el aceite va dentro de la preparación: poniéndolos así, la
+  # cena queda naturalmente por debajo del almuerzo, que es lo que pide T-5, sin
+  # tener que quitarle la grasa a ninguna de las dos.
+  - componente: grasa
+    en: [almuerzo]
+    reparto: {fruto_graso: 4, aceite: 3}
+
+  - componente: grasa
     en: [cena]
-    reparto: {palta: 4, aceite_oliva: 2, aceite_ajonjoli: 1}
+    reparto: {aceite: 4, fruto_graso: 3}
 
 # ---------------------------------------------------------------
 # REGLAS ACOPLADAS
 # ---------------------------------------------------------------
-# No hay regla «menestra → fruta_vitc» como en escolar_6_11, y no es un olvido:
-# aquí la fruta con vitamina C es componente diario del almuerzo, que es la única
-# comida donde va la menestra. El acoplamiento se cumple por construcción los 7
-# días, no solo los 3 de menestra, y declararlo además convertiría a `fruta_vitc`
-# en un componente dependiente —solo se llena cuando lo dispara la menestra— y
-# dejaría los otros 4 almuerzos sin fruta.
-reglas_acopladas:
-  - si: desayuno.cereal
-    entonces: desayuno.fruta
-    ambito: misma_comida
-    razon: fruta fresca obligatoria a diario, 2 colores, media ración de la de media mañana
+# Sin reglas acopladas, y no es un olvido.
+#
+# La fruta con vitamina C es componente DIARIO del desayuno y del almuerzo, que
+# son las dos comidas donde cae el hierro no hemínico: el acoplamiento
+# «menestra → vitamina C» se cumple por construcción los 7 días, no solo los 3
+# de menestra.
+#
+# Declararlo además haría daño. Una regla acoplada convierte a su objetivo en un
+# componente DEPENDIENTE —solo se llena cuando algo lo dispara—, y al escribir
+# «ancla → fruta_vitc» el motor dejó de llenar la fruta con vitamina C de los
+# siete almuerzos, porque ahí no había disparador. La regla que existía para
+# garantizar la vitamina C fue justo la que la quitó de la mitad del plan.
+reglas_acopladas: []
 
 # ---------------------------------------------------------------
 # PRIORIDADES DE SELECCIÓN
 # ---------------------------------------------------------------
 prioridades:
+  # El ancla no rota: es el mismo alimento seguro todos los días, y por eso está
+  # exenta de variedad. Cuando la ficha declara más de una, la primera de esta
+  # lista es la que abre el día y la segunda queda como respaldo sólido — el
+  # margen para poder retirar un reto sin dejar la comida vacía.
+  ancla:
+    - quinua-licuada-manana
+    - papa
+
   # «(NARANJA, MANDARINA, PAPAYA, KIWI, FRESA) Y MANZANA · OTRAS FRUTAS: guayaba,
-  # piña».
+  # piña». El orden de aquí es el de formato seguro: primero las que se sirven
+  # en gajos limpios, después las que hay que despepitar entera.
   fruta_vitc:
     - naranja
     - mandarina
+    - lima
+    - pina_golden
     - papaya
+    - fresa_colada
     - fresa
     - kiwi
-    - piña golden
-    - lima
     - aguaymanto
 
   bebida:
     - agua
+
+  # La lonchera va primero a lo que aporta proteína y densidad, no a lo dulce:
+  # el niño está en el colegio de 8:00 a 13:30 con un solo recreo.
+  base:
+    - panqueques-avena-huevo
+    - trufas-garbanzo-cacao
+    - galletas-quinua-camote
+    - muffins-zanahoria-avena
+    - mazamorra-kiwicha
+    - compota-pera-avena
+    - paletas-mango-papaya
 
 # ---------------------------------------------------------------
 # VARIEDAD
 # ---------------------------------------------------------------
 variedad:
   no_repetir_dia_completo: true
-  max_veces_misma_receta_semana: 3
-  min_recetas_distintas_semana: 8
+  # V-1. El ancla está exenta: se sirve todos los días, ocupa su propio slot y
+  # no consume el cupo del slot de energía.
+  max_veces_misma_receta_semana: 2
+  min_recetas_distintas_semana: 6
+  # V-3. Aviso, no bloqueo: en selectividad la monotonía de una franja es un
+  # dato clínico que Paty tiene que ver, no un error de aritmética.
+  min_preparaciones_por_franja_semana: 3
 
 # ---------------------------------------------------------------
 # AJUSTES POR DIAGNÓSTICO
@@ -254,6 +390,11 @@ decisiones_pendientes:
     desayuno. ¿Te sirve así, o quieres que pueda aparecer también como proteína
     del almuerzo descontando de ese mismo tope?
   - >
-    Aceite de ajonjolí: aparece en escolar_6_11 y lo mantuve con cupo 1 por
-    comida, pero tu tabla de 3–5 años solo nombra oliva, linaza y chía. ¿Lo dejo,
-    lo cambio por linaza o lo saco?
+    El aceite de ajonjolí salió de las rotaciones al partir la ensalada en
+    verdura + grasa: tu tabla de 3–5 años solo nombra oliva, linaza y chía. ¿Lo
+    devuelvo como cuarta grasa, lo cambio por linaza, o se queda fuera?
+  - >
+    Presupuesto sensorial: los topes de suma_n están calibrados a esta gramática
+    de 4–7 slots, no a la tabla genérica de 3–5. Si en la práctica ves que el
+    almuerzo sale corto o la cena larga, el número que hay que mover es
+    `presupuesto_sensorial`, no las frecuencias.

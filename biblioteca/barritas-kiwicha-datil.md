@@ -8,6 +8,17 @@ momento: [media_manana, media_tarde]
 componente: base
 familia:
 textura: seca
+roles: [cereal]
+base_botanica: kiwicha
+grano_base: kiwicha
+demanda_oral: 5
+carga_visual: 2
+textura_mixta: true
+unidad_natural: "1 barrita"
+rasgos_visuales: [moteado]
+hierro_no_hemo: true
+densidad_kcal: alta
+tiempo_min: 60
 aporta: [hierro, fibra]
 alergenos_posibles: [mani, frutos_secos, ajonjoli]
 contraindicado_si: [riesgo_disfagia]   # su propia regla de seguridad, en un campo que el motor sí lee

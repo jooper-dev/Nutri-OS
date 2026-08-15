@@ -4,10 +4,20 @@ tipo: base
 titulo: Quinua licuada
 subtitulo: Colada, sin grumo
 edad_min_meses: 24
-momento: [desayuno]
+momento: [desayuno, media_manana, media_tarde]
 componente: cereal
 familia: grano_andino
 textura: liquida
+roles: [cereal]
+base_botanica: quinua
+grano_base: quinua
+demanda_oral: 0
+carga_visual: 0
+unidad_natural: "180 ml"
+requiere_preparacion_segura: "colada, sin un solo grumo ni mota oscura"
+hierro_no_hemo: true
+densidad_kcal: media
+tiempo_min: 30
 aporta: [hierro, energia]
 alergenos_posibles: []
 origen: creada

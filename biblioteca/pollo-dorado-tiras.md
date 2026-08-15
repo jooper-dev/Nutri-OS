@@ -8,6 +8,16 @@ momento: [desayuno]
 componente: acompanante
 familia: pollo
 textura: seca
+roles: [proteina_animal]
+base_botanica: pollo
+demanda_oral: 4
+carga_visual: 2
+unidad_natural: "3 tiras"
+requiere_preparacion_segura: "cortado a través de la fibra, en tiras cortas"
+rasgos_visuales: [fibra_visible]
+hierro_hemo: true
+densidad_kcal: media
+tiempo_min: 25
 aporta: [proteina, energia, grasas_saludables, zinc]
 alergenos_posibles: []
 origen: creada

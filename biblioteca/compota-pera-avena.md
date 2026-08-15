@@ -8,6 +8,15 @@ momento: [media_manana, media_tarde]
 componente: base
 familia:
 textura: humeda
+roles: [fruta]
+base_botanica: pera
+grano_base: avena
+demanda_oral: 1
+carga_visual: 0
+unidad_natural: "½ taza"
+fibra_alta: true
+densidad_kcal: baja
+tiempo_min: 25
 aporta: [fibra]
 alergenos_posibles: [gluten]
 origen: creada

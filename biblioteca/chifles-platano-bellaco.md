@@ -8,6 +8,14 @@ momento: [media_manana, media_tarde]
 componente: base
 familia:
 textura: crujiente
+roles: [tuberculo]
+base_botanica: platano_bellaco
+demanda_oral: 5
+carga_visual: 2
+unidad_natural: "6 chifles"
+rasgos_visuales: [vetas_visibles]
+densidad_kcal: alta
+tiempo_min: 25
 aporta: [energia, grasas_saludables, potasio]
 alergenos_posibles: []
 contraindicado_si: [riesgo_disfagia]   # su propia regla de seguridad, en un campo que el motor sí lee

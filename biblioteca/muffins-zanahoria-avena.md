@@ -4,10 +4,18 @@ tipo: base
 titulo: Muffins de verdura rallada
 subtitulo:
 edad_min_meses: 12
-momento: [desayuno, media_tarde]
-componente: acompanante
+momento: [media_manana, media_tarde]
+componente: base
 familia:
 textura: blanda
+roles: [cereal]
+base_botanica: zanahoria
+grano_base: avena
+demanda_oral: 3
+carga_visual: 1
+unidad_natural: "1 muffin"
+densidad_kcal: media
+tiempo_min: 35
 aporta: [fibra, betacarotenos]
 alergenos_posibles: [gluten]
 origen: creada

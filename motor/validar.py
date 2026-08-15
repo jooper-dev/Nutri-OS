@@ -26,7 +26,15 @@ from pathlib import Path
 
 import parada_clinica
 import recetas_paciente
+import reglas
 from comun import (
+    HUECO,
+    cargar_despensa_basica,
+    cargar_recetas_instanciadas,
+    conceder_ancla,
+    es_despensa,
+    exposiciones_declaradas,
+    rasgos_aversivos,
     CAMPOS_CLINICOS_CON_PROCEDENCIA,
     CLAVES_PROTOCOLO_SOLO_AVISO,
     COMPONENTES_SIN_FILTRO_TEXTURA,
@@ -38,6 +46,7 @@ from comun import (
     cargar_biblioteca,
     cargar_ficha,
     cargar_protocolo,
+    coincide_alimento,
     coincide_rechazo,
     comidas_activas,
     comprobar_rango_edad,
@@ -71,12 +80,21 @@ class Reporte:
         return not self.errores
 
 
-def _items(plan: dict):
-    """Recorre todos los ítems del plan: (semana, dia, comida, item)."""
+def _items(plan: dict, con_huecos: bool = False):
+    """Recorre todos los ítems del plan: (semana, dia, comida, item).
+
+    Los huecos declarados quedan fuera salvo que se pidan. No son alimentos: son
+    ausencias que ya vienen con su motivo y su receta faltante escritos. Contar
+    un hueco como si fuera un ítem hacía dos cosas malas a la vez — daba la
+    ranura por cubierta en el recuento de frecuencias, y producía media docena
+    de errores sobre un plato que no existe.
+    """
     for s in plan["semanas"]:
         for dia, comidas in s["dias"].items():
             for cid, comida in comidas.items():
                 for item in comida["items"]:
+                    if item.get("hueco") and not con_huecos:
+                        continue
                     yield s["semana"], dia, cid, item
 
 
@@ -90,11 +108,23 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
     ficha = cargar_ficha(carpeta)
     protocolo = cargar_protocolo(ficha["protocolo_sugerido"])
     recetas, avisos_bib = cargar_biblioteca()
-    catalogo = {o.id: o for o in recetas + cargar_alimentos_base()}
+    opciones = recetas + cargar_alimentos_base()
+    # El ancla se concede igual que en el ensamblador, y por su cuenta: si el
+    # validador no supiera cuál es el alimento seguro, contaría sus catorce
+    # apariciones como una receta repetida y bloquearía el plan por cumplir
+    # T-10.
+    huerfanas_ancla = conceder_ancla(opciones, ficha)
+    catalogo = {o.id: o for o in opciones}
 
     r = Reporte()
     for a in avisos_bib:
         r.aviso(f"Biblioteca: {a}")
+    if huerfanas_ancla:
+        r.error(
+            "La ficha declara como alimento ancla algo que el sistema no conoce: "
+            + ", ".join(huerfanas_ancla)
+            + ".\n    El slot ANCLA se quedaría vacío todos los días."
+        )
 
     # --- 0. ¿Debe este caso tener un plan? ----------------------------------
     # Va primero porque es la pregunta previa a todas las demás. El validador
@@ -212,11 +242,23 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
             )
 
     for sem, dia, cid, item in _items(plan):
+        # Un hueco declarado no es un alimento: es una ausencia ya explicada.
+        # Tratarlo como ítem produce media docena de errores absurdos sobre él
+        # y tapa el hueco de verdad, que es lo único que hay que leer ahí.
+        if item.get("hueco"):
+            continue
         ident = item.get("receta_id") or normalizar(item["nombre"])
         opcion = catalogo.get(ident) or next(
             (o for o in catalogo.values() if o.nombre == item["nombre"]), None
         )
         donde = f"S{sem} · {dia} · {cid}"
+
+        # El suplemento lo inyecta la ficha con su dosis y su hora: no sale del
+        # catálogo y no tiene por qué estar ahí.
+        if item.get("componente") == "suplemento":
+            if not str(item.get("cantidad") or "").strip():
+                r.error(f"{donde}: el suplemento «{item['nombre']}» va sin dosis ni hora.")
+            continue
 
         if opcion is None:
             r.error(f"{donde}: «{item['nombre']}» no existe en la biblioteca ni en alimentos base.")
@@ -380,6 +422,10 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
         for dia, comidas in s["dias"].items():
             for cid, comida in comidas.items():
                 for item in comida["items"]:
+                    # Un hueco declarado no cubre la ranura: si contara, un plan
+                    # con siete huecos de proteína cumpliría «proteína 7 veces».
+                    if item.get("hueco"):
+                        continue
                     conteo_comp[(item["componente"], cid)] += 1
                     op = catalogo.get(item.get("receta_id") or "") or next(
                         (o for o in catalogo.values() if o.nombre == item["nombre"]), None
@@ -510,8 +556,13 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
             firmas[firma] = f"S{s['semana']} {dia}"
             for c in comidas.values():
                 for i in c["items"]:
-                    if i.get("receta_id"):
-                        usos[i["receta_id"]] += 1
+                    # V-5. El ancla está exenta de toda regla de variedad: se
+                    # sirve TODOS los días y ocupa su propio slot. Sin esta
+                    # exención, cumplir T-10 rompía V-1 y el plan correcto salía
+                    # bloqueado por hacer lo que se le pedía.
+                    rid = i.get("receta_id")
+                    if rid and not (rid in catalogo and catalogo[rid].es_ancla):
+                        usos[rid] += 1
 
         tope = var.get("max_veces_misma_receta_semana")
         if tope:
@@ -572,13 +623,22 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
     # nuevas es justo lo que decide si el plan es ambicioso o es papel mojado.
     repertorio = [str(x) for x in (ficha.get("repertorio_aceptado") or [])]
     if repertorio:
+        despensa = cargar_despensa_basica()
+        conocidos = repertorio + list(exposiciones_declaradas(ficha))
         nuevos: dict[str, None] = {}
         for _sem, _dia, _cid, item in _items(plan):
-            if item.get("receta_id"):
+            # Ni la receta ni el suplemento: la primera declara sus propias
+            # exposiciones ingrediente por ingrediente, y el segundo es una
+            # indicación médica, no un alimento que el niño acepte o rechace.
+            if item.get("receta_id") or item.get("componente") == "suplemento":
                 continue
             nombre = str(item["nombre"])
-            if not any(coincide_rechazo(x, Opcion(id="", nombre=nombre, componente="",
-                                                  edad_min_meses=0)) for x in repertorio):
+            # El aceite y el agua no se «aceptan»: son despensa. Listarlos como
+            # introducciones nuevas ahoga el aviso que sí protege al niño.
+            if es_despensa(nombre, despensa):
+                continue
+            if not any(coincide_alimento(x, Opcion(id="", nombre=nombre, componente="",
+                                                   edad_min_meses=0)) for x in conocidos):
                 nuevos[nombre] = None
         if nuevos:
             r.aviso(
@@ -638,6 +698,48 @@ def validar(nombre_carpeta: str) -> tuple[Reporte, dict]:
     # --- 7. Degradaciones del ensamblador -----------------------------------
     for d in plan.get("degradaciones", []):
         r.aviso(f"Sustitución forzada: {d}")
+
+    # --- 8. Capa 7 · el catálogo de reglas, por ID --------------------------
+    # Aquí es donde el plan se rechaza por R-2, T-6, V-1 u O-3, y no por una
+    # frase que haya que interpretar. El ID es lo que permite decir «tumba la
+    # T-4 de este niño» sin describir el párrafo entero, y lo que hace que un
+    # reporte se pueda comparar con el de la semana pasada.
+    rasgos_excluidos, problemas_rasgos = rasgos_aversivos(ficha)
+    for p in problemas_rasgos:
+        r.error(p)
+
+    instanciadas, _ = cargar_recetas_instanciadas(carpeta)
+    for infra in reglas.evaluar(
+        plan, ficha, protocolo, catalogo, instanciadas, rasgos_excluidos
+    ):
+        (r.error if infra.bloquea else r.aviso)(infra.texto())
+
+    # --- 9. Huecos declarados -----------------------------------------------
+    # No son errores: son el resultado profesional de un slot que se quedó sin
+    # candidatos válidos. Van arriba, con las exposiciones, porque cada uno es
+    # una receta que hay que encargar antes del próximo control.
+    for h in plan.get("huecos") or []:
+        r.destacado(
+            f"{HUECO} · S{h.get('semana')} · {h.get('dia')} · {h.get('comida')} · "
+            f"{h.get('componente')}: {h.get('motivo')}\n"
+            f"    Reglas que vaciaron el conjunto: {h.get('reglas')}\n"
+            f"    Qué falta: {h.get('receta_que_falta')}"
+        )
+
+    # --- 10. Exposiciones declaradas en la ficha ----------------------------
+    # Las de las recetas ya suben a destacado desde recetas_paciente. Estas son
+    # las del plan: alimentos servidos tal cual que el niño no tiene en su
+    # repertorio y que se introducen a propósito. Se aprueban una a una.
+    servidos = {
+        str(i["nombre"]) for _s, _d, _c, i in _items(plan) if i.get("exposicion")
+    }
+    for clave, datos in sorted(exposiciones_declaradas(ficha).items()):
+        r.destacado(
+            f"EXPOSICIÓN PLANIFICADA · «{clave}» desde la semana "
+            f"{datos['desde_semana']}"
+            + (f" — aparece como {', '.join(sorted(servidos))}" if servidos else "")
+            + f". {datos['porque']} · PENDIENTE DEL VISTO BUENO DE PATY."
+        )
 
     return r, plan
 

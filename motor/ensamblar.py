@@ -26,17 +26,24 @@ from comun import (
     COMPONENTES_SIN_EXIGENCIA_DE_VARIEDAD,
     DIAS,
     DIR_PACIENTES,
+    HUECO,
     ErrorNutriOS,
     Opcion,
     ajustes_clinicos,
     cargar_alimentos_base,
     cargar_biblioteca,
+    cargar_despensa_basica,
     cargar_ficha,
     cargar_protocolo,
+    coincide_alimento,
+    exposiciones_declaradas,
     comidas_activas,
     comprobar_rango_edad,
+    conceder_ancla,
+    es_despensa,
     guardar_json,
     normalizar,
+    rasgos_aversivos,
     resolver_regla_acoplada,
 )
 
@@ -49,7 +56,14 @@ MAX_INTENTOS = 60
 
 
 class Repertorio:
-    """Todas las opciones disponibles, ya filtradas para este paciente."""
+    """Todas las opciones disponibles, ya filtradas para este paciente.
+
+    El filtrado va en capas y el orden importa, porque cada una explica un
+    descarte distinto en el reporte: primero lo que este niño no puede comer
+    (alergia, exclusión, edad, textura, rasgo aversivo), después lo que su boca
+    no puede procesar hoy (techo oral y visual), y por último lo que no está en
+    su repertorio y nadie ha declarado como exposición.
+    """
 
     def __init__(
         self,
@@ -58,17 +72,99 @@ class Repertorio:
         protocolo: dict,
         frecuencias: list[dict],
         exclusiones_extra: set[str] | None = None,
+        rasgos_excluidos: set[str] | None = None,
+        n_semana: int = 1,
     ):
         self.ficha = ficha
+        self.protocolo = protocolo
+        self.gramatica = {
+            str(k): (v or {}) for k, v in (protocolo.get("gramatica") or {}).items()
+        }
         self.descartes: list[tuple[str, str]] = []
+        # Cuántas reglas duras rompió la última elección. Lo lee quien llama
+        # para decidir si degrada la familia de la rotación.
+        self.ultima_rompe = 0
         self.por_componente: dict[str, list[Opcion]] = defaultdict(list)
+        self.anclas: list[Opcion] = []
+
+        perfil = ficha.get("perfil_sensorial") or {}
+        self.techo_oral = perfil.get("nivel_oral_actual")
+        self.techo_visual = perfil.get("nivel_visual_actual")
+
+        despensa = cargar_despensa_basica()
+        repertorio = [str(x) for x in (ficha.get("repertorio_aceptado") or [])]
+        # T-8 · una exposición entra a partir de SU semana y se queda: la
+        # exposición sin presión es la intervención, no el consumo, así que un
+        # alimento nuevo se mantiene en el plan aunque se rechace.
+        declaradas = exposiciones_declaradas(ficha)
+        expuestos = [
+            clave
+            for clave, datos in declaradas.items()
+            if datos["desde_semana"] <= n_semana
+        ]
+        self.expuestos = expuestos
+        self.expuestos_nuevos = [
+            clave
+            for clave, datos in declaradas.items()
+            if datos["desde_semana"] == n_semana
+        ]
 
         for o in opciones:
-            apta, motivo = o.apta_para(ficha, exclusiones_extra)
-            if apta:
-                self.por_componente[o.componente].append(o)
-            else:
+            apta, motivo = o.apta_para(ficha, exclusiones_extra, rasgos_excluidos)
+            if not apta:
                 self.descartes.append((o.nombre, motivo))
+                continue
+
+            # R-11 · prohibido lo genérico. «Fruta picada» no dice qué fruta
+            # ni cuánta, y no se puede contrastar contra una lista de
+            # exclusiones que nombra especies. El validador lo rechazaría
+            # igualmente: no tiene sentido elegirlo para tumbar el plan después.
+            if o.generico:
+                self.descartes.append((o.nombre, "R-11: nombre genérico, no verificable"))
+                continue
+
+            # T-1 · techo de demanda oral. Un componente que lo supera solo
+            # puede entrar como RETO, y el reto lo coloca el generador a
+            # propósito: no se cuela por relleno. Es lo que evita un salto de N0
+            # a N4 a las 7:30 con tono oral bajo.
+            if (
+                self.techo_oral is not None
+                and o.demanda_oral is not None
+                and o.demanda_oral > int(self.techo_oral)
+            ):
+                self.descartes.append(
+                    (o.nombre, f"T-1: N{o.demanda_oral} sobre el techo N{self.techo_oral}")
+                )
+                continue
+
+            # T-7 · techo de carga visual, con un nivel de margen. V3 no es «un
+            # poco más difícil»: es otra categoría de tarea.
+            if (
+                self.techo_visual is not None
+                and o.carga_visual is not None
+                and o.carga_visual > int(self.techo_visual) + 1
+            ):
+                self.descartes.append(
+                    (o.nombre, f"T-7: V{o.carga_visual} sobre el techo V{self.techo_visual}")
+                )
+                continue
+
+            # T-8 · fuera del repertorio, o va declarado, o no va. La regla ya
+            # existía para los ingredientes de una receta y no para el alimento
+            # servido tal cual, y por ahí entró la pavita ocho veces en catorce
+            # días sin que nadie la hubiera nombrado en la anamnesis.
+            if repertorio and not o.es_receta and not es_despensa(o.nombre, despensa):
+                conocido = any(coincide_alimento(r, o) for r in repertorio)
+                declarado = any(coincide_alimento(e, o) for e in expuestos)
+                if not conocido and not declarado:
+                    self.descartes.append(
+                        (o.nombre, "fuera del repertorio y sin declarar como exposición")
+                    )
+                    continue
+
+            self.por_componente[o.componente].append(o)
+            if o.es_ancla:
+                self.anclas.append(o)
 
         # Familias con cupo propio en el protocolo: no pueden usarse como
         # relleno improvisado, o se desbordaría su frecuencia.
@@ -91,9 +187,38 @@ class Repertorio:
             for comp, lista in (protocolo.get("prioridades") or {}).items()
         }
 
+    # -- Capa 2 · la gramática decide de dónde salen los candidatos --------
+
+    def _fuentes(self, componente: str) -> list[str]:
+        slot = self.gramatica.get(componente)
+        if slot is None:
+            return [componente]
+        fuentes = slot.get("fuentes")
+        if fuentes is None:
+            return [componente]
+        return [str(f) for f in fuentes]
+
+    def roles_de(self, componente: str) -> list[str]:
+        return [str(r) for r in ((self.gramatica.get(componente) or {}).get("roles") or [])]
+
     def candidatas(self, componente: str, comida: str, familia: str = "") -> list[Opcion]:
+        """Lo que puede ocupar este slot en esta comida.
+
+        Dos filtros y en este orden: de dónde sale (las `fuentes` del slot) y
+        con qué rol entra (R-0). El rol es lo que impide que un tubérculo llene
+        el sitio de la proteína aunque esté guardado en el mismo cajón.
+        """
+        roles = self.roles_de(componente)
+        if "ancla" in roles:
+            pool = list(self.anclas)
+        else:
+            pool = [o for f in self._fuentes(componente) for o in self.por_componente.get(f, [])]
+
         salida = []
-        for o in self.por_componente.get(componente, []):
+        vistos: set[str] = set()
+        for o in pool:
+            if o.id in vistos:
+                continue
             # Dos niveles: la clave del protocolo puede ser un cajón (familia)
             # o un alimento concreto (id). Ver Opcion.responde_a.
             if familia and not o.responde_a(familia):
@@ -101,6 +226,9 @@ class Repertorio:
             # Una receta solo entra en los momentos que declara.
             if o.es_receta and o.momento and comida not in o.momento:
                 continue
+            if roles and not o.rol_para(roles):
+                continue
+            vistos.add(o.id)
             salida.append(o)
         return salida
 
@@ -113,7 +241,19 @@ class Repertorio:
         tope_semana: int,
         rng: random.Random,
         excluir_reguladas: bool = False,
+        presupuesto: dict | None = None,
+        contexto: dict | None = None,
     ) -> Opcion | None:
+        """Elige qué llena este slot, con las reglas duras delante.
+
+        `contexto` es lo que ya hay en esta comida y lo que pasó ayer. Sin él,
+        el generador elegía a ciegas y el validador rechazaba después: un
+        desayuno con ancla líquida, grasa untable y fruta colada cumple todas
+        las frecuencias y rompe R-4 —tres componentes en papilla—, y una cena
+        que copia el almuerzo rompe T-5. Mirar el conjunto al elegir no es armar
+        la grilla por fuerza bruta: es no meter a sabiendas lo que va a salir
+        rechazado.
+        """
         pool = self.candidatas(componente, comida, familia)
         # Si la ranura no pide una familia concreta, no puede tomar prestada una
         # familia que tiene cupo propio en el protocolo: se desbordaría su
@@ -123,8 +263,10 @@ class Repertorio:
         if not pool:
             return None
 
+        # El ancla está exenta del tope de repetición: se sirve todos los días y
+        # no cuenta para ninguna regla de variedad (V-5, T-10).
         disponibles = [
-            o for o in pool if (not o.es_receta) or usos[o.id] < tope_semana
+            o for o in pool if o.es_ancla or (not o.es_receta) or usos[o.id] < tope_semana
         ]
         if not disponibles:
             return None
@@ -137,17 +279,111 @@ class Repertorio:
                     return i
             return len(orden)   # lo que no está en la lista va al final
 
+        # T-3 y R-7 juntos, como criterio de desempate y no como filtro: donde
+        # la franja tiene presupuesto sensorial apretado —la cena—, la opción
+        # más suave gana; y a igualdad, la de mayor densidad calórica, porque a
+        # un niño que come poco no se le pide comer más, se le da más en lo poco
+        # que come.
+        sentido = str((presupuesto or {}).get("sentido") or "")
+        densidad = {"alta": 0, "media": 1, "baja": 2}
+        ctx = contexto or {}
+        puestas: list[Opcion] = list(ctx.get("opciones") or [])
+        tope_franja: dict = ctx.get("tope_franja") or {}
+        tope_suma_dia = ctx.get("tope_suma_dia")
+        ayer: set[str] = set(ctx.get("ayer") or set())
+
+        # Lo que todavía va a entrar en esta comida. Sin esto, el generador
+        # elegía cada slot mirando solo lo ya puesto y se quedaba sin salida al
+        # final: con el ancla líquida y la fruta colada ya dentro, ninguna grasa
+        # untable podía entrar sin romper R-4 — y la comida sí tenía solución si
+        # la fruta se elegía sabiendo que después venía una grasa de N1.
+        pend_blandos: int = int(ctx.get("pendientes_blandos") or 0)
+        pend_suma: int = int(ctx.get("pendientes_suma") or 0)
+
+        def rompe(o: Opcion) -> int:
+            """Cuántas reglas duras rompería meter esto aquí. Menos es mejor."""
+            fallos = 0
+            # R-1 · un solo grano por comida, y una sola base botánica. Es lo
+            # que impide «avena + panqueques de avena» y «barritas de kiwicha +
+            # kiwicha pop»: dos nombres distintos y un solo cereal. Se comprueba
+            # sobre el grano, no sobre el título, y también sobre lo que no
+            # forma bocado, porque un aceite de ajonjolí sigue siendo ajonjolí.
+            if o.grano_base and any(
+                x.grano_base == o.grano_base for x in puestas
+            ):
+                fallos += 1
+            if o.base_botanica and o.base_botanica != "mezcla" and any(
+                x.base_botanica == o.base_botanica for x in puestas
+            ):
+                fallos += 1
+            if not o.forma_bocado:
+                return fallos
+            bocados = [x for x in puestas if x.forma_bocado] + [o]
+            # R-4 · máximo dos componentes en papilla por comida.
+            blandos = sum(1 for x in bocados if (x.demanda_oral or 0) <= 1)
+            if blandos + pend_blandos > 2:
+                fallos += 1
+            suma = sum(x.demanda_oral or 0 for x in bocados) + pend_suma
+            n3 = sum(1 for x in bocados if (x.demanda_oral or 0) >= 3)
+            n4 = sum(1 for x in bocados if (x.demanda_oral or 0) >= 4)
+            # T-3 · presupuesto de la franja.
+            if tope_franja.get("suma_n") is not None and suma > int(tope_franja["suma_n"]):
+                fallos += 1
+            if tope_franja.get("max_n3") is not None and n3 > int(tope_franja["max_n3"]):
+                fallos += 1
+            if tope_franja.get("max_n4") is not None and n4 > int(tope_franja["max_n4"]):
+                fallos += 1
+            # T-5 · la cena pesa menos que el almuerzo del mismo día.
+            if tope_suma_dia is not None and suma > int(tope_suma_dia):
+                fallos += 1
+            return fallos
+
         def puntaje(o: Opcion) -> tuple:
             clinico = -len(self.priorizar & set(o.aporta))   # menor = mejor
+            # La demanda oral pesa más que la variedad en las dos franjas que
+            # tienen presupuesto propio, y en direcciones opuestas:
+            #
+            #   cena      lo más suave. A las 18:00 la fatiga oral es máxima y
+            #             la comida tiene que terminar en éxito (T-4, T-5).
+            #   almuerzo  lo más exigente que quepa en el presupuesto. Es la
+            #             comida de trabajo: si también aquí se eligiera lo
+            #             blando, la cena no tendría por dónde quedar dos
+            #             puntos por debajo y T-5 sería imposible de cumplir.
+            #
+            # `rompe()` es el que impide pasarse del techo por arriba; esto solo
+            # decide hacia dónde tira dentro de lo que ya cabe.
+            #
+            # El ancla queda fuera de las dos direcciones, y de la rotación. No
+            # compite: es el mismo alimento seguro todos los días, lo elige la
+            # lista de prioridades del protocolo y nada más. Sin esta excepción,
+            # el desayuno prefería la papa amarilla (N2) a la quinua licuada
+            # (N0) por ser «más de trabajo», y el alimento seguro del niño
+            # desaparecía del plan por segunda vez y por otro camino.
+            n = o.demanda_oral or 0
+            if o.es_ancla:
+                esfuerzo = 0
+            elif sentido == "suave":
+                esfuerzo = n
+            elif sentido == "trabajo":
+                esfuerzo = -n
+            else:
+                esfuerzo = 0
+            rotacion = 0 if o.es_ancla else usos[o.id]
             return (
-                usos[o.id],
+                rompe(o),
+                # V-2 · ninguna receta en días consecutivos. El ancla exenta.
+                1 if (o.es_receta and not o.es_ancla and o.id in ayer) else 0,
+                *((esfuerzo, rotacion) if sentido else (rotacion, esfuerzo)),
                 clinico,
                 preferencia(o),
+                densidad.get(o.densidad_kcal, 1),
                 0 if o.validada_en_cocina else 1,
                 rng.random(),
             )
 
-        return min(disponibles, key=puntaje)
+        mejor = min(disponibles, key=puntaje)
+        self.ultima_rompe = rompe(mejor)
+        return mejor
 
 
 # ---------------------------------------------------------------------------
@@ -175,16 +411,54 @@ def _ranuras(
     return out
 
 
-def _reparto(reparto: dict, total: int) -> list[str]:
-    """Convierte {avena:2, canihua:2, resto:...} en una lista de N familias."""
+def _reparto(
+    reparto: dict, total: int, viables: set[str] | None = None
+) -> list[str]:
+    """Convierte {avena:2, canihua:2, resto:...} en una lista de N familias.
+
+    **V-4 · Redistribución proporcional.** Cuando una familia de la rotación no
+    tiene ningún candidato para este paciente, sus cupos se reparten entre las
+    demás **en proporción a lo que ya tenían**, y no se acumulan sobre una sola.
+
+    Esto salió de un plan real: al excluir la cañihua, sus dos cupos semanales
+    se fueron enteros a la quinua licuada. Una regla de variedad terminó
+    produciendo monotonía, que es exactamente lo contrario de lo que la regla
+    existe para hacer.
+
+    `viables` son las claves que sí tienen candidatos. Si no se pasa, no se
+    redistribuye nada y el comportamiento es el de siempre.
+    """
     fijas, resto_key = [], None
+    cupos: dict[str, int] = {}
     for fam, n in reparto.items():
         if str(n).strip() == "resto":
             if resto_key:
                 raise ErrorNutriOS("Una rotación no puede tener dos valores 'resto'.")
             resto_key = fam
         else:
-            fijas += [fam] * int(n)
+            cupos[fam] = int(n)
+
+    if viables is not None:
+        caidas = {f: n for f, n in cupos.items() if f not in viables}
+        vivas = {f: n for f, n in cupos.items() if f in viables}
+        huerfanos = sum(caidas.values())
+        if huerfanos and vivas:
+            base = sum(vivas.values()) or 1
+            reparto_extra = {
+                f: huerfanos * n // base for f, n in vivas.items()
+            }
+            sobra = huerfanos - sum(reparto_extra.values())
+            # Lo que no cae en cuenta redonda va a las de mayor cupo, en orden
+            # estable: el reparto no puede depender de cómo iteró el diccionario.
+            for f, _ in sorted(vivas.items(), key=lambda kv: (-kv[1], kv[0]))[:sobra]:
+                reparto_extra[f] += 1
+            cupos = {f: n + reparto_extra[f] for f, n in vivas.items()}
+        elif huerfanos:
+            cupos = vivas
+
+    for fam, n in cupos.items():
+        fijas += [fam] * n
+
     if len(fijas) > total:
         raise ErrorNutriOS(
             f"Rotación imposible: pide {len(fijas)} apariciones para {total} ranuras."
@@ -258,7 +532,15 @@ def construir_semana(
         comidas_validas = rot.get("en") or ids_activas
         ranuras = _ranuras(protocolo, comp, comidas_validas, n_semana)
         ranuras = [r for r in ranuras if (r[0], r[1], comp) not in familia_forzada]
-        familias = _reparto(rot["reparto"], len(ranuras))
+        # V-4: qué claves de la rotación tienen de verdad algún candidato para
+        # este paciente. Las que no, ceden su cupo proporcionalmente.
+        viables = {
+            fam
+            for fam in (rot.get("reparto") or {})
+            if str(rot["reparto"][fam]).strip() == "resto"
+            or any(rep.candidatas(comp, c, fam) for c in comidas_validas)
+        }
+        familias = _reparto(rot["reparto"], len(ranuras), viables)
         rng.shuffle(familias)
         for (d, c), fam in zip(ranuras, familias):
             if fam:
@@ -279,6 +561,12 @@ def construir_semana(
     for comida in activas:
         for comp in comida["componentes"]:
             if (comp, comida["id"]) in cubiertos or comp in dependientes:
+                continue
+            # El suplemento no se elige: lo inyecta la ficha con su dosis, su
+            # hora y su separación de lácteos. Buscarle candidatos en el
+            # catálogo declararía siete huecos al día por un slot que sí está
+            # lleno.
+            if comp == "suplemento":
                 continue
             a_llenar += [(d, comida["id"], comp) for d in range(7)]
 
@@ -324,6 +612,28 @@ def construir_semana(
                 )
         a_llenar += nuevas
 
+    # --- 4b. Intervenciones activas: el producto, no la categoría ----------
+    # I-1. La frecuencia del protocolo pide la familia («yogurt, media tarde»);
+    # la intervención activa refina a QUÉ yogurt, porque «el estreñimiento se
+    # normalizó desde que recibe yogurt a diario» se refiere al que ya toma.
+    # El plan anterior lo bajó a tres veces por semana Y le cambió el producto:
+    # las dos cosas modifican un tratamiento en curso que estaba funcionando.
+    for iv in ficha.get("intervenciones_activas") or []:
+        alimento = str(iv.get("alimento") or "").strip()
+        if not alimento:
+            continue
+        franja = str(iv.get("franja") or "").strip()
+        for clave, fam in list(familia_forzada.items()):
+            d, c, comp = clave
+            if franja and c != franja:
+                continue
+            concretas = [
+                o for o in rep.candidatas(comp, c, fam)
+                if normalizar(o.id) == normalizar(alimento)
+            ]
+            if concretas:
+                familia_forzada[clave] = alimento
+
     # --- 5. Relleno de familias sobrantes -----------------------------------
     for regla in frecuencias:
         if regla.get("modo") != "relleno" or not regla.get("familia"):
@@ -347,7 +657,15 @@ def construir_semana(
         # componente y está escrita en comun.py, con el porqué.
         if comp in COMPONENTES_SIN_EXIGENCIA_DE_VARIEDAD:
             continue
-        techo = len(opciones) * tope
+        # El tope de repetición solo lo tienen las recetas: un alimento base
+        # puede ir a diario y nadie espera lo contrario del arroz. Contarlo
+        # todo con tope bloqueaba planes que sí se podían construir, y la
+        # señal que sí importa —una sola preparación cubriendo la franja
+        # entera— la da V-3 en el reporte, como aviso clínico y no como error
+        # de aritmética.
+        con_receta = sum(1 for o in opciones if o.es_receta)
+        hay_base = any(not o.es_receta for o in opciones)
+        techo = float("inf") if hay_base else con_receta * tope
         if opciones and n > techo:
             raise ErrorNutriOS(
                 f"Biblioteca insuficiente para «{comp}» en «{c}»: hacen falta {n} "
@@ -407,12 +725,107 @@ def construir_semana(
             )
 
     # --- 6. Elección concreta ----------------------------------------------
-    sin_opcion: list[str] = []
+    # Aquí es donde la v2 se separa del motor anterior: si un slot se queda sin
+    # candidatos válidos NO se rellena con lo que haya. Se declara el hueco, se
+    # dice qué reglas vaciaron el conjunto y qué receta lo cerraría.
+    #
+    # Un hueco declarado es un resultado profesional. Un cereal ocupando el slot
+    # de la proteína es un error que la nutricionista ve en tres segundos.
+    presupuesto = protocolo.get("presupuesto_sensorial") or {}
+    # Dónde conviene elegir lo más suave a igualdad de todo lo demás: en las
+    # comidas donde no se admite ningún reto. A las 18:00 la mandíbula de un niño
+    # con tono bajo ya trabajó todo el día, y la cena tiene que cerrar en éxito.
+    # En el almuerzo NO se aplica: ahí preferir siempre lo blando produciría el
+    # otro error, una comida de trabajo sin trabajo.
+    suaves = {str(x) for x in (presupuesto.get("comidas_sin_reto") or [])}
     degradaciones: set[str] = set()
-    orden = sorted(set(a_llenar), key=lambda t: (t[0], t[1], t[2]))
+    huecos: dict[tuple[int, str, str], dict] = {}
+    # El orden importa: dentro de un día, el almuerzo se construye antes que la
+    # cena, y por eso T-5 puede mirar cuánto pesó el almuerzo al elegir la cena.
+    orden_comida = {c["id"]: n for n, c in enumerate(protocolo.get("comidas") or [])}
+    #
+    # Y dentro de una comida, primero el slot con menos candidatos. El orden
+    # alfabético dejaba la grasa para el final, y cuando le tocaba ya había dos
+    # componentes en papilla delante: ninguna grasa untable podía entrar sin
+    # romper R-4, aunque la comida sí tenía solución si se elegía al revés.
+    anchura = {
+        (c, comp): len(rep.candidatas(comp, c))
+        for _d, c, comp in set(a_llenar)
+    }
+    orden = sorted(
+        set(a_llenar),
+        key=lambda t: (
+            t[0],
+            orden_comida.get(t[1], 99),
+            anchura.get((t[1], t[2]), 99),
+            t[2],
+        ),
+    )
+    suma_dia: dict[tuple[int, str], int] = {}
+    usados_por_dia: dict[int, set[str]] = defaultdict(set)
+
     for d, c, comp in orden:
         fam = familia_forzada.get((d, c, comp), "")
-        elegida = rep.elegir(comp, c, fam, usos, tope, rng)
+        aprieta = {"sentido": "suave"} if c in suaves else (
+            {"sentido": "trabajo"} if presupuesto.get(c) else {}
+        )
+        puestas = [o for o in semana[d][c].values()]
+        tope_suma_dia = None
+        margen = presupuesto.get("margen_cena")
+        if c == "cena" and margen is not None and (d, "almuerzo") in suma_dia:
+            tope_suma_dia = suma_dia[(d, "almuerzo")] - int(margen)
+        # Qué queda por llenar de esta comida, para que el que elige ahora sepa
+        # cuánta demanda oral se va a gastar después.
+        pendientes = [
+            x
+            for (dd, cc, xx) in orden
+            if dd == d and cc == c and xx not in semana[d][c] and xx != comp
+            for x in [xx]
+        ]
+        pend_blandos = 0
+        pend_suma = 0
+        for otro in pendientes:
+            opciones_otro = rep.candidatas(otro, c, familia_forzada.get((d, c, otro), ""))
+            bocados_otro = [o for o in opciones_otro if o.forma_bocado]
+            if not bocados_otro:
+                continue
+            minimo = min((o.demanda_oral or 0) for o in bocados_otro)
+            pend_suma += minimo
+            if all((o.demanda_oral or 0) <= 1 for o in bocados_otro):
+                pend_blandos += 1
+
+        contexto = {
+            "opciones": puestas,
+            "tope_franja": presupuesto.get(c) or {},
+            "tope_suma_dia": tope_suma_dia,
+            "ayer": usados_por_dia.get(d - 1, set()),
+            "pendientes_blandos": pend_blandos,
+            "pendientes_suma": pend_suma,
+        }
+        elegida = rep.elegir(
+            comp, c, fam, usos, tope, rng, presupuesto=aprieta, contexto=contexto
+        )
+        # La rotación pedía una familia y esa familia rompe una regla dura aquí:
+        # la palta de la cena es un bocado más y deja la cena por encima del
+        # almuerzo (T-5). Se degrada a otra familia del mismo componente, y
+        # NUNCA en silencio. Solo se hace cuando el componente no tiene regla de
+        # frecuencia propia: una frecuencia escrita no se degrada por
+        # comodidad sensorial, se declara el conflicto y lo resuelve Paty.
+        regulado = any(
+            f.get("componente") == comp and f.get("veces") is not None
+            for f in frecuencias
+        )
+        if elegida is not None and fam and rep.ultima_rompe and not regulado:
+            alterna = rep.elegir(
+                comp, c, "", usos, tope, rng,
+                excluir_reguladas=True, presupuesto=aprieta, contexto=contexto,
+            )
+            if alterna is not None and rep.ultima_rompe == 0:
+                degradaciones.add(
+                    f"{comp}/{fam}: la rotación pedía «{fam}» y aquí rompía una regla "
+                    f"sensorial; se sustituyó por «{alterna.familia or alterna.id}»"
+                )
+                elegida = alterna
         if elegida is None and fam:
             # La familia que pedía el protocolo no tiene ninguna opción viable
             # para este paciente (alergia, rechazo o edad). Se degrada a otra,
@@ -420,39 +833,81 @@ def construir_semana(
             degradaciones.add(
                 f"{comp}/{fam}: sin opciones para este paciente; se sustituyó por otra familia"
             )
-            elegida = rep.elegir(comp, c, "", usos, tope, rng, excluir_reguladas=True)
+            elegida = rep.elegir(
+                comp,
+                c,
+                "",
+                usos,
+                tope,
+                rng,
+                excluir_reguladas=True,
+                presupuesto=aprieta,
+                contexto=contexto,
+            )
         if elegida is None:
-            sin_opcion.append(f"{DIAS[d]} · {c} · {comp}" + (f" ({fam})" if fam else ""))
+            huecos[(d, c, comp)] = _declarar_hueco(rep, comp, c, fam, ficha)
             continue
         usos[elegida.id] += 1
         semana[d][c][comp] = elegida
-
-    if sin_opcion:
-        raise ErrorNutriOS(
-            "No hay opciones disponibles para estas ranuras (biblioteca insuficiente "
-            "o filtros del paciente demasiado restrictivos):\n  - "
-            + "\n  - ".join(sin_opcion[:12])
-            + (f"\n  ... y {len(sin_opcion) - 12} más" if len(sin_opcion) > 12 else "")
-        )
+        usados_por_dia[d].add(elegida.id)
+        if elegida.forma_bocado:
+            suma_dia[(d, c)] = suma_dia.get((d, c), 0) + (elegida.demanda_oral or 0)
 
     # --- 7. Serialización ---------------------------------------------------
-    salida = {"semana": n_semana, "dias": {}, "degradaciones": sorted(degradaciones)}
+    gram = {str(k): (v or {}) for k, v in (protocolo.get("gramatica") or {}).items()}
+    salida = {
+        "semana": n_semana,
+        "dias": {},
+        "degradaciones": sorted(degradaciones),
+        "huecos": [],
+    }
     for d in range(7):
         dia = {}
         for comida in activas:
             items = []
             for comp in comida["componentes"]:
+                hueco = huecos.get((d, comida["id"], comp))
+                if hueco:
+                    items.append(
+                        {
+                            "componente": comp,
+                            "rol": (gram.get(comp) or {}).get("papel", ""),
+                            "nombre": HUECO,
+                            "cantidad": "",
+                            "receta_id": None,
+                            "hueco": True,
+                            **hueco,
+                        }
+                    )
+                    salida["huecos"].append(
+                        {"dia": DIAS[d], "comida": comida["id"], "componente": comp, **hueco}
+                    )
+                    continue
                 o = semana[d][comida["id"]].get(comp)
                 if not o:
                     continue
-                items.append(
-                    {
-                        "componente": comp,
-                        "nombre": o.nombre,
-                        "cantidad": porciones.get(comp, ""),
-                        "receta_id": o.id if o.es_receta else None,
-                    }
-                )
+                item = {
+                    "componente": comp,
+                    # Con qué rol llena ESTE slot. Un alimento puede poder cubrir
+                    # varios, pero en una comida dada ocupa exactamente uno: si la
+                    # quinua entra como cereal, no cuenta además como proteína.
+                    "rol": o.rol_para(rep.roles_de(comp)),
+                    "nombre": o.nombre,
+                    # R-12 y O-5: la unidad la pone el alimento, y su formato
+                    # seguro se imprime aquí, en la grilla, no solo en la receta.
+                    "cantidad": o.porcion_impresa(porciones.get(comp, "")),
+                    "receta_id": o.id if o.es_receta else None,
+                }
+                # Solo los alimentos base se marcan aquí. Una receta declara
+                # sus propias exposiciones en su front-matter, ingrediente por
+                # ingrediente, y marcarla entera porque su id contiene la
+                # palabra «zanahoria» convertía un muffin que el niño ya come en
+                # una introducción nueva.
+                if not o.es_receta and any(
+                    coincide_alimento(e, o) for e in rep.expuestos
+                ):
+                    item["exposicion"] = True
+                items.append(item)
             if items:
                 dia[comida["id"]] = {
                     "nombre": comida["nombre"],
@@ -461,6 +916,41 @@ def construir_semana(
                 }
         salida["dias"][DIAS[d]] = dia
     return salida
+
+
+def _declarar_hueco(
+    rep: Repertorio, comp: str, comida: str, familia: str, ficha: dict
+) -> dict:
+    """Qué falta para cerrar este slot, escrito para que se pueda encargar.
+
+    No basta con decir que está vacío: hay que decir qué receta habría que
+    escribir —qué rol, qué techo de demanda oral, qué carga visual máxima y qué
+    restricciones— para que alguien pueda sentarse a escribirla con P1.
+    """
+    perfil = ficha.get("perfil_sensorial") or {}
+    slot = rep.gramatica.get(comp) or {}
+    roles = ", ".join(rep.roles_de(comp)) or "(sin roles declarados)"
+    motivos = [m for _, m in rep.descartes]
+    frecuentes = sorted({m.split(":")[0] for m in motivos})[:5]
+    return {
+        "motivo": (
+            f"ningún candidato de rol [{roles}]"
+            + (f" en la familia «{familia}»" if familia else "")
+            + f" pasa los filtros de este paciente."
+        ),
+        "reglas": ", ".join(frecuentes) or "—",
+        "receta_que_falta": (
+            f"receta de componente «{comp}», momento «{comida}», rol [{roles}], "
+            f"demanda oral ≤ N{perfil.get('nivel_oral_actual', '?')}, carga visual ≤ "
+            f"V{perfil.get('nivel_visual_actual', '?')}"
+            + (
+                f", sin el rasgo «{perfil['concepto_aversivo']}»"
+                if perfil.get("concepto_aversivo")
+                else ""
+            )
+            + ". Se escribe con prompts/P1_RECETAS.md en modo BASE."
+        ),
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -559,6 +1049,67 @@ def aplicar_reglas_periodicas(
                 if item["componente"] == comp and not reservada(item, comp):
                     item["nombre"] = elegida.nombre
                     item["receta_id"] = elegida.id if elegida.es_receta else None
+                    # La porción viaja con el alimento, no con la ranura. Sin
+                    # esto, la res entraba con la unidad del pollo al que
+                    # sustituía y sin su formato seguro impreso (R-12, O-5).
+                    item["cantidad"] = elegida.porcion_impresa(item.get("cantidad", ""))
+                    item["rol"] = elegida.roles[0] if elegida.roles else item.get("rol", "")
+
+
+def _inyectar_suplementos(plan: dict, ficha: dict, protocolo: dict) -> None:
+    """R-Fe3 · El suplemento es una fila del plan, no una nota al pie.
+
+    No pasa por el catálogo, y es deliberado: un suplemento es de este paciente
+    —marca, dosis, horario y separación—, no un alimento que el sistema elija.
+    Lo que hace el motor es asegurarse de que se imprima, con su hora y con la
+    separación de lácteos escrita con todas las letras.
+
+    En el primer caso real, «Kid Cal 7.5 ml en ayunas» vivía en el texto del
+    enfoque. Lo que no está en la grilla, la madre no lo lee a las siete de la
+    mañana.
+    """
+    suplementos = [s for s in (ficha.get("suplementos") or []) if s]
+    if not suplementos:
+        return
+    franja = next(
+        (c for c in (protocolo.get("comidas") or []) if "suplemento" in (c.get("componentes") or [])),
+        None,
+    )
+    if franja is None:
+        return
+
+    items = []
+    for s in suplementos:
+        partes = [str(s.get("dosis") or "").strip(), str(s.get("horario") or "").strip()]
+        separar = [str(x) for x in (s.get("separar_de") or []) if str(x).strip()]
+        horas = s.get("horas_separacion")
+        if separar and horas:
+            partes.append(
+                f"{horas} h de separación de {', '.join(separar)}"
+            )
+        items.append(
+            {
+                "componente": "suplemento",
+                "rol": "suplemento",
+                "nombre": str(s.get("nombre") or "Suplemento"),
+                "cantidad": " · ".join(p for p in partes if p),
+                "receta_id": None,
+            }
+        )
+
+    for s_ in plan["semanas"]:
+        for dia in s_["dias"].values():
+            dia[franja["id"]] = {
+                "nombre": franja.get("nombre", "Suplemento"),
+                "hora": franja.get("hora", ""),
+                "items": [dict(i) for i in items],
+            }
+            # El orden de las comidas del día lo fija el protocolo, y el
+            # suplemento va primero: se acaba de añadir al final del dict.
+            orden = [c["id"] for c in (protocolo.get("comidas") or [])]
+            for cid in orden:
+                if cid in dia:
+                    dia[cid] = dia.pop(cid)
 
 
 def ensamblar(nombre_carpeta: str, semilla: int | None = None) -> dict:
@@ -595,9 +1146,38 @@ def ensamblar(nombre_carpeta: str, semilla: int | None = None) -> dict:
     if problemas:
         raise ErrorNutriOS("\n  - ".join(["Ajustes clínicos que no se pueden aplicar:"] + problemas))
 
+    # T-6 · el concepto aversivo se traduce a rasgos ANTES de filtrar nada. Si
+    # la ficha declara uno que el sistema no conoce, se detiene: un concepto que
+    # no filtra nada es peor que no declararlo, porque hace creer que la
+    # aversión está contemplada y el kiwi vuelve al plato.
+    rasgos_excluidos, problemas_rasgos = rasgos_aversivos(ficha)
+    if problemas_rasgos:
+        raise ErrorNutriOS("\n".join(problemas_rasgos))
+
     recetas, avisos = cargar_biblioteca()
+    opciones = recetas + cargar_alimentos_base()
+
+    # El ancla no es una propiedad del alimento: es de ESTE niño. Se concede
+    # aquí, sobre las opciones ya cargadas, antes de construir el repertorio.
+    huerfanas = conceder_ancla(opciones, ficha)
+    if huerfanas:
+        raise ErrorNutriOS(
+            "La ficha declara como alimento ancla algo que no existe en el catálogo ni "
+            "en la biblioteca: " + ", ".join(huerfanas) + ".\n"
+            "    El slot ANCLA se quedaría vacío todos los días, que es exactamente lo "
+            "que pasó cuando el alimento seguro desapareció 8 de 14 días del plan.\n"
+            "    Solución: escribe el ancla con el nombre con que el sistema conoce el "
+            "alimento (datos/alimentos_base.yaml o el id de una base), o añade el "
+            "alimento al catálogo."
+        )
+
     rep = Repertorio(
-        recetas + cargar_alimentos_base(), ficha, protocolo, frecuencias, exclusiones_extra
+        opciones,
+        ficha,
+        protocolo,
+        frecuencias,
+        exclusiones_extra,
+        rasgos_excluidos,
     )
 
     variedad = protocolo.get("variedad") or {}
@@ -608,7 +1188,22 @@ def ensamblar(nombre_carpeta: str, semilla: int | None = None) -> dict:
         rng = random.Random(base + intento)
         try:
             semanas = [
-                construir_semana(protocolo, frecuencias, ficha, rep, rng, i + 1)
+                construir_semana(
+                    protocolo,
+                    frecuencias,
+                    ficha,
+                    Repertorio(
+                        opciones,
+                        ficha,
+                        protocolo,
+                        frecuencias,
+                        exclusiones_extra,
+                        rasgos_excluidos,
+                        n_semana=i + 1,
+                    ),
+                    rng,
+                    i + 1,
+                )
                 for i in range(n_semanas)
             ]
         except ErrorNutriOS as e:
@@ -647,7 +1242,11 @@ def ensamblar(nombre_carpeta: str, semilla: int | None = None) -> dict:
         "marco_diario": protocolo.get("marco_diario") or {},
         "avisos_biblioteca": avisos,
         "degradaciones": sorted({d for s_ in semanas for d in s_["degradaciones"]}),
+        "huecos": [
+            {"semana": s_["semana"], **h} for s_ in semanas for h in s_.get("huecos", [])
+        ],
     }
+    _inyectar_suplementos(plan, ficha, protocolo)
     aplicar_reglas_periodicas(plan, protocolo, frecuencias, rep, random.Random(base))
 
     plan["recetas_usadas"] = sorted(

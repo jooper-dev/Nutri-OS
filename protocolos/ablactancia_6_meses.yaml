@@ -186,3 +186,23 @@ preferencias_clinicas:
 # de al lado, y el bloque `decisiones_pendientes` desaparece: un archivo que
 # sigue preguntando lo que ya se respondió acaba llenando de ruido todos los
 # reportes y enseñando a no leerlos.
+
+# ---------------------------------------------------------------
+# GRAMÁTICA DE SLOTS · Capa 2
+# ---------------------------------------------------------------
+# A los seis meses la comida es un solo plato y la papilla es el formato
+# correcto, así que aquí no hay presupuesto de demanda oral que repartir: lo que
+# el tipado protege es otra cosa —que el slot del hierro lo llene una fuente de
+# hierro y no un puré de zapallo, que es el error que en esta franja hace daño.
+gramatica:
+  base_energetica: {papel: ENERGIA,  roles: [cereal, tuberculo], fuentes: [base_energetica]}
+  proteina_hierro: {papel: PROTEINA, roles: [proteina_animal, proteina_vegetal, menestra],
+                    fuentes: [proteina_hierro]}
+  verdura:         {papel: VEGETAL,  roles: [verdura], fuentes: [verdura]}
+  grasa:           {papel: GRASA,    roles: [grasa],   fuentes: [grasa]}
+  fruta_vitc:      {papel: FRUTA,    roles: [fruta],   fuentes: [fruta_vitc]}
+  fruta:           {papel: FRUTA,    roles: [fruta],   fuentes: [fruta, fruta_vitc]}
+
+presupuesto_sensorial:
+  comidas_principales: [almuerzo]
+  comidas_sin_reto: []

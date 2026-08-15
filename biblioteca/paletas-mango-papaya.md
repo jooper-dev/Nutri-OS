@@ -8,6 +8,14 @@ momento: [media_manana, media_tarde]
 componente: base
 familia:
 textura: humeda
+roles: [fruta]
+base_botanica: mango
+demanda_oral: 1
+carga_visual: 0
+unidad_natural: "1 paleta"
+vitamina_c: true
+densidad_kcal: baja
+tiempo_min: 20
 aporta: [vitamina_c, betacarotenos]
 alergenos_posibles: []
 origen: creada

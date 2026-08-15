@@ -14,7 +14,7 @@ comidas:
   - id: desayuno
     nombre: Desayuno
     hora: "7:30 – 8:30"
-    componentes: [cereal, acompanante, grasa, fruta]
+    componentes: [cereal, acompanante, grasa, fruta_vitc]
 
   - id: media_manana
     nombre: Media mañana
@@ -24,7 +24,7 @@ comidas:
   - id: almuerzo
     nombre: Almuerzo
     hora: "12:30 – 1:30"
-    componentes: [carbohidrato, proteina, menestra, ensalada_grasa, fruta_vitc, bebida]
+    componentes: [carbohidrato, proteina, menestra, verdura, grasa, fruta_vitc, bebida]
 
   - id: media_tarde
     nombre: Media tarde
@@ -34,7 +34,7 @@ comidas:
   - id: cena
     nombre: Cena
     hora: "6:00 – 7:00"
-    componentes: [carbohidrato, proteina, menestra, ensalada_grasa, fruta_vitc, bebida]
+    componentes: [carbohidrato, proteina, menestra, verdura, grasa, fruta_vitc, bebida]
 
 # ---------------------------------------------------------------
 # FRECUENCIAS SEMANALES
@@ -70,15 +70,27 @@ frecuencias_semanales:
     modo: maximo
     minimo: 3
 
-  - componente: fruta
+  # R-Fe4: con déficit de hierro, la vitamina C del desayuno es obligatoria en
+  # ≥5 de 7 días. Aquí va a diario, que es más simple de ejecutar y más fácil de
+  # comprobar. En el plan auditado salió 0 de 14.
+  - componente: fruta_vitc
     en: [desayuno]
     veces: 7
     modo: exacto
 
-  - componente: ensalada_grasa
+  # La ensalada mezclada se partió en verdura + grasa: «Ensalada con palta»
+  # ocupaba 28 de 28 comidas principales y es V3, el ítem visualmente más
+  # heterogéneo posible. Ahora la verdura va sola y de un color, y la grasa se
+  # nombra y se cuantifica en su propio slot. R-11 rechaza el genérico.
+  - componente: verdura
     en: [almuerzo, cena]
     veces: 14
     modo: exacto           # a diario, en ambas comidas
+
+  - componente: fruta_vitc
+    en: [almuerzo, cena]
+    veces: 14
+    modo: exacto           # R-Fe1: donde hay hierro no hemínico, hay vitamina C
 
   - componente: base
     familia: yogurt
@@ -102,13 +114,13 @@ rotaciones:
     en: [desayuno]
     reparto: {fruto_graso: 2, mantequilla_anacardos: 2, mantequilla_mani: 1, mantequilla_almendras: 1, aceite: resto}
 
-  - componente: ensalada_grasa
+  - componente: grasa
     en: [almuerzo]
-    reparto: {palta: 3, aceite_oliva: 2, aceite_ajonjoli: 2}
+    reparto: {fruto_graso: 3, aceite: resto}
 
-  - componente: ensalada_grasa
+  - componente: grasa
     en: [cena]
-    reparto: {palta: 3, aceite_oliva: 2, aceite_ajonjoli: 2}
+    reparto: {aceite: 4, fruto_graso: resto}
 
   # 'papa: 2, camote: 2' pasa a ser 'tuberculo: 4': hoy el cajón solo contiene
   # esos dos y el reparto sale igual (2 y 2), pero cuando el catálogo tenga
@@ -122,16 +134,23 @@ rotaciones:
 # ---------------------------------------------------------------
 # REGLAS ACOPLADAS
 # ---------------------------------------------------------------
-reglas_acopladas:
-  - si: menestra
-    entonces: fruta_vitc
-    ambito: misma_comida
-    razon: absorción de hierro no hemínico
-
-  - si: desayuno.cereal
-    entonces: desayuno.fruta
-    ambito: misma_comida
-    razon: fruta fresca obligatoria a diario, con prioridad cítrica
+# Sin «menestra → fruta_vitc», y no es un olvido: la fruta con vitamina C pasó a
+# ser componente diario de las dos comidas principales. Una regla acoplada
+# convierte a su objetivo en un componente DEPENDIENTE —solo se llena cuando
+# algo lo dispara— y dejaba sin vitamina C las cenas que no llevaban menestra,
+# justo las que sí llevaban espinaca o quinua. La regla que existía para
+# proteger el hierro era la que lo dejaba sin proteger cuatro días de siete.
+# Sin reglas acopladas, y no es un olvido.
+#
+# La fruta con vitamina C es componente DIARIO del desayuno y de las dos comidas
+# principales, que es donde cae el hierro no hemínico: el acoplamiento
+# «menestra → vitamina C» se cumple por construcción los siete días.
+#
+# Declararlo además hace daño. Una regla acoplada convierte a su objetivo en un
+# componente DEPENDIENTE —solo se llena cuando algo lo dispara— y así la fruta
+# con vitamina C desapareció de las catorce comidas principales: la regla que
+# existía para garantizarla fue la que la quitó.
+reglas_acopladas: []
 
 # ---------------------------------------------------------------
 # PRIORIDADES DE SELECCIÓN
@@ -180,3 +199,40 @@ preferencias_clinicas:
   selectividad:
     max_recetas_nuevas_semana: 3
     nota_qa: priorizar recetas ya aceptadas por el paciente
+
+# ---------------------------------------------------------------
+# GRAMÁTICA DE SLOTS · Capa 2
+# ---------------------------------------------------------------
+# Cada componente es un slot tipado: declara su PAPEL y el conjunto cerrado de
+# roles que acepta. R-0 comprueba que quien lo llena tenga uno de ellos, y es lo
+# que impide que un cereal ocupe el sitio de la proteína. `fuentes` dice de qué
+# cajones del catálogo salen los candidatos.
+gramatica:
+  cereal:       {papel: ENERGIA,  roles: [cereal, tuberculo], fuentes: [cereal]}
+  carbohidrato: {papel: ENERGIA,  roles: [cereal, tuberculo], fuentes: [carbohidrato]}
+  acompanante:  {papel: PROTEINA, roles: [proteina_animal, proteina_vegetal, menestra],
+                 fuentes: [acompanante, proteina]}
+  proteina:     {papel: PROTEINA, roles: [proteina_animal, proteina_vegetal, menestra],
+                 fuentes: [proteina, acompanante]}
+  menestra:     {papel: PROTEINA, roles: [menestra], opcional: true, fuentes: [menestra]}
+  grasa:        {papel: GRASA,    roles: [grasa],   fuentes: [grasa]}
+  verdura:      {papel: VEGETAL,  roles: [verdura], fuentes: [verdura]}
+  fruta:        {papel: FRUTA,    roles: [fruta],   fuentes: [fruta, fruta_vitc]}
+  fruta_vitc:   {papel: FRUTA,    roles: [fruta],   fuentes: [fruta_vitc]}
+  base:         {papel: BASE,     roles: [fruta, lacteo, cereal, tuberculo,
+                                          proteina_vegetal, proteina_animal, menestra],
+                 fuentes: [base, acompanante]}
+  crujiente:    {papel: COMPLEMENTO, roles: [cereal], opcional: true, fuentes: [crujiente]}
+  bebida:       {papel: BEBIDA,   roles: [bebida],  fuentes: [bebida]}
+
+# ---------------------------------------------------------------
+# PRESUPUESTO SENSORIAL · Capa 4
+# ---------------------------------------------------------------
+# Perfil típico: los topes van holgados a propósito. Un escolar sin perfil
+# sensorial declarado no necesita presupuesto de demanda oral, pero el bloque
+# tiene que existir para que las reglas T sepan qué comidas son principales y
+# cuál es la cena.
+presupuesto_sensorial:
+  comidas_principales: [desayuno, almuerzo, cena]
+  comidas_sin_reto: [cena]
+  retos_dia: 2

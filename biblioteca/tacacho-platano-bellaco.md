@@ -4,10 +4,18 @@ tipo: base
 titulo: Tacacho de bellaco
 subtitulo:
 edad_min_meses: 12
-momento: [desayuno]
-componente: acompanante
+momento: [almuerzo, cena]
+componente: carbohidrato
 familia:
 textura: seca
+roles: [tuberculo]
+base_botanica: platano_bellaco
+demanda_oral: 3
+carga_visual: 2
+unidad_natural: "1 bola"
+rasgos_visuales: [vetas_visibles]
+densidad_kcal: alta
+tiempo_min: 30
 aporta: [energia, grasas_saludables, potasio]
 alergenos_posibles: []
 origen: creada

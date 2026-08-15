@@ -8,6 +8,16 @@ momento: [desayuno]
 componente: acompanante
 familia:
 textura: mixta
+roles: [proteina_animal]
+base_botanica: pollo
+grano_base: trigo
+demanda_oral: 3
+carga_visual: 2
+textura_mixta: true
+unidad_natural: "1 bastón"
+hierro_hemo: true
+densidad_kcal: alta
+tiempo_min: 35
 aporta: [proteina, hierro]
 alergenos_posibles: [gluten, mani, frutos_secos]
 origen: creada

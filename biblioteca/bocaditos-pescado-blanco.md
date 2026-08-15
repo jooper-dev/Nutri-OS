@@ -4,10 +4,19 @@ tipo: base
 titulo: Bocaditos de pescado blanco
 subtitulo: Pulpa blanca, sin vetas oscuras
 edad_min_meses: 24
-momento: [almuerzo, cena]
+momento: [desayuno, almuerzo, cena]
 componente: proteina
 familia: pescado
 textura: mixta
+roles: [proteina_animal]
+base_botanica: pescado_blanco
+demanda_oral: 3
+carga_visual: 1
+unidad_natural: "3 bocaditos"
+requiere_preparacion_segura: "sin espinas y sin vetas oscuras"
+hierro_hemo: true
+densidad_kcal: media
+tiempo_min: 30
 aporta: [proteina, energia, grasas_saludables]
 alergenos_posibles: [pescado]
 origen: creada

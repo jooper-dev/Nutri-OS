@@ -1,23 +1,79 @@
 # Alimentos base — Nutri-OS
 #
 # Componentes simples que NO son recetas del recetario: acompañamientos que se
-# preparan sin instrucciones (arroz graneado, papa sancochada, fruta picada).
-# En el sistema anterior esto era el "Frente 2 · Creaciones ad-hoc".
+# preparan sin instrucciones (arroz graneado, papa sancochada, gajos de naranja).
 #
-# Las CANTIDADES no viven aquí: las aporta `porciones` de la ficha del paciente,
-# porque dependen del requerimiento calórico de cada niño.
+# Campos por alimento
+# ===================
 #
-# Campos por alimento:
-#   id             identificador interno
-#   nombre         como se imprime en el plan
-#   edad_min_meses edad mínima segura
-#   alergenos      lista; se cruza contra las alergias del paciente
-#   familia        opcional, el "cajón" al que pertenece (ver abajo)
-#   aporta         opcional, para priorización clínica
-#   nunca_recomendar  opcional. true = fuera de todo plan, para todo paciente,
-#                  por decisión clínica de Paty. No depende de que nadie se
-#                  acuerde: filtra antes que la edad y las alergias, y el
-#                  validador bloquea el plan si el alimento aparece igualmente.
+#   id                identificador interno
+#   nombre            como se imprime en el plan. NUNCA una categoría:
+#                     «Mandarina», no «fruta»; «Corbina», no «pescado».
+#   edad_min_meses    edad mínima segura
+#   alergenos         lista; se cruza contra las alergias del paciente
+#   familia           el "cajón" al que pertenece, para rotaciones y frecuencias
+#   aporta            para la priorización clínica del protocolo
+#
+#   roles             QUÉ PAPEL cumple en la comida. Un alimento puede poder
+#                     cubrir varios, pero en una comida dada ocupa exactamente
+#                     uno. Vocabulario cerrado:
+#                       cereal · tuberculo · menestra · proteina_animal ·
+#                       proteina_vegetal · grasa · fruta · verdura · lacteo ·
+#                       bebida · suplemento
+#                     El rol `ancla` no se escribe aquí: lo concede la ficha del
+#                     niño, en `perfil_sensorial.alimentos_ancla`.
+#
+#   base_botanica     para la anti-redundancia a nivel de ingrediente. Dos
+#                     componentes de la misma comida no comparten base botánica.
+#   grano_base        si es cereal: avena | quinua | kiwicha | canihua | arroz |
+#                     trigo | algarrobo. Es lo que impide «avena + panqueques de
+#                     avena» en el mismo desayuno.
+#
+#   demanda_oral      N0–N5, el trabajo que la boca tiene que hacer:
+#                       N0 líquido colado · N1 puré liso · N2 blando aplastable
+#                       N3 blando masticable · N4 firme o fibroso · N5 duro o
+#                       crujiente seco
+#   carga_visual      V0–V3, cuánta información visual llega de golpe:
+#                       V0 monocromo · V1 un color con relieve · V2 piezas
+#                       separadas identificables · V3 piezas de distinto color y
+#                       tamaño mezcladas
+#   textura           seca | crujiente | blanda | humeda | liquida | mixta
+#   textura_mixta     true = líquido y sólido en la misma cucharada. Es la
+#                     propiedad sensorial más subestimada y la más rechazada en
+#                     hipersensibilidad táctil-oral.
+#
+#   unidad_natural    LA PORCIÓN LA DEFINE EL ALIMENTO, NUNCA EL SLOT. De aquí
+#                     salió «Uva, ½ unidad mediana» y «Granola, ¾ taza (180 ml)»:
+#                     la plantilla del componente imponía su unidad a cualquier
+#                     cosa que cayera dentro. Media uva no existe como porción.
+#   requiere_preparacion_segura
+#                     texto obligatorio cuando el alimento solo es apto en cierto
+#                     formato. Si existe, LA GRILLA LO IMPRIME: la madre lee la
+#                     grilla, no el recetario, a las siete de la mañana.
+#
+#   rasgos_visuales   qué VE el niño. Vocabulario en datos/conceptos_aversivos.yaml.
+#                     Es lo que permite que «puntos negros» excluya el kiwi sin
+#                     que nadie haya escrito «kiwi» en ninguna lista.
+#
+#   hierro_no_hemo · hierro_hemo · vitamina_c · calcio_alto · fibra_alta
+#                     marcadores para las reglas del hierro (R-Fe1 a R-Fe5).
+#   densidad_kcal     baja | media | alta. R-7: ante dos opciones equivalentes,
+#                     gana la de mayor densidad.
+#
+#   forma_bocado      false = no se mastica y no cuenta para la demanda oral de
+#                     la comida: el agua y el aceite que va dentro de la
+#                     preparación. Sin este campo, R-4 marcaba «tres componentes
+#                     en papilla» en un almuerzo cuyos tres eran el aceite, el
+#                     agua y la fruta colada. Por defecto, true.
+#   nunca_recomendar  true = fuera de todo plan, para todo paciente, por decisión
+#                     clínica de Paty. Filtra antes que la edad y las alergias.
+#   generico          true = el nombre no identifica un alimento concreto. R-11
+#                     lo rechaza en la grilla. Se conserva en el catálogo cuando
+#                     todavía hay protocolos que lo nombran, para que el bloqueo
+#                     sea visible y no un hueco silencioso.
+#
+# Los booleanos omitidos valen false; `rasgos_visuales` omitido vale lista vacía;
+# `grano_base` y `base_botanica` omitidos valen null.
 #
 # Sobre `familia` — el protocolo nombra alimentos en dos niveles:
 #
@@ -25,134 +81,549 @@
 #                    decida cuáles. Un tubérculo andino nuevo entra solo.
 #   {camote: 2}      el alimento concreto, cuando la razón clínica es de ESE
 #                    alimento y no de su cajón.
-#
-# Los dos funcionan como clave de rotación o de frecuencia, y se pueden mezclar
-# en la misma regla. Por eso los cajones de abajo son CULINARIOS, no botánicos:
-# el camote es una raíz, pero en la olla se usa como la papa y el protocolo los
-# trata igual, así que comparten cajón. Si `familia` falta, el alimento es su
-# propio cajón de un solo miembro, y solo se le puede pedir por su nombre.
 
+# ===========================================================================
+# CARBOHIDRATOS · fondo de plato del almuerzo y la cena
+# ===========================================================================
 carbohidrato:
-  # Cajones: grano · grano_andino · tuberculo · raiz · pasta
-  - {id: arroz,    nombre: "Arroz",             edad_min_meses: 6,  alergenos: [], familia: grano,        textura: seca}
-  - {id: papa,     nombre: "Papa sancochada",   edad_min_meses: 6,  alergenos: [], familia: tuberculo,    textura: blanda}
-  - {id: camote,   nombre: "Camote sancochado", edad_min_meses: 6,  alergenos: [], familia: tuberculo,    aporta: [fibra, betacarotenos], textura: blanda}
-  - {id: quinua,   nombre: "Quinua",            edad_min_meses: 6,  alergenos: [], familia: grano_andino, aporta: [proteina], textura: humeda}
-  - {id: fideos,   nombre: "Fideos",            edad_min_meses: 8,  alergenos: [gluten], familia: pasta,  textura: humeda}
-  - {id: yuca,     nombre: "Yuca sancochada",   edad_min_meses: 8,  alergenos: [], familia: raiz,         textura: blanda}
+  - {id: arroz, nombre: "Arroz graneado", edad_min_meses: 6, alergenos: [], familia: grano,
+     roles: [cereal], base_botanica: arroz, grano_base: arroz,
+     demanda_oral: 2, carga_visual: 1, textura: seca, unidad_natural: "½ taza",
+     densidad_kcal: media}
 
+  - {id: papa, nombre: "Papa amarilla sancochada", edad_min_meses: 6, alergenos: [], familia: tuberculo,
+     roles: [tuberculo], base_botanica: papa,
+     demanda_oral: 2, carga_visual: 1, textura: blanda, unidad_natural: "½ taza en trozos",
+     densidad_kcal: media}
+
+  - {id: camote, nombre: "Camote sancochado", edad_min_meses: 6, alergenos: [], familia: tuberculo,
+     roles: [tuberculo], base_botanica: camote, aporta: [fibra, betacarotenos],
+     demanda_oral: 2, carga_visual: 1, textura: blanda, unidad_natural: "½ taza en trozos",
+     fibra_alta: true, densidad_kcal: media}
+
+  - {id: olluco, nombre: "Olluco en bastones", edad_min_meses: 12, alergenos: [], familia: tuberculo,
+     roles: [tuberculo], base_botanica: olluco,
+     demanda_oral: 3, carga_visual: 2, textura: blanda, unidad_natural: "½ taza en bastones",
+     densidad_kcal: baja}
+
+  - {id: quinua, nombre: "Quinua graneada", edad_min_meses: 6, alergenos: [], familia: grano_andino,
+     roles: [cereal, proteina_vegetal], base_botanica: quinua, grano_base: quinua,
+     aporta: [proteina, hierro], demanda_oral: 2, carga_visual: 1, textura: humeda,
+     unidad_natural: "½ taza", hierro_no_hemo: true, densidad_kcal: media}
+
+  # «Fideos, ½ taza» era un genérico. La anamnesis del primer caso real nombra el
+  # plato concreto que el niño sí come —tallarín verde y tallarín rojo—, así que
+  # el nombre existía y solo había que usarlo. Los dos llevan salsa de color
+  # parejo, sin trozos ni motas: visualmente son V1, no V3.
+  - {id: tallarin_verde, nombre: "Tallarín verde", edad_min_meses: 12, alergenos: [gluten], familia: pasta,
+     roles: [cereal], base_botanica: trigo, grano_base: trigo,
+     demanda_oral: 3, carga_visual: 1, textura: humeda, unidad_natural: "½ taza",
+     requiere_preparacion_segura: "salsa licuada y colada, sin trocitos de hoja",
+     densidad_kcal: media}
+
+  - {id: tallarin_rojo, nombre: "Tallarín rojo", edad_min_meses: 12, alergenos: [gluten], familia: pasta,
+     roles: [cereal], base_botanica: trigo, grano_base: trigo,
+     demanda_oral: 3, carga_visual: 1, textura: humeda, unidad_natural: "½ taza",
+     requiere_preparacion_segura: "salsa licuada y colada, sin trozos",
+     densidad_kcal: media}
+
+  - {id: yuca, nombre: "Yuca sancochada", edad_min_meses: 8, alergenos: [], familia: raiz,
+     roles: [tuberculo], base_botanica: yuca,
+     demanda_oral: 3, carga_visual: 1, textura: blanda, unidad_natural: "½ taza en trozos",
+     densidad_kcal: alta}
+
+# ===========================================================================
+# BASE ENERGÉTICA · purés de la ablactancia
+# ===========================================================================
 base_energetica:
-  - {id: papa_pure,    nombre: "Papa aplastada",    edad_min_meses: 6, alergenos: [], textura: humeda}
-  - {id: camote_pure,  nombre: "Camote aplastado",  edad_min_meses: 6, alergenos: [], aporta: [betacarotenos], textura: humeda}
-  - {id: zapallo_pure, nombre: "Zapallo aplastado", edad_min_meses: 6, alergenos: [], aporta: [betacarotenos], textura: humeda}
-  - {id: arroz_pure,   nombre: "Arroz bien cocido", edad_min_meses: 6, alergenos: [], textura: humeda}
+  - {id: papa_pure, nombre: "Papa amarilla aplastada", edad_min_meses: 6, alergenos: [],
+     roles: [tuberculo], base_botanica: papa,
+     demanda_oral: 1, carga_visual: 0, textura: humeda, unidad_natural: "3 cdas",
+     densidad_kcal: media}
 
+  - {id: camote_pure, nombre: "Camote aplastado", edad_min_meses: 6, alergenos: [],
+     roles: [tuberculo], base_botanica: camote, aporta: [betacarotenos],
+     demanda_oral: 1, carga_visual: 0, textura: humeda, unidad_natural: "3 cdas",
+     densidad_kcal: media}
+
+  - {id: zapallo_pure, nombre: "Zapallo aplastado", edad_min_meses: 6, alergenos: [],
+     roles: [verdura], base_botanica: zapallo, aporta: [betacarotenos],
+     demanda_oral: 1, carga_visual: 0, textura: humeda, unidad_natural: "3 cdas",
+     densidad_kcal: baja}
+
+  - {id: arroz_pure, nombre: "Arroz bien cocido", edad_min_meses: 6, alergenos: [],
+     roles: [cereal], base_botanica: arroz, grano_base: arroz,
+     demanda_oral: 1, carga_visual: 0, textura: humeda, unidad_natural: "3 cdas",
+     densidad_kcal: media}
+
+# ===========================================================================
+# CEREAL · la bebida o el grano del desayuno
+# ===========================================================================
 cereal:
-  # Cajones: hojuelas · harinas · grano_andino. La avena se queda en su propio
-  # cajón a propósito: si entrara en 'hojuelas' podría salir en la ranura de
-  # 'hojuelas: resto' y aparecer tres veces por semana en vez de dos, que es lo
-  # que dice la rotación. No se gana nada y se pierde una frecuencia escrita.
-  - {id: avena,      nombre: "Avena",              edad_min_meses: 6, alergenos: [], familia: avena,    aporta: [fibra], textura: humeda}
-  - {id: canihua,    nombre: "Cañihua",            edad_min_meses: 6, alergenos: [], familia: grano_andino, aporta: [hierro, proteina], textura: humeda}
-  - {id: maca,       nombre: "Harina de maca",     edad_min_meses: 12, alergenos: [], familia: harinas, textura: humeda}
-  - {id: algarrobo,  nombre: "Harina de algarrobo", edad_min_meses: 12, alergenos: [], familia: harinas, aporta: [hierro], textura: humeda}
-  - {id: siete_sem,  nombre: "Harina 7 semillas",  edad_min_meses: 12, alergenos: [ajonjoli, soya], familia: harinas, textura: humeda}
-  - {id: kiwicha,    nombre: "Hojuelas de kiwicha", edad_min_meses: 6, alergenos: [], familia: hojuelas, aporta: [hierro], textura: crujiente}
-  - {id: quinua_hoj, nombre: "Hojuelas de quinua",  edad_min_meses: 6, alergenos: [], familia: hojuelas, aporta: [proteina], textura: crujiente}
+  # La avena se queda en su propio cajón a propósito: si entrara en 'hojuelas'
+  # podría salir en la ranura de 'hojuelas: resto' y aparecer tres veces por
+  # semana en vez de dos, que es lo que dice la rotación.
+  - {id: avena, nombre: "Avena cocida", edad_min_meses: 6, alergenos: [gluten], familia: avena,
+     roles: [cereal], base_botanica: avena, grano_base: avena, aporta: [fibra],
+     demanda_oral: 1, carga_visual: 0, textura: humeda, unidad_natural: "¾ taza (180 ml)",
+     fibra_alta: true, densidad_kcal: media}
 
+  - {id: canihua, nombre: "Cañihua cocida", edad_min_meses: 6, alergenos: [], familia: grano_andino,
+     roles: [cereal, proteina_vegetal], base_botanica: canihua, grano_base: canihua,
+     aporta: [hierro, proteina], demanda_oral: 1, carga_visual: 0, textura: humeda,
+     unidad_natural: "¾ taza (180 ml)", hierro_no_hemo: true, densidad_kcal: media}
+
+  - {id: maca, nombre: "Harina de maca", edad_min_meses: 12, alergenos: [], familia: harinas,
+     roles: [cereal], base_botanica: maca,
+     demanda_oral: 0, carga_visual: 0, textura: humeda, unidad_natural: "¾ taza (180 ml)",
+     densidad_kcal: media}
+
+  - {id: algarrobo, nombre: "Harina de algarrobo", edad_min_meses: 12, alergenos: [], familia: harinas,
+     roles: [cereal], base_botanica: algarrobo, grano_base: algarrobo, aporta: [hierro],
+     demanda_oral: 0, carga_visual: 0, textura: humeda, unidad_natural: "¾ taza (180 ml)",
+     hierro_no_hemo: true, densidad_kcal: media}
+
+  - {id: siete_sem, nombre: "Harina 7 semillas", edad_min_meses: 12, alergenos: [ajonjoli, soya],
+     familia: harinas, roles: [cereal], base_botanica: siete_semillas,
+     demanda_oral: 0, carga_visual: 0, textura: humeda, unidad_natural: "¾ taza (180 ml)",
+     densidad_kcal: media}
+
+  - {id: kiwicha, nombre: "Hojuelas de kiwicha cocidas", edad_min_meses: 6, alergenos: [],
+     familia: hojuelas, roles: [cereal], base_botanica: kiwicha, grano_base: kiwicha,
+     aporta: [hierro], demanda_oral: 1, carga_visual: 0, textura: humeda,
+     unidad_natural: "¾ taza (180 ml)", hierro_no_hemo: true, densidad_kcal: media}
+
+  - {id: quinua_hoj, nombre: "Hojuelas de quinua cocidas", edad_min_meses: 6, alergenos: [],
+     familia: hojuelas, roles: [cereal], base_botanica: quinua, grano_base: quinua,
+     aporta: [proteina], demanda_oral: 1, carga_visual: 0, textura: humeda,
+     unidad_natural: "¾ taza (180 ml)", hierro_no_hemo: true, densidad_kcal: media}
+
+# ===========================================================================
+# MENESTRA
+# ===========================================================================
+# «La cáscara de la menestra ES el punto negro.» Todas llevan su formato seguro
+# escrito: colada y sin cáscara. Sin ese formato, `rasgos_visuales` incluiría
+# `cascara_visible` y T-6 las tumbaría todas para un perfil de puntos negros —
+# que es exactamente lo que no queremos: la menestra colada sí entra.
 menestra:
-  - {id: lentejas,      nombre: "Lentejas",       edad_min_meses: 7, alergenos: [], familia: menestra, aporta: [hierro, fibra], textura: humeda}
-  - {id: frejol_cast,   nombre: "Frejol castilla", edad_min_meses: 8, alergenos: [], familia: menestra, aporta: [hierro, fibra], textura: humeda}
-  - {id: panamito,      nombre: "Frejol panamito", edad_min_meses: 8, alergenos: [], familia: menestra, aporta: [hierro, fibra], textura: humeda}
-  - {id: garbanzo,      nombre: "Garbanzo",       edad_min_meses: 8, alergenos: [], familia: menestra, aporta: [hierro, fibra], textura: blanda}
-  - {id: arveja_part,   nombre: "Arveja partida",  edad_min_meses: 7, alergenos: [], familia: menestra, aporta: [fibra], textura: humeda}
+  - {id: lentejas, nombre: "Lenteja colada", edad_min_meses: 7, alergenos: [], familia: menestra,
+     roles: [menestra, proteina_vegetal], base_botanica: lenteja, aporta: [hierro, fibra],
+     demanda_oral: 1, carga_visual: 0, textura: humeda, unidad_natural: "½ taza",
+     requiere_preparacion_segura: "pasada por malla fina, sin una sola cáscara",
+     hierro_no_hemo: true, fibra_alta: true, densidad_kcal: media}
 
+  - {id: frejol_cast, nombre: "Frejol castilla colado", edad_min_meses: 8, alergenos: [], familia: menestra,
+     roles: [menestra, proteina_vegetal], base_botanica: frejol, aporta: [hierro, fibra],
+     demanda_oral: 1, carga_visual: 0, textura: humeda, unidad_natural: "½ taza",
+     requiere_preparacion_segura: "pasado por malla fina, sin cáscara",
+     hierro_no_hemo: true, fibra_alta: true, densidad_kcal: media}
+
+  - {id: panamito, nombre: "Frejol panamito colado", edad_min_meses: 8, alergenos: [], familia: menestra,
+     roles: [menestra, proteina_vegetal], base_botanica: frejol, aporta: [hierro, fibra],
+     demanda_oral: 1, carga_visual: 0, textura: humeda, unidad_natural: "½ taza",
+     requiere_preparacion_segura: "pasado por malla fina, sin cáscara",
+     hierro_no_hemo: true, fibra_alta: true, densidad_kcal: media}
+
+  - {id: garbanzo, nombre: "Garbanzo colado", edad_min_meses: 8, alergenos: [], familia: menestra,
+     roles: [menestra, proteina_vegetal], base_botanica: garbanzo, aporta: [hierro, fibra],
+     demanda_oral: 1, carga_visual: 0, textura: blanda, unidad_natural: "½ taza",
+     requiere_preparacion_segura: "pelado y pasado por malla fina",
+     hierro_no_hemo: true, fibra_alta: true, densidad_kcal: media}
+
+  - {id: arveja_part, nombre: "Arveja partida colada", edad_min_meses: 7, alergenos: [], familia: menestra,
+     roles: [menestra, proteina_vegetal], base_botanica: arveja, aporta: [fibra, hierro],
+     demanda_oral: 1, carga_visual: 0, textura: humeda, unidad_natural: "½ taza",
+     requiere_preparacion_segura: "pasada por malla fina",
+     hierro_no_hemo: true, fibra_alta: true, densidad_kcal: media}
+
+# ===========================================================================
+# PROTEÍNA ANIMAL
+# ===========================================================================
+# «Pollo, 50 g en crudo» y «Pescado, 50 g en crudo» eran genéricos: no se podían
+# contrastar contra una lista de exclusiones que nombra «trucha» y «pescado de
+# pulpa oscura». Aquí cada especie y cada corte van por su nombre, con su demanda
+# oral real —la pechuga cede antes que el muslo— y con su formato seguro.
 proteina:
-  - {id: pollo,     nombre: "Pollo",          edad_min_meses: 6,  alergenos: [],         familia: pollo,   aporta: [proteina, hierro], textura: seca}
-  - {id: pescado,   nombre: "Pescado",        edad_min_meses: 6,  alergenos: [pescado],  familia: pescado, aporta: [proteina, omega3], textura: seca}
-  - {id: res,       nombre: "Carne de res",   edad_min_meses: 7,  alergenos: [carne_mamifero], familia: res, aporta: [proteina, hierro, zinc], textura: seca}
-  - {id: huevo,     nombre: "Huevo",          edad_min_meses: 6,  alergenos: [huevo],    familia: huevo,   aporta: [proteina], textura: blanda}
-  - {id: pavita,    nombre: "Pavita",         edad_min_meses: 6,  alergenos: [],         familia: pollo,   aporta: [proteina], textura: seca}
+  - {id: pollo_pechuga, nombre: "Pechuga de pollo en cubos", edad_min_meses: 6, alergenos: [],
+     familia: pollo, roles: [proteina_animal], base_botanica: pollo,
+     aporta: [proteina, hierro, zinc], demanda_oral: 3, carga_visual: 1, textura: blanda,
+     unidad_natural: "50 g en crudo", requiere_preparacion_segura: "cocida en su jugo, cortada a través de la fibra",
+     hierro_hemo: true, densidad_kcal: media}
 
+  - {id: pollo_muslo, nombre: "Muslo de pollo deshilachado", edad_min_meses: 6, alergenos: [],
+     familia: pollo, roles: [proteina_animal], base_botanica: pollo,
+     aporta: [proteina, hierro, zinc], demanda_oral: 4, carga_visual: 2, textura: seca,
+     unidad_natural: "50 g en crudo", requiere_preparacion_segura: "deshilachado corto, sin nervio",
+     rasgos_visuales: [fibra_visible], hierro_hemo: true, densidad_kcal: media}
+
+  - {id: pavita, nombre: "Pavita en cubos", edad_min_meses: 6, alergenos: [], familia: pollo,
+     roles: [proteina_animal], base_botanica: pavita, aporta: [proteina, zinc],
+     demanda_oral: 3, carga_visual: 1, textura: blanda, unidad_natural: "50 g en crudo",
+     requiere_preparacion_segura: "cocida en su jugo, cortada a través de la fibra",
+     hierro_hemo: true, densidad_kcal: media}
+
+  - {id: res, nombre: "Carne de res molida", edad_min_meses: 7, alergenos: [carne_mamifero],
+     familia: res, roles: [proteina_animal], base_botanica: res,
+     aporta: [proteina, hierro, zinc], demanda_oral: 3, carga_visual: 1, textura: blanda,
+     unidad_natural: "50 g en crudo", requiere_preparacion_segura: "molida, cocida en su jugo",
+     hierro_hemo: true, densidad_kcal: alta}
+
+  - {id: huevo, nombre: "Huevo", edad_min_meses: 6, alergenos: [huevo], familia: huevo,
+     roles: [proteina_animal], base_botanica: huevo, aporta: [proteina, hierro],
+     demanda_oral: 2, carga_visual: 0, textura: blanda, unidad_natural: "1 unidad",
+     hierro_hemo: true, densidad_kcal: media}
+
+  # Pescado de pulpa CLARA, por especie. La trucha y el pescado de pulpa oscura
+  # no están en el catálogo a propósito: son exclusión escrita en más de una
+  # ficha, y un genérico «Pescado» las volvía a colar por la puerta de atrás.
+  - {id: corbina, nombre: "Corbina en cubos", edad_min_meses: 8, alergenos: [pescado],
+     familia: pescado, roles: [proteina_animal], base_botanica: corbina,
+     aporta: [proteina, omega3], demanda_oral: 3, carga_visual: 1, textura: blanda,
+     unidad_natural: "50 g en crudo", requiere_preparacion_segura: "sin espinas, sin piel y sin vetas oscuras",
+     hierro_hemo: true, densidad_kcal: media}
+
+  - {id: perico, nombre: "Perico en cubos", edad_min_meses: 8, alergenos: [pescado],
+     familia: pescado, roles: [proteina_animal], base_botanica: perico,
+     aporta: [proteina, omega3], demanda_oral: 3, carga_visual: 1, textura: blanda,
+     unidad_natural: "50 g en crudo", requiere_preparacion_segura: "sin espinas, sin piel y sin vetas oscuras",
+     hierro_hemo: true, densidad_kcal: media}
+
+  - {id: lenguado, nombre: "Lenguado en cubos", edad_min_meses: 8, alergenos: [pescado],
+     familia: pescado, roles: [proteina_animal], base_botanica: lenguado,
+     aporta: [proteina, omega3], demanda_oral: 3, carga_visual: 1, textura: blanda,
+     unidad_natural: "50 g en crudo", requiere_preparacion_segura: "sin espinas y sin piel",
+     hierro_hemo: true, densidad_kcal: media}
+
+# ===========================================================================
+# PROTEÍNA CON HIERRO · vísceras y menestras aplastadas de la ablactancia
+# ===========================================================================
 proteina_hierro:
-  - {id: higado_pollo, nombre: "Hígado de pollo", edad_min_meses: 6, alergenos: [], familia: higado, aporta: [hierro, vitamina_a], textura: blanda}
+  - {id: higado_pollo, nombre: "Hígado de pollo aplastado", edad_min_meses: 6, alergenos: [],
+     familia: higado, roles: [proteina_animal], base_botanica: higado_pollo,
+     aporta: [hierro, vitamina_a], demanda_oral: 1, carga_visual: 0, textura: blanda,
+     unidad_natural: "2 cdas", hierro_hemo: true, densidad_kcal: media}
+
   # NUNCA SE RECOMIENDA. No es una preferencia ni un ajuste de temporada: es una
   # posición clínica sostenida de la Nut. Patricia López, mantenida frente a
   # ofertas de patrocinio que rechazó. Se deja en el catálogo, y no se borra, para
-  # que la regla sea visible y para que nadie la vuelva a añadir por descuido
-  # creyendo que faltaba.
-  #
-  # `nunca_recomendar` excluye el alimento para TODOS los pacientes, antes que
-  # cualquier otro filtro, y el validador bloquea el plan si aparece. Cierra de
-  # paso la duda que quedaba abierta sobre etiquetarla `carne_mamifero` según sea
-  # de res o de pollo: si no entra en ningún plan, la etiqueta es indiferente.
-  - {id: sangrecita,   nombre: "Sangrecita",      edad_min_meses: 6, alergenos: [], familia: higado, aporta: [hierro], textura: blanda, nunca_recomendar: true}
-  - {id: bazo,         nombre: "Bazo",            edad_min_meses: 7, alergenos: [carne_mamifero], familia: higado, aporta: [hierro], textura: blanda}
-  - {id: pollo_desm,   nombre: "Pollo deshilachado", edad_min_meses: 6, alergenos: [], familia: pollo, aporta: [proteina, hierro], textura: seca}
+  # que la regla sea visible y para que nadie la vuelva a añadir por descuido.
+  - {id: sangrecita, nombre: "Sangrecita", edad_min_meses: 6, alergenos: [], familia: higado,
+     roles: [proteina_animal], base_botanica: sangrecita, aporta: [hierro],
+     demanda_oral: 1, carga_visual: 0, textura: blanda, unidad_natural: "2 cdas",
+     hierro_hemo: true, densidad_kcal: media, nunca_recomendar: true}
+
+  - {id: bazo, nombre: "Bazo aplastado", edad_min_meses: 7, alergenos: [carne_mamifero],
+     familia: higado, roles: [proteina_animal], base_botanica: bazo, aporta: [hierro],
+     demanda_oral: 1, carga_visual: 0, textura: blanda, unidad_natural: "2 cdas",
+     hierro_hemo: true, densidad_kcal: media}
+
+  - {id: pollo_desm, nombre: "Pollo deshilachado fino", edad_min_meses: 6, alergenos: [],
+     familia: pollo, roles: [proteina_animal], base_botanica: pollo,
+     aporta: [proteina, hierro], demanda_oral: 3, carga_visual: 1, textura: blanda,
+     unidad_natural: "2 cdas", requiere_preparacion_segura: "deshilachado corto, humedecido en su caldo",
+     hierro_hemo: true, densidad_kcal: media}
+
   # Menestra aplastada desde los 6 meses: OMS 2023, «Guideline for complementary
-  # feeding of infants and young children 6–23 months of age» — «Pulses, nuts and
-  # seeds should be consumed frequently». La condición es la preparación, y estas
-  # dos la cumplen: lenteja y arveja partida se deshacen al cocer y van sin
-  # cáscara. El frejol panamito se queda en 8 m porque la piel entera no se
-  # deshace igual y es la que da el problema.
-  - {id: lentejas_pure, nombre: "Lentejas aplastadas",      edad_min_meses: 6, alergenos: [], familia: menestra, aporta: [hierro, fibra], textura: humeda}
-  - {id: panamito_pure, nombre: "Frejol panamito aplastado", edad_min_meses: 8, alergenos: [], familia: menestra, aporta: [hierro, fibra], textura: humeda}
-  - {id: arveja_pure,   nombre: "Arveja partida aplastada",  edad_min_meses: 6, alergenos: [], familia: menestra, aporta: [hierro, fibra], textura: humeda}
+  # feeding of infants and young children 6–23 months of age». La condición es la
+  # preparación, y estas dos la cumplen: lenteja y arveja partida se deshacen al
+  # cocer y van sin cáscara.
+  - {id: lentejas_pure, nombre: "Lenteja aplastada", edad_min_meses: 6, alergenos: [],
+     familia: menestra, roles: [menestra, proteina_vegetal], base_botanica: lenteja,
+     aporta: [hierro, fibra], demanda_oral: 1, carga_visual: 0, textura: humeda,
+     unidad_natural: "2 cdas", requiere_preparacion_segura: "sin cáscara",
+     hierro_no_hemo: true, fibra_alta: true, densidad_kcal: media}
 
+  - {id: panamito_pure, nombre: "Frejol panamito aplastado", edad_min_meses: 8, alergenos: [],
+     familia: menestra, roles: [menestra, proteina_vegetal], base_botanica: frejol,
+     aporta: [hierro, fibra], demanda_oral: 1, carga_visual: 0, textura: humeda,
+     unidad_natural: "2 cdas", requiere_preparacion_segura: "sin cáscara",
+     hierro_no_hemo: true, fibra_alta: true, densidad_kcal: media}
+
+  - {id: arveja_pure, nombre: "Arveja partida aplastada", edad_min_meses: 6, alergenos: [],
+     familia: menestra, roles: [menestra, proteina_vegetal], base_botanica: arveja,
+     aporta: [hierro, fibra], demanda_oral: 1, carga_visual: 0, textura: humeda,
+     unidad_natural: "2 cdas", hierro_no_hemo: true, fibra_alta: true, densidad_kcal: media}
+
+# ===========================================================================
+# VERDURA · en formato V1/V2, cada una por su nombre
+# ===========================================================================
+# «Ensalada» aparecía en 28 de 28 comidas principales y era el ítem visualmente
+# más heterogéneo posible: piezas de distinto color y tamaño mezcladas entre sí.
+# Aquí la verdura va sola, de un color, en bastones o cubos parejos, y la grasa
+# que la acompaña se nombra aparte en su propio slot.
 verdura:
-  - {id: zanahoria, nombre: "Zanahoria",  edad_min_meses: 6, alergenos: [], aporta: [betacarotenos], textura: blanda}
-  - {id: zapallo,   nombre: "Zapallo",    edad_min_meses: 6, alergenos: [], aporta: [betacarotenos], textura: humeda}
-  - {id: espinaca,  nombre: "Espinaca",   edad_min_meses: 12, alergenos: [], aporta: [hierro, folato], textura: humeda}
-  - {id: brocoli,   nombre: "Brócoli",    edad_min_meses: 8, alergenos: [], aporta: [vitamina_c, fibra], textura: blanda}
-  - {id: betarraga, nombre: "Betarraga",  edad_min_meses: 12, alergenos: [], aporta: [folato], textura: blanda}
-  - {id: vainita,   nombre: "Vainita",    edad_min_meses: 8, alergenos: [], aporta: [fibra], textura: blanda}
+  - {id: zanahoria, nombre: "Zanahoria en bastones", edad_min_meses: 6, alergenos: [],
+     roles: [verdura], base_botanica: zanahoria, familia: vegetal_anaranjado,
+     aporta: [betacarotenos], demanda_oral: 3, carga_visual: 2, textura: blanda,
+     unidad_natural: "½ taza en bastones", requiere_preparacion_segura: "sancochada hasta que ceda, en bastones parejos",
+     densidad_kcal: baja}
 
+  - {id: zapallo, nombre: "Zapallo en cubos", edad_min_meses: 6, alergenos: [],
+     roles: [verdura], base_botanica: zapallo, familia: vegetal_anaranjado,
+     aporta: [betacarotenos], demanda_oral: 2, carga_visual: 1, textura: humeda,
+     unidad_natural: "½ taza en cubos", densidad_kcal: baja}
+
+  - {id: espinaca, nombre: "Espinaca licuada", edad_min_meses: 12, alergenos: [],
+     roles: [verdura], base_botanica: espinaca, familia: vegetal_verde,
+     aporta: [hierro, folato], demanda_oral: 1, carga_visual: 0, textura: humeda,
+     unidad_natural: "2 cdas", requiere_preparacion_segura: "licuada y colada, sin hebras",
+     hierro_no_hemo: true, densidad_kcal: baja}
+
+  - {id: brocoli, nombre: "Brócoli en floretes", edad_min_meses: 8, alergenos: [],
+     roles: [verdura], base_botanica: brocoli, familia: vegetal_verde,
+     aporta: [vitamina_c, fibra], demanda_oral: 3, carga_visual: 2, textura: blanda,
+     unidad_natural: "3 floretes", requiere_preparacion_segura: "sancochado hasta que ceda",
+     vitamina_c: true, fibra_alta: true, densidad_kcal: baja}
+
+  - {id: betarraga, nombre: "Betarraga en cubos", edad_min_meses: 12, alergenos: [],
+     roles: [verdura], base_botanica: betarraga, familia: vegetal_morado,
+     aporta: [folato], demanda_oral: 3, carga_visual: 1, textura: blanda,
+     unidad_natural: "½ taza en cubos", densidad_kcal: baja}
+
+  - {id: vainita, nombre: "Vainita en bastones", edad_min_meses: 8, alergenos: [],
+     roles: [verdura], base_botanica: vainita, familia: vegetal_verde,
+     aporta: [fibra], demanda_oral: 3, carga_visual: 2, textura: blanda,
+     unidad_natural: "½ taza en bastones", requiere_preparacion_segura: "sancochada y sin hilos",
+     densidad_kcal: baja}
+
+  - {id: tomate, nombre: "Tomate en gajos", edad_min_meses: 12, alergenos: [],
+     roles: [verdura], base_botanica: tomate, familia: vegetal_rojo,
+     aporta: [vitamina_c], demanda_oral: 2, carga_visual: 1, textura: humeda,
+     unidad_natural: "3 gajos", requiere_preparacion_segura: "pelado y sin pepas",
+     vitamina_c: true, densidad_kcal: baja}
+
+  - {id: pepinillo, nombre: "Pepinillo en bastones", edad_min_meses: 12, alergenos: [],
+     roles: [verdura], base_botanica: pepinillo, familia: vegetal_verde,
+     aporta: [fibra], demanda_oral: 3, carga_visual: 2, textura: blanda,
+     unidad_natural: "½ taza en bastones", requiere_preparacion_segura: "pelado y sin pepas",
+     densidad_kcal: baja}
+
+# ===========================================================================
+# ENSALADA CON GRASA · genérico heredado, en retirada
+# ===========================================================================
+# Se conserva porque hubo planes que lo usaron y porque borrarlo dejaría un hueco
+# silencioso donde antes había un ítem. Está marcado `generico: true`, así que
+# R-11 lo rechaza en la grilla y ningún protocolo nuevo debería nombrarlo: la
+# verdura va sola y de un color, y la grasa en su propio slot.
 ensalada_grasa:
-  - {id: ens_palta,     nombre: "Ensalada con palta",              edad_min_meses: 12, alergenos: [], familia: palta,            aporta: [grasas_saludables], textura: mixta}
-  - {id: ens_oliva,     nombre: "Ensalada con aceite de oliva",    edad_min_meses: 12, alergenos: [], familia: aceite_oliva,     aporta: [grasas_saludables], textura: mixta}
-  - {id: ens_ajonjoli,  nombre: "Ensalada con aceite de ajonjolí", edad_min_meses: 12, alergenos: [ajonjoli], familia: aceite_ajonjoli, aporta: [grasas_saludables], textura: mixta}
+  - {id: ens_palta, nombre: "Ensalada con palta", edad_min_meses: 12, alergenos: [], familia: palta,
+     roles: [verdura, grasa], base_botanica: mezcla, aporta: [grasas_saludables],
+     demanda_oral: 3, carga_visual: 3, textura: mixta, textura_mixta: true,
+     unidad_natural: "½ taza (90 g) + 1 cdta de aceite", rasgos_visuales: [mezcla_heterogenea],
+     densidad_kcal: alta, generico: true}
 
+  - {id: ens_oliva, nombre: "Ensalada con aceite de oliva", edad_min_meses: 12, alergenos: [],
+     familia: aceite_oliva, roles: [verdura, grasa], base_botanica: mezcla,
+     aporta: [grasas_saludables], demanda_oral: 3, carga_visual: 3, textura: mixta,
+     textura_mixta: true, unidad_natural: "½ taza (90 g) + 1 cdta de aceite",
+     rasgos_visuales: [mezcla_heterogenea], densidad_kcal: media, generico: true}
+
+  - {id: ens_ajonjoli, nombre: "Ensalada con aceite de ajonjolí", edad_min_meses: 12,
+     alergenos: [ajonjoli], familia: aceite_ajonjoli, roles: [verdura, grasa],
+     base_botanica: mezcla, aporta: [grasas_saludables], demanda_oral: 3, carga_visual: 3,
+     textura: mixta, textura_mixta: true, unidad_natural: "½ taza (90 g) + 1 cdta de aceite",
+     rasgos_visuales: [mezcla_heterogenea], densidad_kcal: media, generico: true}
+
+# ===========================================================================
+# GRASA · nombrada y cuantificada. R-3 la exige en toda comida principal
+# ===========================================================================
 grasa:
-  # Cajones: aceite · fruto_graso · una familia propia por mantequilla.
-  # Las tres mantequillas NO se unifican: comparten alérgeno pero la rotación
-  # las reparte 2/1/1 a propósito, y una ficha puede rechazar solo una.
-  - {id: aceite_oliva_g, nombre: "Aceite de oliva",  edad_min_meses: 6,  alergenos: [], familia: aceite,       aporta: [grasas_saludables], textura: liquida}
-  - {id: palta_g,        nombre: "Palta",            edad_min_meses: 6,  alergenos: [], familia: fruto_graso,  aporta: [grasas_saludables], textura: humeda}
-  - {id: mant_anacardo,  nombre: "Mantequilla de anacardos", edad_min_meses: 12, alergenos: [frutos_secos], familia: mantequilla_anacardos, textura: humeda}
+  # Las mantequillas NO se unifican bajo un cajón: comparten alérgeno pero la
+  # rotación las reparte a propósito, y una ficha puede rechazar solo una.
+  - {id: aceite_oliva_g, nombre: "Aceite de oliva extra virgen", edad_min_meses: 6, alergenos: [],
+     familia: aceite, roles: [grasa], forma_bocado: false,
+     base_botanica: oliva, aporta: [grasas_saludables],
+     demanda_oral: 0, carga_visual: 0, textura: liquida, unidad_natural: "1 cdta",
+     densidad_kcal: alta}
+
+  - {id: aceite_girasol_g, nombre: "Aceite de girasol", edad_min_meses: 6, alergenos: [],
+     familia: aceite, roles: [grasa], forma_bocado: false,
+     base_botanica: girasol, aporta: [grasas_saludables],
+     demanda_oral: 0, carga_visual: 0, textura: liquida, unidad_natural: "1 cdta",
+     densidad_kcal: alta}
+
+  - {id: palta_g, nombre: "Palta aplastada", edad_min_meses: 6, alergenos: [],
+     familia: fruto_graso, roles: [grasa], base_botanica: palta, aporta: [grasas_saludables],
+     demanda_oral: 1, carga_visual: 0, textura: humeda, unidad_natural: "¼ de unidad",
+     requiere_preparacion_segura: "aplastada lisa, en plato aparte",
+     densidad_kcal: alta}
+
+  - {id: mant_anacardo, nombre: "Mantequilla de anacardos", edad_min_meses: 12,
+     alergenos: [frutos_secos], familia: mantequilla_anacardos, roles: [grasa],
+     base_botanica: anacardo, aporta: [grasas_saludables], demanda_oral: 1, carga_visual: 0,
+     textura: humeda, unidad_natural: "1 cdta", densidad_kcal: alta}
+
   # 'mani', no 'frutos_secos': el maní es una leguminosa y en alergia pediátrica
-  # es un alérgeno distinto, con su propia prevalencia y su propio manejo. Con
-  # una sola etiqueta pasaban las dos cosas malas a la vez: una alergia escrita
-  # como 'mani' no coincidía con nada y bloqueaba el plan por etiqueta
-  # desconocida, y un niño alérgico solo a los frutos secos se quedaba sin maní
-  # sin ninguna razón.
-  - {id: mant_mani,      nombre: "Mantequilla de maní",      edad_min_meses: 12, alergenos: [mani], familia: mantequilla_mani, textura: humeda}
-  - {id: mant_almendra,  nombre: "Mantequilla de almendras", edad_min_meses: 12, alergenos: [frutos_secos], familia: mantequilla_almendras, textura: humeda}
+  # es un alérgeno distinto, con su propia prevalencia y su propio manejo.
+  - {id: mant_mani, nombre: "Mantequilla de maní", edad_min_meses: 12, alergenos: [mani],
+     familia: mantequilla_mani, roles: [grasa], base_botanica: mani,
+     aporta: [grasas_saludables], demanda_oral: 1, carga_visual: 0, textura: humeda,
+     unidad_natural: "1 cdta", densidad_kcal: alta}
 
+  - {id: mant_almendra, nombre: "Mantequilla de almendras", edad_min_meses: 12,
+     alergenos: [frutos_secos], familia: mantequilla_almendras, roles: [grasa],
+     base_botanica: almendra, aporta: [grasas_saludables], demanda_oral: 1, carga_visual: 0,
+     textura: humeda, unidad_natural: "1 cdta", densidad_kcal: alta}
+
+  - {id: mant_pecana, nombre: "Mantequilla de pecanas", edad_min_meses: 12,
+     alergenos: [frutos_secos], familia: mantequilla_pecanas, roles: [grasa],
+     base_botanica: pecana, aporta: [grasas_saludables], demanda_oral: 1, carga_visual: 0,
+     textura: humeda, unidad_natural: "1 cdta", densidad_kcal: alta}
+
+# ===========================================================================
+# FRUTA · sin vitamina C relevante
+# ===========================================================================
 fruta:
-  - {id: platano,   nombre: "Plátano",   edad_min_meses: 6,  alergenos: [], textura: blanda}
-  - {id: manzana,   nombre: "Manzana",   edad_min_meses: 6,  alergenos: [], textura: blanda}
-  - {id: pera,      nombre: "Pera",      edad_min_meses: 6,  alergenos: [], aporta: [fibra], textura: blanda}
-  - {id: mango,     nombre: "Mango",     edad_min_meses: 8,  alergenos: [], textura: blanda}
-  - {id: uva_cort,  nombre: "Uva cortada a lo largo", edad_min_meses: 12, alergenos: [], textura: blanda}
-  - {id: durazno,   nombre: "Durazno",   edad_min_meses: 8,  alergenos: [], textura: blanda}
+  - {id: platano, nombre: "Plátano de seda", edad_min_meses: 6, alergenos: [],
+     roles: [fruta], base_botanica: platano, familia: fruta_amarilla,
+     demanda_oral: 2, carga_visual: 1, textura: blanda, unidad_natural: "½ unidad en rodajas",
+     densidad_kcal: media}
 
+  - {id: manzana, nombre: "Manzana", edad_min_meses: 6, alergenos: [], roles: [fruta],
+     base_botanica: manzana, familia: fruta_roja, demanda_oral: 2, carga_visual: 1,
+     textura: blanda, unidad_natural: "½ unidad mediana",
+     requiere_preparacion_segura: "pelada y en cubos parejos", densidad_kcal: baja}
+
+  - {id: pera, nombre: "Pera", edad_min_meses: 6, alergenos: [], roles: [fruta],
+     base_botanica: pera, familia: fruta_verde, aporta: [fibra], demanda_oral: 2,
+     carga_visual: 1, textura: blanda, unidad_natural: "½ unidad mediana",
+     requiere_preparacion_segura: "pelada y en cubos parejos", fibra_alta: true,
+     densidad_kcal: baja}
+
+  - {id: mango, nombre: "Mango", edad_min_meses: 8, alergenos: [], roles: [fruta],
+     base_botanica: mango, familia: fruta_amarilla, demanda_oral: 2, carga_visual: 1,
+     textura: blanda, unidad_natural: "½ taza en cubos",
+     requiere_preparacion_segura: "sin fibra de la pepa", densidad_kcal: media}
+
+  # «Uva cortada a lo largo, ½ unidad mediana» salió impreso. La unidad se había
+  # copiado de la plantilla de pera y manzana: media uva no existe como porción.
+  - {id: uva_cort, nombre: "Uva sin pepa", edad_min_meses: 12, alergenos: [], roles: [fruta],
+     base_botanica: uva, familia: fruta_verde, demanda_oral: 2, carga_visual: 2,
+     textura: blanda, unidad_natural: "6 unidades",
+     requiere_preparacion_segura: "cortadas a lo largo en cuartos, sin pepa",
+     densidad_kcal: baja}
+
+  - {id: uva_con_pepa, nombre: "Uva con pepa", edad_min_meses: 24, alergenos: [], roles: [fruta],
+     base_botanica: uva, familia: fruta_verde, demanda_oral: 3, carga_visual: 2,
+     textura: blanda, unidad_natural: "6 unidades", rasgos_visuales: [semillas_visibles],
+     densidad_kcal: baja}
+
+  - {id: durazno, nombre: "Durazno", edad_min_meses: 8, alergenos: [], roles: [fruta],
+     base_botanica: durazno, familia: fruta_amarilla, demanda_oral: 2, carga_visual: 1,
+     textura: blanda, unidad_natural: "½ unidad mediana",
+     requiere_preparacion_segura: "pelado y en cubos", densidad_kcal: baja}
+
+# ===========================================================================
+# FRUTA CON VITAMINA C · con su formato seguro impreso
+# ===========================================================================
+# La regla del hierro depende entera de esta lista. En el primer caso real
+# apareció 0 veces en 14 desayunos, mientras el recetario se construía alrededor
+# de proteger la absorción del hierro: se blindó el hierro por un lado y se le
+# quitó el potenciador por el otro.
 fruta_vitc:
-  - {id: naranja,     nombre: "Naranja",      edad_min_meses: 8,  alergenos: [], aporta: [vitamina_c], textura: blanda}
-  - {id: mandarina,   nombre: "Mandarina",    edad_min_meses: 8,  alergenos: [], aporta: [vitamina_c], textura: blanda}
-  - {id: lima,        nombre: "Lima",         edad_min_meses: 8,  alergenos: [], aporta: [vitamina_c], textura: blanda}
-  - {id: pina_golden, nombre: "Piña Golden",  edad_min_meses: 12, alergenos: [], aporta: [vitamina_c], textura: blanda}
-  - {id: aguaymanto,  nombre: "Aguaymanto",   edad_min_meses: 12, alergenos: [], aporta: [vitamina_c], textura: blanda}
-  - {id: papaya,      nombre: "Papaya",       edad_min_meses: 6,  alergenos: [], aporta: [vitamina_c, fibra], textura: blanda}
-  - {id: kiwi,        nombre: "Kiwi",         edad_min_meses: 8,  alergenos: [], aporta: [vitamina_c], textura: blanda}
-  - {id: fresa,       nombre: "Fresa",        edad_min_meses: 8,  alergenos: [], aporta: [vitamina_c], textura: blanda}
+  - {id: naranja, nombre: "Naranja", edad_min_meses: 8, alergenos: [], roles: [fruta],
+     base_botanica: citrico, familia: citrico, aporta: [vitamina_c], demanda_oral: 2,
+     carga_visual: 1, textura: blanda, unidad_natural: "3 gajos",
+     requiere_preparacion_segura: "sin hollejo ni pepa", vitamina_c: true, densidad_kcal: baja}
 
+  - {id: mandarina, nombre: "Mandarina", edad_min_meses: 8, alergenos: [], roles: [fruta],
+     base_botanica: citrico, familia: citrico, aporta: [vitamina_c], demanda_oral: 2,
+     carga_visual: 1, textura: blanda, unidad_natural: "4 gajos",
+     requiere_preparacion_segura: "sin pepa y sin hilos blancos", vitamina_c: true,
+     densidad_kcal: baja}
+
+  - {id: lima, nombre: "Lima dulce", edad_min_meses: 8, alergenos: [], roles: [fruta],
+     base_botanica: citrico, familia: citrico, aporta: [vitamina_c], demanda_oral: 2,
+     carga_visual: 1, textura: blanda, unidad_natural: "4 gajos",
+     requiere_preparacion_segura: "sin hollejo ni pepa", vitamina_c: true, densidad_kcal: baja}
+
+  - {id: pina_golden, nombre: "Piña Golden", edad_min_meses: 12, alergenos: [], roles: [fruta],
+     base_botanica: pina, familia: fruta_amarilla, aporta: [vitamina_c], demanda_oral: 3,
+     carga_visual: 1, textura: blanda, unidad_natural: "3 cubos",
+     requiere_preparacion_segura: "en cubos parejos, sin el corazón fibroso", vitamina_c: true,
+     densidad_kcal: baja}
+
+  - {id: papaya, nombre: "Papaya", edad_min_meses: 6, alergenos: [], roles: [fruta],
+     base_botanica: papaya, familia: fruta_anaranjada, aporta: [vitamina_c, fibra],
+     demanda_oral: 2, carga_visual: 1, textura: blanda, unidad_natural: "4 cubos",
+     requiere_preparacion_segura: "sin una sola semilla", vitamina_c: true, densidad_kcal: baja}
+
+  # La fresa entera lleva pepitas en toda la superficie. Colada no las lleva, y
+  # la propia nutricionista ya lo resolvía así en sus recetas de paletas y
+  # mazamorra: «cuela el puré y descarta todas las pepitas». Son dos alimentos
+  # distintos para el sistema, porque son dos cosas distintas para el niño.
+  - {id: fresa, nombre: "Fresa entera", edad_min_meses: 8, alergenos: [], roles: [fruta],
+     base_botanica: fresa, familia: fruta_roja, aporta: [vitamina_c], demanda_oral: 2,
+     carga_visual: 2, textura: blanda, unidad_natural: "4 unidades",
+     rasgos_visuales: [semillas_visibles], vitamina_c: true, densidad_kcal: baja}
+
+  - {id: fresa_colada, nombre: "Fresa licuada y colada", edad_min_meses: 8, alergenos: [],
+     roles: [fruta], base_botanica: fresa, familia: fruta_roja, aporta: [vitamina_c],
+     demanda_oral: 0, carga_visual: 0, textura: liquida, unidad_natural: "3 cdas",
+     requiere_preparacion_segura: "colada, sin una sola pepita", vitamina_c: true,
+     densidad_kcal: baja}
+
+  - {id: kiwi, nombre: "Kiwi", edad_min_meses: 8, alergenos: [], roles: [fruta],
+     base_botanica: kiwi, familia: fruta_verde, aporta: [vitamina_c], demanda_oral: 2,
+     carga_visual: 2, textura: blanda, unidad_natural: "½ unidad en rodajas",
+     rasgos_visuales: [semillas_visibles], vitamina_c: true, densidad_kcal: baja}
+
+  - {id: aguaymanto, nombre: "Aguaymanto", edad_min_meses: 12, alergenos: [], roles: [fruta],
+     base_botanica: aguaymanto, familia: fruta_anaranjada, aporta: [vitamina_c], demanda_oral: 3,
+     carga_visual: 2, textura: blanda, unidad_natural: "6 unidades",
+     rasgos_visuales: [semillas_visibles], vitamina_c: true, densidad_kcal: baja}
+
+# ===========================================================================
+# CRUJIENTE · granos reventados
+# ===========================================================================
+# Un grano reventado es visualmente moteado y de textura seca y crujiente: es
+# literalmente el aspecto y la textura del concepto «puntos negros». Se quedan en
+# el catálogo con el rasgo declarado, para los perfiles que sí los toleran; T-6
+# los retira solo del plan que declare ese concepto aversivo.
 crujiente:
-  - {id: kiwicha_pop, nombre: "Kiwicha pop", edad_min_meses: 12, alergenos: [], aporta: [hierro], textura: crujiente}
-  - {id: quinua_pop,  nombre: "Quinua pop",  edad_min_meses: 12, alergenos: [], aporta: [proteina], textura: crujiente}
+  - {id: kiwicha_pop, nombre: "Kiwicha pop", edad_min_meses: 12, alergenos: [],
+     roles: [cereal], base_botanica: kiwicha, grano_base: kiwicha, aporta: [hierro],
+     demanda_oral: 5, carga_visual: 3, textura: crujiente, unidad_natural: "2 cdas",
+     rasgos_visuales: [grano_reventado, moteado], hierro_no_hemo: true, densidad_kcal: media}
 
+  - {id: quinua_pop, nombre: "Quinua pop", edad_min_meses: 12, alergenos: [],
+     roles: [cereal], base_botanica: quinua, grano_base: quinua, aporta: [proteina],
+     demanda_oral: 5, carga_visual: 3, textura: crujiente, unidad_natural: "2 cdas",
+     rasgos_visuales: [grano_reventado, moteado], hierro_no_hemo: true, densidad_kcal: media}
+
+# ===========================================================================
+# BASE · el centro de un refrigerio
+# ===========================================================================
+# «Fruta picada» ocupaba 8 ranuras: no dice qué fruta, no dice cuánta, y no se
+# puede contrastar contra una lista de exclusiones que nombra especies. Además es
+# V3 —piezas de distinto color y tamaño mezcladas—, la categoría más difícil para
+# un perfil de hipersensibilidad visual. Se queda marcada como genérica para que
+# R-11 la rechace en vez de dejar el hueco sin explicación.
 base:
-  - {id: fruta_picada, nombre: "Fruta picada",     edad_min_meses: 6,  alergenos: [], textura: blanda}
-  - {id: yogurt,       nombre: "Yogurt natural",   edad_min_meses: 12, alergenos: [lacteos], familia: yogurt, aporta: [calcio], textura: humeda}
+  - {id: fruta_picada, nombre: "Fruta picada", edad_min_meses: 6, alergenos: [],
+     roles: [fruta], base_botanica: mezcla, demanda_oral: 2, carga_visual: 3,
+     textura: blanda, unidad_natural: "1 porción", rasgos_visuales: [mezcla_heterogenea],
+     densidad_kcal: baja, generico: true}
 
+  - {id: yogurt, nombre: "Yogurt natural", edad_min_meses: 12, alergenos: [lacteos],
+     familia: yogurt, roles: [lacteo], base_botanica: leche_vaca, aporta: [calcio],
+     demanda_oral: 1, carga_visual: 0, textura: humeda, unidad_natural: "½ taza (120 ml)",
+     calcio_alto: true, densidad_kcal: media}
+
+  # El producto concreto que un niño ya toma no es lo mismo que su categoría.
+  # «El estreñimiento se normalizó desde que recibe yogurt a diario» se refiere a
+  # ESTE, y cambiarlo por el natural es modificar un tratamiento en curso.
+  - {id: yogurt_fresa, nombre: "Yogurt de fresa", edad_min_meses: 12, alergenos: [lacteos],
+     familia: yogurt, roles: [lacteo], base_botanica: leche_vaca, aporta: [calcio],
+     demanda_oral: 1, carga_visual: 0, textura: humeda, unidad_natural: "½ taza (120 ml)",
+     requiere_preparacion_segura: "sin trozos de fruta dentro", calcio_alto: true,
+     densidad_kcal: media}
+
+# ===========================================================================
+# BEBIDA
+# ===========================================================================
+# R-9: el líquido no compite con la comida. Se ofrece AL FINAL y con tope.
 bebida:
-  - {id: agua, nombre: "Agua", edad_min_meses: 6, alergenos: [], textura: liquida}
+  - {id: agua, nombre: "Agua", edad_min_meses: 6, alergenos: [], roles: [bebida], forma_bocado: false,
+     base_botanica: agua, demanda_oral: 0, carga_visual: 0, textura: liquida,
+     unidad_natural: "½ taza (120 ml), al final de la comida", densidad_kcal: baja}

@@ -8,6 +8,16 @@ momento: [desayuno]
 componente: cereal
 familia: hojuelas
 textura: crujiente
+roles: [cereal]
+base_botanica: kiwicha
+grano_base: kiwicha
+demanda_oral: 5
+carga_visual: 3
+unidad_natural: "5 cdas"
+rasgos_visuales: [moteado, grano_reventado]
+hierro_no_hemo: true
+densidad_kcal: alta
+tiempo_min: 55
 aporta: [energia, hierro]
 alergenos_posibles: [gluten]
 origen: creada

@@ -1,0 +1,96 @@
+# Conceptos aversivos — Nutri-OS
+#
+# La generalización aversiva es el mecanismo mismo de la selectividad sensorial:
+# el niño no rechaza alimentos, rechaza RASGOS. Declarado «puntos negros», quedan
+# fuera el kiwi, la fresa entera, la uva con pepa, la granola, los granos
+# reventados y cualquier cosa moteada, espolvoreada o con vetas visibles,
+# **aunque nadie los haya nombrado nunca**.
+#
+# Un sistema que filtra por lista de alimentos siempre va un paso atrás del niño:
+# la lista se escribe con lo que ya rechazó, y el siguiente rechazo es siempre
+# uno que no está en la lista. Por eso aquí no se enumeran alimentos: se enumeran
+# rasgos, y cada alimento del catálogo declara los suyos en `rasgos_visuales`.
+#
+# CÓMO SE USA
+#
+# La ficha del niño escribe `perfil_sensorial.concepto_aversivo: "puntos negros"`.
+# El motor busca esa frase aquí, saca la lista de rasgos, y excluye del plan todo
+# alimento y toda receta que declare alguno. Es la regla T-6, y bloquea.
+#
+# Si la ficha declara un concepto que no está en este archivo, el validador se
+# detiene: un concepto aversivo que no filtra nada es peor que no declararlo,
+# porque hace creer que la aversión está contemplada.
+#
+# CÓMO SE AÑADE UNO
+#
+# Se escribe la frase tal como la dice la familia (en minúsculas, sin tildes al
+# comparar da igual) y se listan los rasgos del vocabulario de abajo. Si hace
+# falta un rasgo nuevo, se añade también a `vocabulario` y se etiqueta con él a
+# los alimentos del catálogo que lo presenten. Un rasgo que ningún alimento
+# declara no excluye nada.
+
+# ---------------------------------------------------------------------------
+# VOCABULARIO DE RASGOS VISUALES
+# ---------------------------------------------------------------------------
+# Cada línea describe qué ve el niño, no de qué está hecho el alimento.
+vocabulario:
+  semillas_visibles: >
+    Pepitas o semillas oscuras a la vista, en la superficie o en el corte:
+    kiwi, fresa entera, aguaymanto, papaya sin limpiar, uva con pepa.
+  moteado: >
+    Superficie con puntos, motas o partículas de otro color pegadas por fuera:
+    granola, masa con trocitos, cereal con pasas.
+  grano_reventado: >
+    Grano inflado o reventado, seco y de superficie irregular: quinua pop,
+    kiwicha pop, canchita.
+  espolvoreado: >
+    Algo esparcido por encima de otra cosa: canela, cacao, queso rallado,
+    perejil picado.
+  vetas_visibles: >
+    Franjas o líneas de otro color dentro del alimento: pescado de pulpa
+    oscura, carne con nervio, plátano bellaco muy maduro.
+  cascara_visible: >
+    Piel, hollejo o cáscara que se ve y se nota: menestra sin colar, fruta con
+    piel, cítrico con membrana.
+  mezcla_heterogenea: >
+    Piezas de distinto color y tamaño mezcladas entre sí en el mismo plato:
+    ensalada, fruta picada surtida, guiso, arroz con cosas dentro.
+  fibra_visible: >
+    Hebras o hilos que se ven y se sienten al masticar: piña con fibra, apio,
+    carne deshilachada gruesa.
+
+# ---------------------------------------------------------------------------
+# CONCEPTOS
+# ---------------------------------------------------------------------------
+conceptos:
+  "puntos negros":
+    descripcion: >
+      Rechazo visual a la partícula oscura sobre fondo claro. Arranca casi
+      siempre en un alimento concreto —el plátano bellaco, la sopa con hierbas—
+      y se generaliza a todo lo que comparta el rasgo, sin que el niño haya
+      probado nunca lo nuevo.
+    rasgos:
+      - semillas_visibles
+      - moteado
+      - grano_reventado
+      - espolvoreado
+      - vetas_visibles
+      - cascara_visible
+      - mezcla_heterogenea
+
+  "cosas mezcladas":
+    descripcion: >
+      Rechazo a que dos alimentos se toquen o compartan plato. No es un problema
+      de color sino de mapa: el niño tiene que poder identificar cada pieza antes
+      de morder.
+    rasgos:
+      - mezcla_heterogenea
+      - espolvoreado
+
+  "hilachas":
+    descripcion: >
+      Rechazo a la fibra larga, que se queda en la boca y no se traga. Suele
+      convivir con bajo tono oral y con fatiga masticatoria.
+    rasgos:
+      - fibra_visible
+      - vetas_visibles

@@ -193,6 +193,25 @@ else:
     universo = recetas + cargar_alimentos_base()
     for ruta in sorted(DIR_PROTOCOLOS.glob("*.yaml")):
         d = yaml.safe_load(ruta.read_text(encoding="utf-8")) or {}
+        gramatica = {str(k): (v or {}) for k, v in (d.get("gramatica") or {}).items()}
+
+        def fuentes_de(comp: str) -> list[str]:
+            """De qué cajones del catálogo saca candidatos ese slot.
+
+            Con la gramática de slots, el componente del protocolo dejó de ser
+            el cajón del catálogo: `acompanante` en el desayuno saca candidatos
+            de `acompanante` y de `proteina`, y `ancla` no saca de ninguno —lo
+            concede la ficha del niño—. Comparar contra el componente a secas
+            marcaba como huérfanas claves que sí resuelven.
+            """
+            slot = gramatica.get(comp)
+            if slot is None:
+                return [comp]
+            fuentes = slot.get("fuentes")
+            if fuentes is None:
+                return [comp]
+            return [str(f) for f in fuentes]
+
         claves = [
             (r["componente"], k)
             for r in (d.get("rotaciones") or [])
@@ -212,7 +231,17 @@ else:
             {
                 f"{comp}/{clave}"
                 for comp, clave in claves
-                if not any(o.componente == comp and o.responde_a(clave) for o in universo)
+                # El slot ANCLA se llena con lo que la ficha del niño declare
+                # alimento seguro, así que su clave puede ser cualquier cosa del
+                # universo: se comprueba que exista, no de qué cajón sale.
+                if not any(
+                    (
+                        o.componente in fuentes_de(comp)
+                        or "ancla" in (gramatica.get(comp) or {}).get("roles", [])
+                    )
+                    and o.responde_a(clave)
+                    for o in universo
+                )
             }
         )
         if huerfanas:
@@ -220,6 +249,53 @@ else:
             errores.append(ruta.name)
         else:
             linea(True, f"{ruta.name} — {len(claves)} clave(s) de rotación/frecuencia resuelven")
+
+print("\n— Gramática de slots —")
+# Un componente que la comida declara y la gramática no tipa es un slot sin
+# roles: R-0 no lo puede comprobar y cualquier cosa puede caer dentro. Es
+# exactamente el estado del que se venía —la crema de quinua ocupando el sitio
+# de la proteína— así que se detecta aquí, al editar el protocolo, y no cuando
+# ya hay un plan impreso encima de la mesa.
+if "biblioteca" in errores:
+    linea(False, "no se puede comprobar: la biblioteca no cargó")
+else:
+    from comun import ROLES_VALIDOS  # noqa: E402
+
+    for ruta in sorted(DIR_PROTOCOLOS.glob("*.yaml")):
+        d = yaml.safe_load(ruta.read_text(encoding="utf-8")) or {}
+        gram = {str(k): (v or {}) for k, v in (d.get("gramatica") or {}).items()}
+        if not gram:
+            print(
+                f"  · {ruta.name} — sin gramática de slots: R-0 y el tipado de roles "
+                f"no se comprueban en este protocolo."
+            )
+            avisos.append(
+                f"{ruta.name}: sin bloque «gramatica». Los slots no están tipados, así "
+                f"que un alimento puede ocupar el sitio de otro rol sin que nada lo vea."
+            )
+            continue
+        comps = sorted({c for m in d.get("comidas") or [] for c in m["componentes"]})
+        sin_tipar = [c for c in comps if c not in gram]
+        roles_malos = sorted(
+            {
+                r
+                for slot in gram.values()
+                for r in (slot.get("roles") or [])
+                if r not in ROLES_VALIDOS
+            }
+        )
+        if sin_tipar or roles_malos:
+            if sin_tipar:
+                linea(False, f"{ruta.name} — componentes sin tipar: {', '.join(sin_tipar)}")
+            if roles_malos:
+                linea(
+                    False,
+                    f"{ruta.name} — roles que no existen: {', '.join(roles_malos)}. "
+                    f"Válidos: {', '.join(sorted(ROLES_VALIDOS))}",
+                )
+            errores.append(ruta.name)
+        else:
+            linea(True, f"{ruta.name} — {len(comps)} slot(s) tipados")
 
 print("\n— Frecuencias contra la edad del protocolo —")
 # Que una familia tenga alimentos detrás no basta: tienen que ser alimentos que

@@ -277,6 +277,70 @@ def asegurar_fotos(plan: dict) -> None:
 # ---------------------------------------------------------------------------
 
 
+def _comprobar_par(plan: dict, instanciadas: dict, titulos: dict) -> None:
+    """Que la grilla y el recetario coincidan pieza por pieza. Si no, no se emite.
+
+    Tres comprobaciones, y las tres se hacen contando:
+
+      1. Toda preparación de la grilla tiene su receta instanciada.
+      2. Toda receta que va a imprimirse aparece en algún día de la grilla.
+      3. Cada instancia lleva el mismo nombre en los dos documentos.
+
+    Las recetas instanciadas de un control anterior que este plan ya no usa no
+    entran en el recetario y no cuentan: el recetario se maqueta desde
+    `recetas_usadas`, no desde la carpeta.
+    """
+    en_grilla: dict[str, set[str]] = {}
+    for s_ in plan["semanas"]:
+        for dia in s_["dias"].values():
+            for comida in dia.values():
+                for item in comida["items"]:
+                    rid = item.get("receta_id")
+                    if rid:
+                        en_grilla.setdefault(rid, set()).add(str(item["nombre"]))
+
+    a_imprimir = set(plan.get("recetas_usadas") or [])
+    problemas: list[str] = []
+
+    sin_receta = sorted(set(en_grilla) - set(instanciadas))
+    if sin_receta:
+        problemas.append(
+            f"{len(sin_receta)} preparación(es) de la grilla no tienen receta en el "
+            f"recetario: {', '.join(sin_receta)}"
+        )
+
+    fuera = sorted(a_imprimir - set(en_grilla))
+    if fuera:
+        problemas.append(
+            f"{len(fuera)} receta(s) irían al recetario sin aparecer en ningún día del "
+            f"plan: {', '.join(fuera)}"
+        )
+
+    for rid in sorted(en_grilla):
+        titulo = titulos.get(rid)
+        if not titulo:
+            continue
+        distintos = sorted(n for n in en_grilla[rid] if n != titulo)
+        if distintos:
+            problemas.append(
+                f"«{rid}» se llama «{titulo}» en el recetario y "
+                f"«{', '.join(distintos)}» en la grilla"
+            )
+
+    if problemas:
+        raise ErrorNutriOS(
+            "El plan y el recetario no coinciden, así que no se emite ninguno de los "
+            "dos:\n  - " + "\n  - ".join(problemas) + "\n"
+            "    Un recetario que no corresponde al plan es peor que no tener recetario: "
+            "la madre lee un nombre en la grilla, busca la receta y encuentra otra cosa. "
+            "En el primer caso real eso significó buscar unas trufas de pecana y "
+            "encontrar una receta con mantequilla de maní.\n"
+            "    Solución: instancia con prompts/P1_RECETAS.md las que falten, retira de "
+            f"{DIR_RECETAS_PACIENTE}/ las que ya no correspondan, y vuelve a ensamblar y "
+            "validar."
+        )
+
+
 def construir_hojas(plan: dict, caras: bool) -> list[dict]:
     """
     Convierte el plan en hojas de horario.
@@ -420,6 +484,23 @@ def renderizar(nombre_carpeta: str, caras: bool = False, fotos: bool = True) -> 
                     titulo = titulos.get(item.get("receta_id") or "")
                     if titulo:
                         item["nombre"] = titulo
+    # --- O-3 · el plan y su recetario se emiten juntos o no se emiten -------
+    # El recetario decía en portada «estas son las preparaciones que aparecen en
+    # el plan» y era falso: cinco preparaciones de la grilla no tenían receta y
+    # siete recetas no aparecían en ningún día. Y no era azar — Compota de
+    # manzana / Compota de pera, Paletas de fresa / Paletas de mango, Trufas de
+    # pecana / Trufas de garbanzo—: los dos documentos salieron de
+    # instanciaciones distintas de la misma base.
+    #
+    # La consecuencia no es cosmética. La madre lee «Trufas de pecana» en el
+    # plan, busca la receta y encuentra una con mantequilla de maní. Pecana y
+    # maní no son el mismo fruto seco ni el mismo alérgeno.
+    #
+    # Se comprueba contando, no leyendo, y aquí y no en el validador porque esto
+    # es una propiedad de lo que se IMPRIME. Si falla, no sale ninguno de los
+    # dos PDF: medio par no sirve de nada.
+    _comprobar_par(plan, instanciadas, titulos)
+
     env = _entorno()
     css_base = CSS(filename=str(PLANTILLAS / "estilo.css"))
     css_plan = CSS(filename=str(PLANTILLAS / "plan.css"))

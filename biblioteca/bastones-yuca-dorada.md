@@ -4,10 +4,17 @@ tipo: base
 titulo: Bastones de tubérculo
 subtitulo: Sancochado y dorado
 edad_min_meses: 12
-momento: [desayuno]
-componente: acompanante
+momento: [almuerzo, cena]
+componente: carbohidrato
 familia:
 textura: seca
+roles: [tuberculo]
+base_botanica: yuca
+demanda_oral: 3
+carga_visual: 2
+unidad_natural: "3 bastones"
+densidad_kcal: alta
+tiempo_min: 30
 aporta: [energia, grasas_saludables]
 alergenos_posibles: []
 origen: creada

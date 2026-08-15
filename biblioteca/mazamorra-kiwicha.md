@@ -8,6 +8,15 @@ momento: [media_tarde, media_manana]
 componente: base
 familia:
 textura: humeda
+roles: [cereal]
+base_botanica: kiwicha
+grano_base: kiwicha
+demanda_oral: 1
+carga_visual: 0
+unidad_natural: "½ taza"
+hierro_no_hemo: true
+densidad_kcal: media
+tiempo_min: 25
 aporta: [hierro, fibra]
 alergenos_posibles: []
 origen: creada
